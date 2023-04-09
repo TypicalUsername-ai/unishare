@@ -4,14 +4,19 @@ import {
 	createBrowserRouter,
 	RouterProvider
 } from 'react-router-dom'
-import App from './App'
+import Home from './Home'
 import './index.css'
+import Account from './Account'
 
 const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <App />,
-  },
+	{
+		path: "/app/home",
+		element: <Home />,
+	},
+	{
+		path: "/app/account",
+		element: <Account />,
+	}
 ]);
 
 ReactDOM.createRoot(document.getElementById('root')).render(
