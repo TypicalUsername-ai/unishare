@@ -4,23 +4,18 @@ import {
 	createBrowserRouter,
 	RouterProvider
 } from 'react-router-dom'
-import Home from './Home'
 import './index.css'
-import Account from './Account'
+import routes from './routes'
+import NavMenu from './components/NavMenu'
 
-const router = createBrowserRouter([
-	{
-		path: "/app/home",
-		element: <Home />,
-	},
-	{
-		path: "/app/account",
-		element: <Account />,
-	}
-]);
+const router = createBrowserRouter(routes, {basename: '/app'});
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
+	<div className="TopMenu">
+		<div> UniShare </div>
+		<NavMenu/>
+	</div>
     <RouterProvider router={router}/>
   </React.StrictMode>,
 )

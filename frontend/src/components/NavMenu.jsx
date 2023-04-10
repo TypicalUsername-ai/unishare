@@ -7,7 +7,7 @@ function NavMenu() {
 		<NavigationMenu.Root className='NavigationMenuRoot' orientation="horizontal">
 			<NavigationMenu.List className='NavigationMenuList'>
 				<NavigationMenu.Item className='NavigationMenuItem'>
-					<NavigationMenu.Link className='NavigationMenuLink' href='/app/home'> Home </NavigationMenu.Link>
+					<NavigationMenu.Link className='NavigationMenuLink' href='/app'> Home </NavigationMenu.Link>
 				</NavigationMenu.Item>
 			
 				<NavigationMenu.Item className='NavigationMenuItem'>
