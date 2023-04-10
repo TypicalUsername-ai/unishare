@@ -1,11 +1,17 @@
-use actix_web::{HttpServer, web, App, get, Error};
+use actix_web::{HttpServer, web, App, get, Error, middleware::Logger};
 use actix_files as fs;
+use env_logger::Env;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+
+    env_logger::init_from_env(Env::default().default_filter_or("info"));
+
     HttpServer::new(|| {
         App::new()
-            .service(web::redirect("/", "/app/home"))
+            .wrap(Logger::default())
+            .wrap(Logger::new("%a %{User-Agent}i"))
+            .service(web::redirect("/", "/app/"))
             .service(fs::Files::new("/assets", "../frontend/dist/assets"))
             .service(app)
             .service(web::scope("/api"))
