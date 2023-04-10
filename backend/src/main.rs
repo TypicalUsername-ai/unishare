@@ -1,6 +1,7 @@
-use actix_web::{HttpServer, web, App, get, Error, middleware::Logger};
-use actix_files as fs;
+use actix_web::{HttpServer, App, middleware::Logger};
 use env_logger::Env;
+
+mod services;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -11,18 +12,10 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .wrap(Logger::default())
             .wrap(Logger::new("%a %{User-Agent}i"))
-            .service(web::redirect("/", "/app/"))
-            .service(fs::Files::new("/assets", "../frontend/dist/assets"))
-            .service(app)
-            .service(web::scope("/api"))
+            .configure(services::webapp::webapp_config)
     })
     .bind(("127.0.0.1", 8080))?
     .run()
     .await
 }
 
-#[get("/app/{trail:.*}")]
-async fn app() -> Result<fs::NamedFile, Error> {
-    let file = fs::NamedFile::open_async("../frontend/dist/index.html").await?;
-    Ok(file)
-}
