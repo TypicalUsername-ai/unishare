@@ -1,0 +1,8 @@
+CREATE DATABASE unishare;
+
+CREATE USER unishare_root WITH PASSWORD 'ss2023_unishare' SUPERUSER CREATEDB;
+
+CREATE SCHEMA unishare;
+
+-- GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO unishare_root;
+-- GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA unishare TO unishare_root;
