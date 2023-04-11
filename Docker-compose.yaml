@@ -1,0 +1,39 @@
+services:
+  db:
+    container_name: psql_db
+    image: postgres:15-bullseye
+    environment:
+      - POSTGRES_PASSWORD=ss2023_unishare
+      - PG_TRUST_LOCALNET=true
+    expose:
+      - 5432
+    ports:
+      - target: 5432
+        published: 5500
+        protocol: tcp
+        mode: host
+    volumes:
+      - ./database/1-unishare.sql:/docker-entrypoint-initdb.d/1-unishare.sql
+      - ./database/data:/var/lib/postgresql/data
+
+  unishare-server:
+    container_name: unishare_main
+    environment:
+      - DATABASE_URL=postgres://unishare_root:ss2023_unishare@psql_db:5432/unishare
+    expose: 
+      - 8080
+    ports:
+      - target: 8080
+        published: 80
+        protocol: tcp
+        mode: host
+
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./backend:/usr/src/backend
+      - ./frontend:/usr/src/frontend
+    working_dir: /usr/src/
+    stdin_open: true
+    tty: true
