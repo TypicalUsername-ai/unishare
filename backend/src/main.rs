@@ -1,4 +1,4 @@
-use actix_web::{HttpServer, App, middleware::Logger};
+use actix_web::{HttpServer, App, middleware::Logger, web};
 use env_logger::Env;
 
 mod services;
@@ -13,6 +13,10 @@ async fn main() -> std::io::Result<()> {
             .wrap(Logger::default())
             .wrap(Logger::new("%a %{User-Agent}i"))
             .configure(services::webapp::webapp_config)
+            .service(
+                web::scope("/api")
+                .configure(services::auth::auth_config)
+            )
     })
     .bind(("127.0.0.1", 8080))?
     .run()
