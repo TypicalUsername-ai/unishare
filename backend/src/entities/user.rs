@@ -1,9 +1,9 @@
 use crate::schema::users;
 use serde::{Serialize, Deserialize};
 use uuid::Uuid;
-use diesel::Insertable;
+use diesel::{Insertable, Queryable};
 
-#[derive(Debug, Insertable, Serialize, Deserialize)]
+#[derive(Debug, Insertable, Queryable, Serialize, Deserialize)]
 #[diesel(table_name = users)]
 pub struct User {
     id: Uuid,
