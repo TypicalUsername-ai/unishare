@@ -38,7 +38,7 @@ import Field from "./field";
         setUserData((prevData) => ({...prevData, [name]: value }));
     };
      
-    const handleSave = () => {
+    const handleSave = async () => {
         const errors = validateData();
         if (Object.keys(errors).length){
             setErrors(errors);
@@ -46,6 +46,14 @@ import Field from "./field";
         }
         setErrors({});
         console.log(userData);
+	const response = await fetch(
+		"http://localhost/api/register",
+		{
+			method: "POST",
+			body: JSON.stringify({username: userData.username, email: userData.email, password: userData.password})
+		}
+	)
+	conosle.log(response)
         setOpen(false);
         window.clearTimeout(timerRef.current);
         timerRef.current = window.setTimeout(() => {
