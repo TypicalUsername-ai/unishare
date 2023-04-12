@@ -32,4 +32,3 @@ RUN apt update
 RUN apt install libpq-dev -y
 # installing the diesel cli interface with only the needed functionality (PostgreSQL)
 RUN cargo install diesel_cli --no-default-features --features postgres
-

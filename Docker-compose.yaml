@@ -20,19 +20,22 @@ services:
     container_name: unishare_main
     environment:
       - DATABASE_URL=postgres://unishare_root:ss2023_unishare@psql_db:5432/unishare
+      - HASH_SALT=VW5Jc0hhUmU
     expose: 
       - 8080
     ports:
-      - 8080:80
+      - target: 8080
+        published: 80
+        protocol: tcp
+        mode: host
     build:
       context: .
       dockerfile: Dockerfile
     volumes:
       - ./backend:/usr/src/backend
       - ./frontend:/usr/src/frontend
+      - ./startup.sh:/usr/src/startup.sh
     working_dir: /usr/src/
     stdin_open: true
     tty: true
-      #   entrypoint: [
-      #"/bin/bash -c /usr/src/startup.sh",
-      #]
+    entrypoint: "/bin/bash -c /usr/src/startup.sh"
