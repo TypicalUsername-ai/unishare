@@ -49,8 +49,9 @@ import Field from "./field";
 	const response = await fetch(
 		"http://localhost/api/register",
 		{
-			method: "POST",
-			body: JSON.stringify({username: userData.username, email: userData.email, password: userData.password})
+			method: 'POST',
+			body: JSON.stringify({username : userData.username, email: userData.email, password: userData.password}),
+			headers: {'Content-Type' : 'application/json'}
 		}
 	)
 	console.log(response)
