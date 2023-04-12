@@ -1,9 +1,10 @@
 use actix_web::web::Data;
 // authorization services go here
-use actix_web::{web, get, post, Responder, Error, HttpResponse};
+use actix_web::{web, get, post, Responder, HttpResponse};
 use diesel::{prelude::*, r2d2::{Pool, ConnectionManager}, pg::PgConnection, insert_into};
-
+use log::warn;
 use crate::entities::user::{NewUser, User};
+use crate::entities::error::{Error, ErrorType};
 use crate::schema::users::dsl::*;
 
 pub fn auth_config(cfg: &mut web::ServiceConfig) {
@@ -13,15 +14,28 @@ pub fn auth_config(cfg: &mut web::ServiceConfig) {
 
 }
 
-#[get("/auth")]
+#[get("/hello")]
 async fn auth() -> impl Responder {
     HttpResponse::Ok().body("{ message : hello from auth }")
 }
 
 #[post("/register")]
-async fn create_user(data: web::Json<NewUser>, pool: Data<Pool<ConnectionManager<PgConnection>>>) -> Result<impl Responder, Error>{
+async fn create_user(data: web::Json<NewUser>, pool: Data<Pool<ConnectionManager<PgConnection>>>) -> impl Responder{
     let to_register= User::from(data.into_inner());
     let mut conn = pool.get().expect("Failed to get connection from the pool");
-    let insert_op: Vec<User> = insert_into(users).values(to_register).get_results(&mut conn).expect("Error inserting user to database");
-    Ok(web::Json(insert_op))
+    let matches: Vec<User> = users
+        .filter(user_email.eq(&to_register.user_email.clone()))
+        .or_filter(username.eq(&to_register.username.clone()))
+        .get_results(&mut conn)
+        .expect("DB query failed");
+    if matches.len() != 0 {
+        warn!("{:?}", matches);
+        HttpResponse::Forbidden()
+            .json(Error{ err_type: ErrorType::DuplicateCredentials, reason: "account with credentials already exists".to_string()})
+    } else {
+
+        let insert_op: Vec<User> = insert_into(users).values(to_register).get_results(&mut conn).expect("Error inserting user to database");
+        HttpResponse::Created()
+            .json(insert_op)
+    }
 }

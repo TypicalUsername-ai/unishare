@@ -7,9 +7,9 @@ use argon2::{Argon2, PasswordHasher, password_hash::SaltString};
 #[derive(Debug, Insertable, Queryable, Serialize, Deserialize)]
 #[diesel(table_name = users)]
 pub struct User {
-    id: Uuid,
-    username: String,
-    user_email: String,
+    pub id: Uuid,
+    pub username: String,
+    pub user_email: String,
     password_hash: String,
 }
 
