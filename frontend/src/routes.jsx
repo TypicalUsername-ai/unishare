@@ -1,5 +1,6 @@
 import Home from './Home'
 import Account from './Account'
+import Registration from './Registration'
 
 const routes = [
 	{
@@ -9,6 +10,10 @@ const routes = [
 	{
 		path: "/account",
 		element: <Account />
+	},
+	{
+		path: "/registration",
+		element: <Registration />
 	}
 ]
 
