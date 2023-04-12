@@ -1,5 +1,5 @@
-import UserForm from "./userForm";
-import "./form.css";
+import UserForm from "./components/UserForm";
+import "./components/form.css";
 import RegSuccess from "./components/RegSuccess";
 
 export default function Registration () {
