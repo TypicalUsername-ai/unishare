@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import validator from "validator";
 import "./form.css";
-import "./index.css";
+// import "./index.css"; not necessary <?>
 
 import * as Toast from '@radix-ui/react-toast';
+import Field from "./field";
 
  const UserForm = ({onSave, user={}}) => {
     const [userData, setUserData] = useState(user);
@@ -56,18 +57,16 @@ import * as Toast from '@radix-ui/react-toast';
     return(
         <div className="formContainer">
             
-                <p className="formLabel">Username</p>
-                <input className="formInput" name='username' value={username} onChange={handleChange}/>
+		<Field text="username" default="e.g. yourusername" name="username" onChange={handleChange}/>
                 <div className="errorInformation">{errors.name}</div>
 
 
-                <p className="formLabel">Email</p>
-                <input className="formInput" name='email' value={email} onChange={handleChange}/>
+	    	<Field text="e-mail" default="e.g. name@domain.com" name="email" onChange={handleChange}/>
                 <div className="errorInformation">{errors.email}</div>
 
-                <p className="formLabel">Password</p>
-                <input className="formInput" name='password' value={password} onChange={handleChange}/>
+		<Field text="password" type="password" default="password" name="password" onChange={handleChange}/>
                 <div className="errorInformation">{errors.password}</div>
+
             
                     <Toast.Provider swipeDirection="right">
                         <button
