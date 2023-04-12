@@ -53,7 +53,7 @@ import Field from "./field";
 			body: JSON.stringify({username: userData.username, email: userData.email, password: userData.password})
 		}
 	)
-	conosle.log(response)
+	console.log(response)
         setOpen(false);
         window.clearTimeout(timerRef.current);
         timerRef.current = window.setTimeout(() => {
