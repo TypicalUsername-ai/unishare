@@ -30,9 +30,8 @@ services:
     volumes:
       - ./backend:/usr/src/backend
       - ./frontend:/usr/src/frontend
+      - ./startup.sh:/usr/src/startup.sh
     working_dir: /usr/src/
     stdin_open: true
     tty: true
-      #   entrypoint: [
-      #"/bin/bash -c /usr/src/startup.sh",
-      #]
+    entrypoint: "/bin/bash -c /usr/src/startup.sh"
