@@ -20,6 +20,7 @@ services:
     container_name: unishare_main
     environment:
       - DATABASE_URL=postgres://unishare_root:ss2023_unishare@psql_db:5432/unishare
+      - HASH_SALT=VW5Jc0hhUmU
     expose: 
       - 8080
     ports:
