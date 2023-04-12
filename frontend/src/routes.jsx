@@ -4,7 +4,7 @@ import Registration from './Registration'
 
 const routes = [
 	{
-		path: "/",
+		path: "/home",
 		element: <Home />
 	},
 	{

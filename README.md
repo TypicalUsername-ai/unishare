@@ -61,26 +61,12 @@ The app is a content management system for notes, flashcards, and other learning
 ```
 ~/ docker compose up
 ```
-1. Build the frontend files to serve them
-```
-~/ cd frontend
-~/frontent/ npm run build
-```
-1. Build the project files
-```
-~/ cd backend
-~/backend/ cargo build --release
-```
-1. Connect to the docker container
-```
-~/ docker attach container_name
-```
-1. Run the diesel migration
-```
-(docker) ~/ diesel migration redo
-```
-1. Start the actix server
-```
-(docker) ~/ ./target/release/executable_name
-```
 
+1. The docker container will set everything up and when the first actix message info appears the server can be connected to on localhost port 80
+
+## Development
+
+- Database data is pewsitend in the `/database/data` folder
+- The `backend`, `frontend` folders and the `startup.sh` file are mounted into the main container
+- To refresh the made changes to the `actix-web` server the docker image has to be restarted (may be subject to change)
+- to refresh the changes in the react app the command `npm run build` can be executed inside the `frontend` folder of the container

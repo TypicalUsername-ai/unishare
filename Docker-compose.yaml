@@ -23,7 +23,10 @@ services:
     expose: 
       - 8080
     ports:
-      - 8080:80
+      - target: 8080
+        published: 80
+        protocol: tcp
+        mode: host
     build:
       context: .
       dockerfile: Dockerfile
