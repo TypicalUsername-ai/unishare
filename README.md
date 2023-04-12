@@ -66,7 +66,7 @@ The app is a content management system for notes, flashcards, and other learning
 
 ## Development
 
-- Database data is pewsitend in the `/database/data` folder
+- Database data is persitent in the `/database/data` folder
 - The `backend`, `frontend` folders and the `startup.sh` file are mounted into the main container
 - To refresh the made changes to the `actix-web` server the docker image has to be restarted (may be subject to change)
 - to refresh the changes in the react app the command `npm run build` can be executed inside the `frontend` folder of the container
