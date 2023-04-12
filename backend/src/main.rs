@@ -2,6 +2,8 @@ use actix_web::{HttpServer, App, middleware::Logger, web};
 use env_logger::Env;
 
 mod services;
+mod entities;
+mod schema;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {

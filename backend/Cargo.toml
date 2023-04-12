@@ -8,4 +8,7 @@ edition = "2021"
 [dependencies]
 actix-files = "0.6.2"
 actix-web = { version = "4.3.1", features = ["cookies"] }
+diesel = { version = "2.0.3", default-features = false, features = ["postgres", "uuid", "r2d2"] }
 env_logger = "0.10.0"
+serde = { version = "1.0.160", features = ["derive"] }
+uuid = { version = "1.3.1", features = ["v4", "fast-rng", "serde"] }
