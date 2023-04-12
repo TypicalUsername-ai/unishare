@@ -9,5 +9,5 @@ pub fn auth_config(cfg: &mut web::ServiceConfig) {
 
 #[get("/auth")]
 async fn auth() -> impl Responder {
-    HttpResponse::Ok().body("hello from auth")
+    HttpResponse::Ok().body("{ message : hello from auth }")
 }

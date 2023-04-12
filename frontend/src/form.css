@@ -1,0 +1,48 @@
+.registrationContainer{
+    position: relative;
+    width: fit-content;
+    height: 500px;
+    margin:auto;
+    background-color:#4CA1AF;
+    padding: 50px;
+    padding-top: 10px;
+}
+.formContainer{
+    display: flex;
+    flex-direction: column;
+}
+.formLabel{
+    font-size: 18px;
+}
+.formInput{
+    font-size: 15px;
+    width: 75%;
+    background-color: #e4ebf1;
+    border: none;
+    height: 35px;
+    color: #1a1a1a;
+}
+
+.formButton {
+    border-radius: 8px;
+    border: 1px solid transparent;
+    padding: 0.6em 1.2em;
+    font-size: 1em;
+    font-weight: 500;
+    font-family: inherit;
+    background-color: #1a1a1a;
+    cursor: pointer;
+    transition: border-color 0.25s;
+    margin-top: 100px;
+  }
+  button:hover {
+    border-color: #646cff;
+  }
+  button:focus,
+  button:focus-visible {
+    outline: 4px auto -webkit-focus-ring-color;
+  }
+.errorInformation{
+    height: 20px;
+    color: red;
+}

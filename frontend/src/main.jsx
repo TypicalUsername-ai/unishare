@@ -8,7 +8,7 @@ import './index.css'
 import routes from './routes'
 import NavMenu from './components/NavMenu'
 
-const router = createBrowserRouter(routes, {basename: '/app'});
+const router = createBrowserRouter(routes, {basename: '/app/'});
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

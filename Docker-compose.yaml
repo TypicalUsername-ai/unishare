@@ -9,7 +9,7 @@ services:
       - 5432
     ports:
       - target: 5432
-        published: 5500
+        published: 5555
         protocol: tcp
         mode: host
     volumes:
@@ -23,11 +23,7 @@ services:
     expose: 
       - 8080
     ports:
-      - target: 8080
-        published: 80
-        protocol: tcp
-        mode: host
-
+      - 8080:80
     build:
       context: .
       dockerfile: Dockerfile
@@ -37,3 +33,6 @@ services:
     working_dir: /usr/src/
     stdin_open: true
     tty: true
+      #   entrypoint: [
+      #"/bin/bash -c /usr/src/startup.sh",
+      #]
