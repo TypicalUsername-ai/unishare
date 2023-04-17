@@ -6,6 +6,7 @@ use log::warn;
 use crate::entities::user::{NewUser, User};
 use crate::entities::error::{Error, ErrorType};
 use crate::schema::users::dsl::*;
+use actix_web::cookie;
 
 pub fn auth_config(cfg: &mut web::ServiceConfig) {
     cfg
@@ -14,7 +15,7 @@ pub fn auth_config(cfg: &mut web::ServiceConfig) {
 
 }
 
-type connectionPool = Pool<ConnectionManager<PgConnection>>;
+type ConnectionPool = Pool<ConnectionManager<PgConnection>>;
 
 #[get("/hello")]
 async fn auth() -> impl Responder {
@@ -22,7 +23,7 @@ async fn auth() -> impl Responder {
 }
 
 #[post("/register")]
-async fn create_user(data: web::Json<NewUser>, pool: Data<connectionPool>) -> impl Responder{
+async fn create_user(data: web::Json<NewUser>, pool: Data<ConnectionPool>) -> impl Responder{
     let to_register= User::from(data.into_inner());
     let mut conn = pool.get().expect("Failed to get connection from the pool");
     let matches: Vec<User> = users
@@ -43,6 +44,20 @@ async fn create_user(data: web::Json<NewUser>, pool: Data<connectionPool>) -> im
 }
 
 #[post("/login")]
-async fn user_login(data: , pool: Data<connectionPool>) -> impl Responder {
+async fn user_login(data: , pool: Data<ConnectionPool>) -> impl Responder {
+    // extract data
+    // find user in db
+    // create a cookie
+    // store a cookie in db
+    // return cookie
+    todo!()
+}
+
+#[post("/logout")]
+async fn user_logout(data: , pool: Data<ConnectionPool>) -> impl Responder {
+    // extract cookie data
+    // find cookie / session in db
+    // delete session from db
+    // return invalidate cookie header
     todo!()
 }
