@@ -14,13 +14,15 @@ pub fn auth_config(cfg: &mut web::ServiceConfig) {
 
 }
 
+type connectionPool = Pool<ConnectionManager<PgConnection>>;
+
 #[get("/hello")]
 async fn auth() -> impl Responder {
     HttpResponse::Ok().body("{ message : hello from auth }")
 }
 
 #[post("/register")]
-async fn create_user(data: web::Json<NewUser>, pool: Data<Pool<ConnectionManager<PgConnection>>>) -> impl Responder{
+async fn create_user(data: web::Json<NewUser>, pool: Data<connectionPool>) -> impl Responder{
     let to_register= User::from(data.into_inner());
     let mut conn = pool.get().expect("Failed to get connection from the pool");
     let matches: Vec<User> = users
@@ -38,4 +40,9 @@ async fn create_user(data: web::Json<NewUser>, pool: Data<Pool<ConnectionManager
         HttpResponse::Created()
             .json(insert_op)
     }
+}
+
+#[post("/login")]
+async fn user_login(data: , pool: Data<connectionPool>) -> impl Responder {
+    todo!()
 }
