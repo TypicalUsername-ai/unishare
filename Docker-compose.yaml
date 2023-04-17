@@ -1,6 +1,6 @@
 services:
   db:
-    container_name: psql_db
+    container_name: unishare_db
     image: postgres:15-bullseye
     environment:
       - POSTGRES_PASSWORD=ss2023_unishare
@@ -19,7 +19,7 @@ services:
   unishare-server:
     container_name: unishare_main
     environment:
-      - DATABASE_URL=postgres://unishare_root:ss2023_unishare@psql_db:5432/unishare
+      - DATABASE_URL=postgres://unishare_root:ss2023_unishare@unishare_db:5432/unishare
       - HASH_SALT=VW5Jc0hhUmU
     expose: 
       - 8080
