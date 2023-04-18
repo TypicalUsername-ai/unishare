@@ -1,7 +1,6 @@
 use actix_web::{HttpServer, App, middleware::Logger, web};
 use env_logger::Env;
 use diesel::{r2d2::{ConnectionManager, Pool}, pg::PgConnection};
-use argon2::Argon2;
 
 mod services;
 mod entities;

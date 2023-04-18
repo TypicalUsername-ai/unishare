@@ -5,12 +5,13 @@ use uuid::Uuid;
 use crate::schema::sessions;
 use serde_json;
 use sha256;
+use base64::{Engine as _, engine::general_purpose};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Session {
     #[serde(flatten)]
     session_data: SessionData,
-    signature: String
+    pub signature: String
 }
 
 impl Session {
@@ -24,13 +25,31 @@ impl Session {
     }
 
     fn sign(mut self) -> Self {
-        let payload_bytes = serde_json::to_string(&self.session_data).expect("Error serializing into JSON");
-        self.signature = sha256::digest(payload_bytes+std::env!("HASH_SALT"));
+        self.signature = self.generate_signature();
         self
+    }
+
+    fn generate_signature(&self) -> String {
+        let payload = serde_json::to_string(&self.session_data).expect("Error serializing into JSON");
+        sha256::digest(payload+std::env!("HASH_SALT"))
+    }
+
+    pub fn validate(&self) -> bool {
+        self.generate_signature() == self.signature
     }
 
     pub fn data(&self) -> SessionData {
         self.session_data.clone()
+    }
+
+    pub fn create_token(&self) -> String {
+        general_purpose::STANDARD_NO_PAD.encode(serde_json::to_string(&self).expect("Failed json serailization"))
+    }
+
+    pub fn try_from_token(base64encoded: String) -> Result<Self, serde_json::Error> {
+        let json_bytes = general_purpose::STANDARD_NO_PAD.decode(base64encoded).expect("Failed b64 decode");
+        let json_string = String::from_utf8(json_bytes).expect("Failed [u8] string conversion");
+        serde_json::from_str(&json_string)
     }
 
 }
@@ -39,9 +58,9 @@ impl Session {
 #[derive(Debug, Serialize, Deserialize, Insertable, Queryable, Clone)]
 #[diesel(table_name = sessions)]
 pub struct SessionData {
-    session_id: Uuid,
-    user_id: Uuid,
-    expires_at: SystemTime,
+    pub session_id: Uuid,
+    pub user_id: Uuid,
+    pub expires_at: SystemTime,
 }
 
 impl SessionData {

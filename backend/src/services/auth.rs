@@ -1,9 +1,11 @@
+use std::time::SystemTime;
+
 // authorization services go here
-use actix_web::{web, get, post, Responder, HttpResponse};
+use actix_web::{web, get, post, Responder, HttpResponse, cookie::Cookie};
 use diesel::{prelude::*, r2d2::{Pool, ConnectionManager}, pg::PgConnection, insert_into};
 use log::warn;
 use uuid::Uuid;
-use crate::entities::{user::{NewUser, User}, session::Session};
+use crate::entities::{user::{NewUser, User}, session::{Session, SessionData}};
 use crate::entities::error::{Error, ErrorType};
 use crate::schema::users;
 use crate::schema::sessions;
@@ -69,7 +71,7 @@ async fn user_login(basic_auth: BasicAuth, pool: web::Data<ConnectionPool>) -> i
                 .values(jwt.data())
                 .execute(& mut conn);
             // return cookie
-            HttpResponse::Ok().json(jwt)
+            HttpResponse::Ok().insert_header(("X-AUTH", jwt.create_token())).json(jwt)
         }
         Err(err) => {
             HttpResponse::Unauthorized().finish()
@@ -81,10 +83,30 @@ async fn user_login(basic_auth: BasicAuth, pool: web::Data<ConnectionPool>) -> i
 #[post("/logout")]
 async fn user_logout(bearer_auth: BearerAuth, pool: web::Data<ConnectionPool>) -> impl Responder {
     // extract cookie data
-    warn!("{:?}", bearer_auth);
-    // find cookie / session in db
-    // delete session from db
-    // return invalidate cookie header
-    todo!();
-    HttpResponse::InternalServerError()
+    let token = Session::try_from_token(bearer_auth.token().to_owned());
+
+    match token {
+        Ok(session) => {
+            // validate authenticity
+            match session.validate() {
+                true => {
+                    let data = session.data();
+                    // find cookie / session in db (not needed?)
+                    if data.expires_at >= SystemTime::now() {
+                        HttpResponse::Ok().finish()
+                    } else {
+                        HttpResponse::Unauthorized().finish()
+                    }
+                    // delete session from db
+                    // return invalidate cookie header
+                }
+                false => {
+                    HttpResponse::Unauthorized().finish()
+                }
+            }
+        }
+        Err(e) => {
+            HttpResponse::Unauthorized().finish()
+        }
+    }
 }

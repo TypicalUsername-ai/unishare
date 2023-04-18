@@ -1413,6 +1413,7 @@ dependencies = [
  "actix-web",
  "actix-web-httpauth",
  "argon2",
+ "base64 0.21.0",
  "diesel",
  "env_logger",
  "log",
