@@ -7,6 +7,8 @@ use crate::entities::user::{NewUser, User};
 use crate::entities::error::{Error, ErrorType};
 use crate::schema::users::dsl::*;
 use actix_web::cookie;
+use actix_web::http::header;
+use actix_web_httpauth::extractors::bearer;
 
 pub fn auth_config(cfg: &mut web::ServiceConfig) {
     cfg
@@ -18,7 +20,8 @@ pub fn auth_config(cfg: &mut web::ServiceConfig) {
 type ConnectionPool = Pool<ConnectionManager<PgConnection>>;
 
 #[get("/hello")]
-async fn auth() -> impl Responder {
+async fn auth(auth: bearer::BearerAuth) -> impl Responder {
+    warn!("Authorization attempt with token <{}>", auth.token());
     HttpResponse::Ok().body("{ message : hello from auth }")
 }
 
@@ -44,20 +47,22 @@ async fn create_user(data: web::Json<NewUser>, pool: Data<ConnectionPool>) -> im
 }
 
 #[post("/login")]
-async fn user_login(data: , pool: Data<ConnectionPool>) -> impl Responder {
+async fn user_login(pool: Data<ConnectionPool>) -> impl Responder {
     // extract data
     // find user in db
     // create a cookie
     // store a cookie in db
     // return cookie
-    todo!()
+    todo!();
+    HttpResponse::InternalServerError()
 }
 
 #[post("/logout")]
-async fn user_logout(data: , pool: Data<ConnectionPool>) -> impl Responder {
+async fn user_logout(pool: Data<ConnectionPool>) -> impl Responder {
     // extract cookie data
     // find cookie / session in db
     // delete session from db
     // return invalidate cookie header
-    todo!()
+    todo!();
+    HttpResponse::InternalServerError()
 }
