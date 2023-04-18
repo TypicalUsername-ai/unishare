@@ -5,7 +5,6 @@ diesel::table! {
         session_id -> Uuid,
         user_id -> Uuid,
         expires_at -> Timestamp,
-        signature -> Nullable<Text>,
     }
 }
 
