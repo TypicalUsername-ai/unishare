@@ -19,19 +19,24 @@ impl Session {
     }
 
     pub fn extend(mut self, time_secs: u64) -> Self {
-        self.session_data.extend(time_secs);
+        self.session_data = self.session_data.extend(time_secs);
         self.sign()
     }
 
     fn sign(mut self) -> Self {
         let payload_bytes = serde_json::to_string(&self.session_data).expect("Error serializing into JSON");
-        self.signature = sha256::digest(payload_bytes);
+        self.signature = sha256::digest(payload_bytes+std::env!("HASH_SALT"));
         self
     }
+
+    pub fn data(&self) -> SessionData {
+        self.session_data.clone()
+    }
+
 }
 
 /// An object containing all the necessary session data, without the cryptographic signature
-#[derive(Debug, Serialize, Deserialize, Insertable, Queryable)]
+#[derive(Debug, Serialize, Deserialize, Insertable, Queryable, Clone)]
 #[diesel(table_name = sessions)]
 pub struct SessionData {
     session_id: Uuid,
