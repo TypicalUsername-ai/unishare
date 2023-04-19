@@ -1,8 +1,7 @@
 use actix_web::{HttpServer, App, middleware::Logger, web};
-use actix_web_httpauth::middleware::HttpAuthentication;
 use env_logger::Env;
 use diesel::{r2d2::{ConnectionManager, Pool}, pg::PgConnection};
-use services::{tokenMiddleware::{self, validator}, auth};
+use services::auth;
 
 mod services;
 mod entities;

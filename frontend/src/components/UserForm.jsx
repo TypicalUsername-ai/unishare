@@ -14,6 +14,9 @@ const UserForm = ({ onSave, user = {} }) => {
     const [open, setOpen] = React.useState(false);
     const timerRef = React.useRef(0);
 
+    const [title, setTitle] = useState("Registration succesful");
+    const [text, setText] = useState("Verification sent to provided email");
+
     const { username, email, password } = userData;
     const specialCharacter = (character) => {
         for (let i = 0; i < specialCharacters.length; i++) {
@@ -63,23 +66,32 @@ const UserForm = ({ onSave, user = {} }) => {
         }
         setErrors({});
         console.log(userData);
-        // const response = await fetch(
-        //     "http://localhost/api/register",
-        //     {
-        //         method: 'POST',
-        //         body: JSON.stringify({ username: userData.username, email: userData.email, password: userData.password }),
-        //         headers: { 'Content-Type': 'application/json' }
-        //     }
-        // )
-        //console.log(response)
+	const response = await fetch(
+		"http://localhost/api/register",
+		{
+			method: 'POST',
+			body: JSON.stringify({ username: userData.username, email: userData.email, password: userData.password }),
+			headers: { 'Content-Type': 'application/json' }
+		}
+	);
+	let resdata = await response.text();
+	console.log(response, resdata);
+	if(response.status !== 201){
+		setTitle("Registration error!");
+		setText(`Reason : ${resdata}`);
+	}else{
+		setText(`Verification email sent to ${email}`);
+	}
         setOpen(false);
         window.clearTimeout(timerRef.current);
         timerRef.current = window.setTimeout(() => {
             setOpen(true);
-            window.location.href = "/app/registrationsuc";
 
-        }, 100);
-        onSave(userData);
+        }, 150);
+	if(response.status === 201){
+		window.location.href = "/app/registrationsuc";
+		onSave(userData);
+	}
     }
 
     return (
@@ -104,8 +116,8 @@ const UserForm = ({ onSave, user = {} }) => {
                         </button>
 
                 <Toast.Root className="ToastRoot" open={open} onOpenChange={setOpen}>
-                    <Toast.Title className="ToastTitle">Registration Successful</Toast.Title>
-                    <Toast.Description asChild><div className="FormInformation">Verification code sent to {email}</div>
+                    <Toast.Title className="ToastTitle">{title}</Toast.Title>
+                    <Toast.Description asChild><div className="FormInformation">{text}</div>
                     </Toast.Description>
                     <Toast.Action className="ToastAction" asChild altText="Goto schedule to undo">
                         <button className="Button small green">Close</button>
