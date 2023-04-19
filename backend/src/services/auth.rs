@@ -36,6 +36,13 @@ async fn test(auth: BearerAuth) -> impl Responder {
     HttpResponse::Ok().body("{ message : hello from auth }")
 }
 
+#[get("/confirm?<uid>")]
+async fn confirm_account(uid: &String, pool: web::Data<ConnectionPool>) -> impl Responder {
+    let mut conn = pool.get().expect("Failed to get connection from the pool");
+    let update_op = diesel::update(users::table).filter(uid.eq(uid)).set(confirmed.eq(true)).execute(&mut conn).expect("Error updating confirmed user in database");
+    HttpResponse::Ok().json(update_op)
+}
+
 /// Function for creation of new user objects
 /// The function requires a `JSON` encoded `NewUser` entity to be provided in the request body
 /// This function errors if the provided username is a duplicate
@@ -54,7 +61,7 @@ async fn create_user(data: web::Json<NewUser>, pool: web::Data<ConnectionPool>, 
             .json(Error{ err_type: ErrorType::DuplicateCredentials, reason: "account with credentials already exists".to_string()})
     } else {
         let insert_op: Vec<User> = insert_into(users::table).values(to_register).get_results(&mut conn).expect("Error inserting user to database");
-        let link = format!("{}/confirm?id={}", std::env!("HOSTNAME"), insert_op[0].id);
+        let link = format!("{}/confirm?uid={}", std::env!("HOSTNAME"), insert_op[0].id);
         let email = Message::builder()
             .from(Mailbox::new(None, std::env!("APP_MAIL").parse::<Address>().expect("error parsing user email")))
             .to(Mailbox::new(None, (insert_op[0].user_email).parse::<Address>().expect("error parsing user email")))
