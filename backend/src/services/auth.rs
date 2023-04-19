@@ -1,17 +1,13 @@
-use std::time::SystemTime;
-
 // authorization services go here
 use actix_web::{web, get, post, Responder, HttpResponse};
 use diesel::{prelude::*, r2d2::{Pool, ConnectionManager}, pg::PgConnection, insert_into};
 use log::warn;
 use uuid::Uuid;
 use crate::entities::{user::{NewUser, User}, session::{Session, AuthResponse}};
-use crate::entities::error::{Error, ErrorType};
+use crate::entities::error::UnishareError;
 use crate::schema::users;
 use crate::schema::sessions;
-use actix_web_httpauth::{extractors::{bearer::BearerAuth, basic::BasicAuth}, middleware::HttpAuthentication};
-
-use super::tokenMiddleware::validator;
+use actix_web_httpauth::extractors::{bearer::BearerAuth, basic::BasicAuth};
 
 /// Function for configuring the authorization and authentication based endpoints
 /// services:
@@ -24,8 +20,7 @@ pub fn auth_config(cfg: &mut web::ServiceConfig) {
         .service(test)
         .service(create_user)
         .service(user_login)
-        .service(user_logout)
-        .wrap(HttpAuthentication::bearer(validator));
+        .service(user_logout);
 
 }
 
@@ -52,8 +47,7 @@ async fn create_user(data: web::Json<NewUser>, pool: web::Data<ConnectionPool>) 
         .expect("DB query failed");
     if matches.len() != 0 {
         warn!("{:?}", matches);
-        HttpResponse::Forbidden()
-            .json(Error{ err_type: ErrorType::DuplicateCredentials, reason: "account with credentials already exists".to_string()})
+        HttpResponse::Forbidden().json(UnishareError::DuplicateCredentials)
     } else {
 
         let insert_op: Vec<User> = insert_into(users::table).values(to_register).get_results(&mut conn).expect("Error inserting user to database");
@@ -100,4 +94,5 @@ async fn user_login(basic_auth: BasicAuth, pool: web::Data<ConnectionPool>) -> i
 /// Not implemented yet
 #[post("/logout")]
 async fn user_logout(bearer_auth: BearerAuth, pool: web::Data<ConnectionPool>) -> impl Responder {
+    HttpResponse::Ok().finish()
 }

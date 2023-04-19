@@ -1,9 +1,9 @@
 use std::time::SystemTime;
 
 use actix_web::dev::ServiceRequest;
-use actix_web_httpauth::extractors::{bearer::BearerAuth, AuthenticationError};
+use actix_web_httpauth::extractors::bearer::BearerAuth;
 use actix_web::Error;
-use crate::entities::session::Session;
+use crate::entities::{session::Session, error::UnishareError};
 
 pub async fn validator(req: ServiceRequest, credentials: BearerAuth) -> Result<ServiceRequest, (Error, ServiceRequest)> {
     // extract cookie data
@@ -19,18 +19,18 @@ pub async fn validator(req: ServiceRequest, credentials: BearerAuth) -> Result<S
                     if data.expires_at >= SystemTime::now() {
                         Ok(req)
                     } else {
-                        Err((AuthenticationError::new().with_error_description("Token expired") ,req))
+                        Err((UnishareError::TokenExpired.into() ,req))
                     }
                     // delete session from db
                     // return invalidate cookie header
                 }
                 false => {
-                    Err((_ , req))
+                    Err((UnishareError::TokenInvalid.into() , req))
                 }
             }
         }
         Err(e) => {
-            Err((Error{err_type: ErrorType::TokenInvalid, reason: "Invalid token".to_owned()}, req))
+            Err((UnishareError::TokenInvalid.into(), req))
         }
     }
 
