@@ -1,4 +1,3 @@
-use base64::display;
 use serde::{Serialize, Deserialize};
 use derive_more::{Display, Error};
 use actix_web::{error, HttpResponse, http::StatusCode};
