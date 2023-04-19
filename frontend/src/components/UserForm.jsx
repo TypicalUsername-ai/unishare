@@ -9,12 +9,18 @@ import Field from "./field";
 const UserForm = ({ onSave, user = {} }) => {
     const [userData, setUserData] = useState(user);
     const [errors, setErrors] = useState({});
+    const specialCharacters = ['!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '-', '=', '+', '-', '/', '.', ',', '*', '-'];
 
     const [open, setOpen] = React.useState(false);
     const timerRef = React.useRef(0);
 
     const { username, email, password } = userData;
-
+    const specialCharacter = (character) => {
+        for (let i = 0; i < specialCharacters.length; i++) {
+            if (character == specialCharacters[i]) return true
+        }
+        return false
+    };
     const validateData = () => {
         let errors = {};
         if (!username) {
@@ -29,8 +35,16 @@ const UserForm = ({ onSave, user = {} }) => {
         if (!password) {
             errors.password = "A password is required!";
         }
-        if (password && password.length < 8) {
-            errors.password = "Password is too short! (I bet it has good personality tho)"
+        if (password) {
+            if (password.length < 8) { errors.password = "Password is too short!"; }
+            for (let i = 0; i < password.length; i++) {
+                if (specialCharacter(password[i]) == true) { break };
+                if (i + 1 == password.length) { errors.password = "Password needs to be more complex"; } // Dont ask me bro, it works ok?
+            }
+            if (/[A-Z]/.test(password) == false) {
+                errors.password = "Password needs at least 1 upper case character";
+            }
+
         }
 
         return errors;
@@ -43,21 +57,21 @@ const UserForm = ({ onSave, user = {} }) => {
 
     const handleSave = async () => {
         const errors = validateData();
-        if (Object.keys(errors).length) {
+        if (Object.keys(errors).length != 0) {
             setErrors(errors);
             return;
         }
         setErrors({});
         console.log(userData);
-        const response = await fetch(
-            "http://localhost/api/register",
-            {
-                method: 'POST',
-                body: JSON.stringify({ username: userData.username, email: userData.email, password: userData.password }),
-                headers: { 'Content-Type': 'application/json' }
-            }
-        )
-        console.log(response)
+        // const response = await fetch(
+        //     "http://localhost/api/register",
+        //     {
+        //         method: 'POST',
+        //         body: JSON.stringify({ username: userData.username, email: userData.email, password: userData.password }),
+        //         headers: { 'Content-Type': 'application/json' }
+        //     }
+        // )
+        //console.log(response)
         setOpen(false);
         window.clearTimeout(timerRef.current);
         timerRef.current = window.setTimeout(() => {

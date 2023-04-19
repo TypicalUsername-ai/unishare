@@ -16,7 +16,7 @@ export default function Registration() {
 
     return (
         <div className="registrationContainer">
-            <h1>UniShare Registration</h1>
+            <h1>UniShare Login</h1>
             <UserForm onSave={handleSave} {...{ user }} />
         </div>
     );

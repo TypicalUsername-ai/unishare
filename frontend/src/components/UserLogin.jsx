@@ -42,14 +42,15 @@ const UserForm = ({ onSave, user = {} }) => {
         }
         setErrors({});
         console.log(userData);
-        const response = await fetch(
-            "http://localhost/api/login",
-            {
-                method: 'POST',
-                body: JSON.stringify({ username: userData.username, password: userData.password }),
-                headers: { 'Content-Type': 'application/json' }
-            }
-        )
+        // let response = await fetch(
+        //     "http://localhost/api/login",
+        //     {
+        //         method: 'POST',
+        //         body: JSON.stringify({ username: userData.username, password: userData.password }),
+        //         headers: { 'Content-Type': 'application/json' }
+        //     }
+        // )
+        let response = 200;
         console.log(response)
         if (response == 200) {
             window.location.href = "/app/loggedin";
