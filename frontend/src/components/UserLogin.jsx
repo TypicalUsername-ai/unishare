@@ -60,14 +60,6 @@ const UserForm = ({ onSave, user = {} }) => {
             setErrors(errors);
             return;
         }
-        setErrors({});
-
-        setOpen(false);
-        window.clearTimeout(timerRef.current);
-        timerRef.current = window.setTimeout(() => {
-            setOpen(true);
-        }, 100);
-        onSave(userData);
     }
 
     return (
@@ -86,15 +78,6 @@ const UserForm = ({ onSave, user = {} }) => {
                     onClick={handleSave}>
                     Login
                         </button>
-
-                <Toast.Root className="ToastRoot" open={open} onOpenChange={setOpen}>
-                    <Toast.Title className="ToastTitle">Registration Successful</Toast.Title>
-                    <Toast.Description asChild><div className="FormInformation">Verification code sent to {email}</div>
-                    </Toast.Description>
-                    <Toast.Action className="ToastAction" asChild altText="Goto schedule to undo">
-                        <button className="Button small green">Close</button>
-                    </Toast.Action>
-                </Toast.Root>
                 <Toast.Viewport className="ToastViewport" />
             </Toast.Provider>
 
