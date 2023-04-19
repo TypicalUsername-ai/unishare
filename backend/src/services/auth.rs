@@ -8,6 +8,7 @@ use crate::entities::error::UnishareError;
 use crate::schema::users;
 use crate::schema::sessions;
 use actix_web_httpauth::extractors::{bearer::BearerAuth, basic::BasicAuth};
+use super::tokenMiddleware::validate_token;
 
 /// Function for configuring the authorization and authentication based endpoints
 /// services:
@@ -15,12 +16,12 @@ use actix_web_httpauth::extractors::{bearer::BearerAuth, basic::BasicAuth};
 ///     `create_user` - creates a new user
 ///     `user_login` - authorizes and existing user
 ///     `user_logout` - invalidates an existing session
-pub fn auth_open_config(cfg: &mut web::ServiceConfig) {
+pub fn auth_config(cfg: &mut web::ServiceConfig) {
     cfg
         .service(test)
         .service(create_user)
-        .service(user_login);
-
+        .service(user_login)
+        .service(user_logout);
 }
 
 type ConnectionPool = Pool<ConnectionManager<PgConnection>>;
@@ -36,7 +37,7 @@ async fn test(auth: BearerAuth) -> impl Responder {
 /// The function requires a `JSON` encoded `NewUser` entity to be provided in the request body
 /// This function errors if the provided username is a duplicate
 #[post("/register")]
-async fn create_user(data: web::Json<NewUser>, pool: web::Data<ConnectionPool>) -> impl Responder{
+async fn create_user(data: web::Json<NewUser>, pool: web::Data<ConnectionPool>) -> Result<impl Responder, UnishareError> {
     let to_register= User::from(data.into_inner());
     let mut conn = pool.get().expect("Failed to get connection from the pool");
     let matches: Vec<User> = users::table
@@ -46,12 +47,12 @@ async fn create_user(data: web::Json<NewUser>, pool: web::Data<ConnectionPool>) 
         .expect("DB query failed");
     if matches.len() != 0 {
         warn!("{:?}", matches);
-        HttpResponse::Forbidden().json(UnishareError::DuplicateCredentials)
+        Err(UnishareError::DuplicateCredentials)
     } else {
 
         let insert_op: Vec<User> = insert_into(users::table).values(to_register).get_results(&mut conn).expect("Error inserting user to database");
-        HttpResponse::Created()
-            .json(insert_op)
+        Ok(HttpResponse::Created()
+            .json(insert_op))
     }
 }
 
@@ -59,7 +60,7 @@ async fn create_user(data: web::Json<NewUser>, pool: web::Data<ConnectionPool>) 
 /// The endpoint is authorized with `Basic` authorization
 /// The basic auth header should be of form `Basic {B64encoded(login:password)}`
 #[post("/login")]
-async fn user_login(basic_auth: BasicAuth, pool: web::Data<ConnectionPool>) -> impl Responder {
+async fn user_login(basic_auth: BasicAuth, pool: web::Data<ConnectionPool>) -> Result<impl Responder, UnishareError> {
     // extract data
     let uname = basic_auth.user_id();
     let plaintext = basic_auth.password().unwrap_or("").to_owned();
@@ -80,12 +81,19 @@ async fn user_login(basic_auth: BasicAuth, pool: web::Data<ConnectionPool>) -> i
                 .values(jwt.data())
                 .execute(& mut conn);
             // return cookie
-            HttpResponse::Ok().json(AuthResponse::new(jwt.clone(), jwt.create_token()))
+            Ok(HttpResponse::Ok().json(AuthResponse::new(jwt.clone(), jwt.create_token())))
         }
         Err(err) => {
-            HttpResponse::Unauthorized().finish()
+            Err(UnishareError::BadCredentials)
 
         }
     }
 }
 
+/// Endpoint for invalidating the token the user provides
+/// Not implemented yet
+#[post("/logout")]
+pub async fn user_logout(bearer_auth: BearerAuth, pool: web::Data<ConnectionPool>) -> Result<impl Responder, UnishareError> {
+    let user_id =  validate_token(bearer_auth).await?;
+    Ok(HttpResponse::Ok().json(user_id))
+}
