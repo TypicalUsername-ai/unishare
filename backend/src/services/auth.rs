@@ -5,11 +5,13 @@ use actix_web::{web, get, post, Responder, HttpResponse};
 use diesel::{prelude::*, r2d2::{Pool, ConnectionManager}, pg::PgConnection, insert_into};
 use log::warn;
 use uuid::Uuid;
-use crate::entities::{user::{NewUser, User}, session::Session};
+use crate::entities::{user::{NewUser, User}, session::{Session, AuthResponse}};
 use crate::entities::error::{Error, ErrorType};
 use crate::schema::users;
 use crate::schema::sessions;
-use actix_web_httpauth::extractors::{bearer::BearerAuth, basic::BasicAuth};
+use actix_web_httpauth::{extractors::{bearer::BearerAuth, basic::BasicAuth}, middleware::HttpAuthentication};
+
+use super::tokenMiddleware::validator;
 
 /// Function for configuring the authorization and authentication based endpoints
 /// services:
@@ -22,7 +24,8 @@ pub fn auth_config(cfg: &mut web::ServiceConfig) {
         .service(test)
         .service(create_user)
         .service(user_login)
-        .service(user_logout);
+        .service(user_logout)
+        .wrap(HttpAuthentication::bearer(validator));
 
 }
 
@@ -84,7 +87,7 @@ async fn user_login(basic_auth: BasicAuth, pool: web::Data<ConnectionPool>) -> i
                 .values(jwt.data())
                 .execute(& mut conn);
             // return cookie
-            HttpResponse::Ok().insert_header(("X-AUTH", jwt.create_token())).json(jwt)
+            HttpResponse::Ok().json(AuthResponse::new(jwt.clone(), jwt.create_token()))
         }
         Err(err) => {
             HttpResponse::Unauthorized().finish()
@@ -97,31 +100,4 @@ async fn user_login(basic_auth: BasicAuth, pool: web::Data<ConnectionPool>) -> i
 /// Not implemented yet
 #[post("/logout")]
 async fn user_logout(bearer_auth: BearerAuth, pool: web::Data<ConnectionPool>) -> impl Responder {
-    // extract cookie data
-    let token = Session::try_from_token(bearer_auth.token().to_owned());
-
-    match token {
-        Ok(session) => {
-            // validate authenticity
-            match session.validate() {
-                true => {
-                    let data = session.data();
-                    // find cookie / session in db (not needed?)
-                    if data.expires_at >= SystemTime::now() {
-                        HttpResponse::Ok().finish()
-                    } else {
-                        HttpResponse::Unauthorized().finish()
-                    }
-                    // delete session from db
-                    // return invalidate cookie header
-                }
-                false => {
-                    HttpResponse::Unauthorized().finish()
-                }
-            }
-        }
-        Err(e) => {
-            HttpResponse::Unauthorized().finish()
-        }
-    }
 }

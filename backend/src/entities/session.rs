@@ -7,7 +7,7 @@ use serde_json;
 use sha256;
 use base64::{Engine as _, engine::general_purpose};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Session {
     #[serde(flatten)]
     session_data: SessionData,
@@ -74,4 +74,24 @@ impl SessionData {
         self.expires_at = self.expires_at.checked_add(time).expect("cannot exted the session for that duration");
         self
     }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct AuthResponse {
+    user: Uuid,
+    access_token: String,
+    expires_in: u64
+}
+
+impl AuthResponse {
+
+    pub fn new(session: Session, token: String) -> Self {
+        let data = session.data();
+        Self { 
+            user: data.user_id, 
+            access_token: token, 
+            expires_in: data.expires_at.duration_since(SystemTime::now()).expect("Duration error").as_secs() 
+        }
+    }
+
 }

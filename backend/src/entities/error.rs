@@ -9,4 +9,6 @@ pub struct Error {
 #[derive(Debug, Serialize, Deserialize)]
 pub enum ErrorType {
     DuplicateCredentials,
+    TokenExpired,
+    TokenInvalid,
 }
