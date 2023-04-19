@@ -11,9 +11,15 @@ use crate::schema::users;
 use crate::schema::sessions;
 use actix_web_httpauth::extractors::{bearer::BearerAuth, basic::BasicAuth};
 
+/// Function for configuring the authorization and authentication based endpoints
+/// services:
+///     `test` - boilerplate testing function
+///     `create_user` - creates a new user
+///     `user_login` - authorizes and existing user
+///     `user_logout` - invalidates an existing session
 pub fn auth_config(cfg: &mut web::ServiceConfig) {
     cfg
-        .service(auth)
+        .service(test)
         .service(create_user)
         .service(user_login)
         .service(user_logout);
@@ -22,12 +28,16 @@ pub fn auth_config(cfg: &mut web::ServiceConfig) {
 
 type ConnectionPool = Pool<ConnectionManager<PgConnection>>;
 
+/// Test function for testing any boilerplate code with development
 #[get("/hello")]
-async fn auth(auth: BearerAuth) -> impl Responder {
+async fn test(auth: BearerAuth) -> impl Responder {
     warn!("Authorization attempt with token <{}>", auth.token());
     HttpResponse::Ok().body("{ message : hello from auth }")
 }
 
+/// Function for creation of new user objects
+/// The function requires a `JSON` encoded `NewUser` entity to be provided in the request body
+/// This function errors if the provided username is a duplicate
 #[post("/register")]
 async fn create_user(data: web::Json<NewUser>, pool: web::Data<ConnectionPool>) -> impl Responder{
     let to_register= User::from(data.into_inner());
@@ -49,6 +59,9 @@ async fn create_user(data: web::Json<NewUser>, pool: web::Data<ConnectionPool>) 
     }
 }
 
+/// Endpoint for providing the authorization token for the user
+/// The endpoint is authorized with `Basic` authorization
+/// The basic auth header should be of form `Basic {B64encoded(login:password)}`
 #[post("/login")]
 async fn user_login(basic_auth: BasicAuth, pool: web::Data<ConnectionPool>) -> impl Responder {
     // extract data
@@ -80,6 +93,8 @@ async fn user_login(basic_auth: BasicAuth, pool: web::Data<ConnectionPool>) -> i
     }
 }
 
+/// Endpoint for invalidating the token the user provides
+/// Not implemented yet
 #[post("/logout")]
 async fn user_logout(bearer_auth: BearerAuth, pool: web::Data<ConnectionPool>) -> impl Responder {
     // extract cookie data
