@@ -1,3 +1,4 @@
+use base64::display;
 use serde::{Serialize, Deserialize};
 use derive_more::{Display, Error};
 use actix_web::{error, HttpResponse, http::StatusCode};
@@ -10,6 +11,8 @@ pub enum UnishareError {
     TokenExpired,
     #[display(fmt = "Invalid Token")]
     TokenInvalid,
+    #[display(fmt = "Bad Credentials")]
+    BadCredentials
 }
 
 impl error::ResponseError for UnishareError {
@@ -22,6 +25,7 @@ impl error::ResponseError for UnishareError {
             UnishareError::DuplicateCredentials => StatusCode::UNAUTHORIZED,
             UnishareError::TokenExpired => StatusCode::UNAUTHORIZED,
             UnishareError::TokenInvalid => StatusCode::UNAUTHORIZED,
+            UnishareError::BadCredentials => StatusCode::UNAUTHORIZED
         }
     }
 }
