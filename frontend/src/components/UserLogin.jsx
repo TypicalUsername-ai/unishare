@@ -46,8 +46,7 @@ const UserForm = ({ onSave, user = {} }) => {
             "http://localhost/api/login",
             {
                 method: 'POST',
-                body: JSON.stringify({ username: userData.username, password: userData.password }),
-                headers: { 'Content-Type': 'application/json' }
+                headers: { 'Authorization': `Basic ${btoa(username + ":" + password)}` }
             }
         )
         console.log(response)
