@@ -51,7 +51,6 @@ const UserForm = ({ onSave, user = {} }) => {
             }
         )
         console.log(response)
-        let response = false;
         if (response == true) {
             window.location.href = "/app/loggedin";
         } else {

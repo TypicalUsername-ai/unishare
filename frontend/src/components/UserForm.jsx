@@ -49,15 +49,15 @@ const UserForm = ({ onSave, user = {} }) => {
         }
         setErrors({});
         console.log(userData);
-        // const response = await fetch(
-        //     "http://localhost/api/register",
-        //     {
-        //         method: 'POST',
-        //         body: JSON.stringify({ username: userData.username, email: userData.email, password: userData.password }),
-        //         headers: { 'Content-Type': 'application/json' }
-        //     }
-        // )
-        // console.log(response)
+        const response = await fetch(
+            "http://localhost/api/register",
+            {
+                method: 'POST',
+                body: JSON.stringify({ username: userData.username, email: userData.email, password: userData.password }),
+                headers: { 'Content-Type': 'application/json' }
+            }
+        )
+        console.log(response)
         setOpen(false);
         window.clearTimeout(timerRef.current);
         timerRef.current = window.setTimeout(() => {
