@@ -1,11 +1,11 @@
 use std::time::SystemTime;
 
 // authorization services go here
-use actix_web::{web, get, post, Responder, HttpResponse, cookie::Cookie};
+use actix_web::{web, get, post, Responder, HttpResponse};
 use diesel::{prelude::*, r2d2::{Pool, ConnectionManager}, pg::PgConnection, insert_into};
 use log::warn;
 use uuid::Uuid;
-use crate::entities::{user::{NewUser, User}, session::{Session, SessionData}};
+use crate::entities::{user::{NewUser, User}, session::Session};
 use crate::entities::error::{Error, ErrorType};
 use crate::schema::users;
 use crate::schema::sessions;
