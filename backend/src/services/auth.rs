@@ -15,12 +15,11 @@ use actix_web_httpauth::extractors::{bearer::BearerAuth, basic::BasicAuth};
 ///     `create_user` - creates a new user
 ///     `user_login` - authorizes and existing user
 ///     `user_logout` - invalidates an existing session
-pub fn auth_config(cfg: &mut web::ServiceConfig) {
+pub fn auth_open_config(cfg: &mut web::ServiceConfig) {
     cfg
         .service(test)
         .service(create_user)
-        .service(user_login)
-        .service(user_logout);
+        .service(user_login);
 
 }
 
@@ -90,9 +89,3 @@ async fn user_login(basic_auth: BasicAuth, pool: web::Data<ConnectionPool>) -> i
     }
 }
 
-/// Endpoint for invalidating the token the user provides
-/// Not implemented yet
-#[post("/logout")]
-async fn user_logout(bearer_auth: BearerAuth, pool: web::Data<ConnectionPool>) -> impl Responder {
-    HttpResponse::Ok().finish()
-}
