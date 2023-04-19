@@ -1,8 +1,9 @@
-use std::time::SystemTime;
+use std::{time::SystemTime, fmt::format};
 
 // authorization services go here
 use actix_web::{web, get, post, Responder, HttpResponse};
 use diesel::{prelude::*, r2d2::{Pool, ConnectionManager}, pg::PgConnection, insert_into};
+use lettre::{SmtpTransport, Transport, Message, Address, message::Mailbox};
 use log::warn;
 use uuid::Uuid;
 use crate::entities::{user::{NewUser, User}, session::Session};
@@ -39,7 +40,7 @@ async fn test(auth: BearerAuth) -> impl Responder {
 /// The function requires a `JSON` encoded `NewUser` entity to be provided in the request body
 /// This function errors if the provided username is a duplicate
 #[post("/register")]
-async fn create_user(data: web::Json<NewUser>, pool: web::Data<ConnectionPool>) -> impl Responder{
+async fn create_user(data: web::Json<NewUser>, pool: web::Data<ConnectionPool>, mailer: web::Data<SmtpTransport>) -> impl Responder{
     let to_register= User::from(data.into_inner());
     let mut conn = pool.get().expect("Failed to get connection from the pool");
     let matches: Vec<User> = users::table
@@ -52,8 +53,16 @@ async fn create_user(data: web::Json<NewUser>, pool: web::Data<ConnectionPool>) 
         HttpResponse::Forbidden()
             .json(Error{ err_type: ErrorType::DuplicateCredentials, reason: "account with credentials already exists".to_string()})
     } else {
-
         let insert_op: Vec<User> = insert_into(users::table).values(to_register).get_results(&mut conn).expect("Error inserting user to database");
+        let link = format!("{}/confirm?id={}", std::env!("HOSTNAME"), insert_op[0].id);
+        let email = Message::builder()
+            .from(Mailbox::new(None, std::env!("APP_MAIL").parse::<Address>().expect("error parsing user email")))
+            .to(Mailbox::new(None, (insert_op[0].user_email).parse::<Address>().expect("error parsing user email")))
+            .subject("Email authentication")
+            .body(String::from("Please click this link to confirm your account in Unishare: ".to_owned() + &link)).expect("error creating email");
+        let result = mailer.send(&email);
+        warn!("{}", std::env!("APP_MAIL"));
+        warn!("mail send result {:?}", result);
         HttpResponse::Created()
             .json(insert_op)
     }
