@@ -60,6 +60,9 @@ const UserForm = ({ onSave, user = {} }) => {
             return;
         }
     }
+    const passwordReminder = async () => {
+        window.location.href = "/app/passwordreset";
+    }
 
     return (
         <div className="formContainer">
@@ -70,6 +73,14 @@ const UserForm = ({ onSave, user = {} }) => {
             <Field text="password" type="password" default="password" name="password" onChange={handleChange} />
             <div className="errorInformation">{errors.password}</div>
 
+            <Toast.Provider swipeDirection="right">
+                <button
+                    className="formButton"
+                    onClick={passwordReminder}>
+                    Forgot Password
+                        </button>
+                <Toast.Viewport className="ToastViewport" />
+            </Toast.Provider>
 
             <Toast.Provider swipeDirection="right">
                 <button

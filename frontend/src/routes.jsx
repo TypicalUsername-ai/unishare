@@ -5,6 +5,8 @@ import Login from './Login'
 import Loggedin from './Loggedin'
 import Registrationsuc from './registrationsuc'
 import Tos from './Tos'
+import PasswordReset from './PasswordReset'
+import PasswordSet from './PasswordSet'
 
 
 
@@ -36,6 +38,14 @@ const routes = [
 	{
 		path: "/tos",
 		element: <Tos />
+	},
+	{
+		path: "/passwordreset",
+		element: <PasswordReset />
+	},
+	{
+		path: "/passwordchange",
+		element: <PasswordSet />
 	}
 ]
 
