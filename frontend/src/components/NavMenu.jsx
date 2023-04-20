@@ -20,6 +20,9 @@ function NavMenu() {
 				<NavigationMenu.Item className='NavigationMenuItem'>
 					<NavigationMenu.Link className='NavigationMenuLink' href='/app/login'> Login </NavigationMenu.Link>
 				</NavigationMenu.Item>
+				<NavigationMenu.Item className='NavigationMenuItem'>
+					<NavigationMenu.Link className='NavigationMenuLink' href='/app/tos'> ToS </NavigationMenu.Link>
+				</NavigationMenu.Item>
 			</NavigationMenu.List>
 		</NavigationMenu.Root>
 	)

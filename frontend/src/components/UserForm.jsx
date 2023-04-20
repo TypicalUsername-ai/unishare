@@ -10,7 +10,7 @@ const UserForm = ({ onSave, user = {} }) => {
     const [userData, setUserData] = useState(user);
     const [errors, setErrors] = useState({});
     const specialCharacters = ['!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '-', '=', '+', '-', '/', '.', ',', '*', '-'];
-
+    let tosagreed = false;
     const [open, setOpen] = React.useState(false);
     const timerRef = React.useRef(0);
 
@@ -37,6 +37,9 @@ const UserForm = ({ onSave, user = {} }) => {
 
         if (!password) {
             errors.password = "A password is required!";
+        }
+        if (tosagreed == false) {
+            errors.tos = "You need to agree to the terms of service";
         }
         if (password) {
             if (password.length < 8) { errors.password = "Password is too short!"; }
@@ -66,32 +69,36 @@ const UserForm = ({ onSave, user = {} }) => {
         }
         setErrors({});
         console.log(userData);
-	const response = await fetch(
-		"http://localhost/api/register",
-		{
-			method: 'POST',
-			body: JSON.stringify({ username: userData.username, email: userData.email, password: userData.password }),
-			headers: { 'Content-Type': 'application/json' }
-		}
-	);
-	let resdata = await response.text();
-	console.log(response, resdata);
-	if(response.status !== 201){
-		setTitle("Registration error!");
-		setText(`Reason : ${resdata}`);
-	}else{
-		setText(`Verification email sent to ${email}`);
-	}
+        const response = await fetch(
+            "http://localhost/api/register",
+            {
+                method: 'POST',
+                body: JSON.stringify({ username: userData.username, email: userData.email, password: userData.password }),
+                headers: { 'Content-Type': 'application/json' }
+            }
+        );
+        let resdata = await response.text();
+        console.log(response, resdata);
+        if (response.status !== 201) {
+            setTitle("Registration error!");
+            setText(`Reason : ${resdata}`);
+        } else {
+            setText(`Verification email sent to ${email}`);
+        }
         setOpen(false);
         window.clearTimeout(timerRef.current);
         timerRef.current = window.setTimeout(() => {
             setOpen(true);
 
         }, 150);
-	if(response.status === 201){
-		window.location.href = "/app/registrationsuc";
-		onSave(userData);
-	}
+        if (response.status === 201) {
+            window.location.href = "/app/registrationsuc";
+            onSave(userData);
+        }
+    }
+    const handleCheckboxChange = (event) => {
+        tosagreed = event.target.checked;
+        console.log(tosagreed);
     }
 
     return (
@@ -106,7 +113,11 @@ const UserForm = ({ onSave, user = {} }) => {
 
             <Field text="password" type="password" default="password" name="password" onChange={handleChange} />
             <div className="errorInformation">{errors.password}</div>
-
+            <div className="checkboxContainer">
+                <input type="checkbox" id="terms" name="terms" value="accepted" onChange={handleCheckboxChange} />
+                <label htmlFor="terms" className="checkboxLabel">I accept the <a href="/app/tos" target="_blank">terms and conditions</a>.</label>
+            </div>
+            <div className="errorInformation">{errors.tos}</div>
 
             <Toast.Provider swipeDirection="right">
                 <button

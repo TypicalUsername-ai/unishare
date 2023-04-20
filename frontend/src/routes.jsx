@@ -4,6 +4,7 @@ import Registration from './Registration'
 import Login from './Login'
 import Loggedin from './Loggedin'
 import Registrationsuc from './registrationsuc'
+import Tos from './Tos'
 
 
 
@@ -31,6 +32,10 @@ const routes = [
 	{
 		path: "/registrationsuc",
 		element: <Registrationsuc />
+	},
+	{
+		path: "/tos",
+		element: <Tos />
 	}
 ]
 
