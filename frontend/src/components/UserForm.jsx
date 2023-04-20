@@ -10,7 +10,7 @@ const UserForm = ({ onSave, user = {} }) => {
     const [userData, setUserData] = useState(user);
     const [errors, setErrors] = useState({});
     const specialCharacters = ['!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '-', '=', '+', '-', '/', '.', ',', '*', '-'];
-    let tosagreed = false;
+    const [tosagreed, settosagreed] = useState(false);
     const [open, setOpen] = React.useState(false);
     const timerRef = React.useRef(0);
 
@@ -96,8 +96,8 @@ const UserForm = ({ onSave, user = {} }) => {
             onSave(userData);
         }
     }
-    const handleCheckboxChange = (event) => {
-        tosagreed = event.target.checked;
+    const handleCheckboxChange = () => {
+        settosagreed(!tosagreed);
         console.log(tosagreed);
     }
 
