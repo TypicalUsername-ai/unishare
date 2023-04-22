@@ -39,18 +39,17 @@ async fn test(auth: BearerAuth) -> impl Responder {
 #[post("/register")]
 async fn create_user(data: web::Json<NewUser>, pool: web::Data<ConnectionPool>) -> Result<impl Responder, UnishareError> {
     let to_register= User::from(data.into_inner());
-    let mut conn = pool.get().expect("Failed to get connection from the pool");
+    let mut conn = pool.get()?;
     let matches: Vec<User> = users::table
         .filter(users::user_email.eq(&to_register.user_email.clone()))
         .or_filter(users::username.eq(&to_register.username.clone()))
-        .get_results(&mut conn)
-        .expect("DB query failed");
+        .get_results(&mut conn)?;
     if matches.len() != 0 {
         warn!("{:?}", matches);
         Err(UnishareError::DuplicateCredentials)
     } else {
 
-        let insert_op: Vec<User> = insert_into(users::table).values(to_register).get_results(&mut conn).expect("Error inserting user to database");
+        let insert_op: Vec<User> = insert_into(users::table).values(to_register).get_results(&mut conn)?;
         Ok(HttpResponse::Created()
             .json(insert_op))
     }
@@ -66,27 +65,26 @@ async fn user_login(basic_auth: BasicAuth, pool: web::Data<ConnectionPool>) -> R
     let plaintext = basic_auth.password().unwrap_or("").to_owned();
     let pass = User::hash_password(&plaintext);
     // find user in db
-    let mut conn = pool.get().expect("Countdn't get connection from the pool");
-    let user: Result<Uuid, diesel::result::Error> = users::table
+    let mut conn = pool.get()?;
+    let user: Vec<Uuid> = users::table
         .select(users::id)
         .filter(users::username.eq(uname).and(users::password_hash.eq(pass)))
-        .first(& mut conn);
+        .load(& mut conn)?;
 
-    match user {
-        Ok(id) => {
+    match user.len() {
+        0 => Err(UnishareError::BadCredentials),
+        1 => {
+            let id = user[0];
             // create a cookie
             let jwt = Session::new(id);
             // store a cookie in db
-            insert_into(sessions::table)
+            let cookie_result = insert_into(sessions::table)
                 .values(jwt.data())
-                .execute(& mut conn);
+                .execute(& mut conn)?;
             // return cookie
             Ok(HttpResponse::Ok().json(AuthResponse::new(jwt.clone(), jwt.create_token())))
-        }
-        Err(err) => {
-            Err(UnishareError::BadCredentials)
-
-        }
+        },
+        _ => Err(UnishareError::BadCredentials)
     }
 }
 

@@ -11,7 +11,9 @@ pub enum UnishareError {
     #[display(fmt = "Invalid Token")]
     TokenInvalid,
     #[display(fmt = "Bad Credentials")]
-    BadCredentials
+    BadCredentials,
+    #[display(fmt = "Internal Database Error ({})", reason)]
+    DatabaseError{ reason: String }
 }
 
 impl error::ResponseError for UnishareError {
@@ -24,7 +26,20 @@ impl error::ResponseError for UnishareError {
             UnishareError::DuplicateCredentials => StatusCode::UNAUTHORIZED,
             UnishareError::TokenExpired => StatusCode::UNAUTHORIZED,
             UnishareError::TokenInvalid => StatusCode::UNAUTHORIZED,
-            UnishareError::BadCredentials => StatusCode::UNAUTHORIZED
+            UnishareError::BadCredentials => StatusCode::UNAUTHORIZED,
+            UnishareError::DatabaseError{reason} => StatusCode::INTERNAL_SERVER_ERROR,
         }
+    }
+}
+
+impl From<diesel::result::Error> for UnishareError {
+    fn from(value: diesel::result::Error) -> Self {
+        Self::DatabaseError { reason: value.to_string() }
+    }
+}
+
+impl From<r2d2::Error> for UnishareError {
+    fn from(value: r2d2::Error) -> Self {
+        Self::DatabaseError { reason: value.to_string() }
     }
 }
