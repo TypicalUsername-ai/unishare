@@ -5,8 +5,10 @@ import "./form.css";
 
 import * as Toast from '@radix-ui/react-toast';
 import Field from "./field";
+import { useNavigate } from "react-router-dom";
 
 const UserPasswordSet = ({ onSave, user = {} }) => {
+    const navigate = useNavigate();
     const [userData, setUserData] = useState(user);
     const [errors, setErrors] = useState({});
     const specialCharacters = ['!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '-', '=', '+', '-', '/', '.', ',', '*', '-'];
@@ -81,7 +83,7 @@ const UserPasswordSet = ({ onSave, user = {} }) => {
         }
         if (response.status === 201) {
             window.setTimeout(() => {
-                window.location.href = "/app/login";
+                navigate("/login");
             }, 3000);
         }
     }

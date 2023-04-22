@@ -5,8 +5,10 @@ import "./form.css";
 
 import * as Toast from '@radix-ui/react-toast';
 import Field from "./field";
+import { useNavigate } from "react-router-dom";
 
 const UserForm = ({ onSave, user = {} }) => {
+    const navigate = useNavigate();
     const [userData, setUserData] = useState(user);
     const [errors, setErrors] = useState({});
 
@@ -51,7 +53,7 @@ const UserForm = ({ onSave, user = {} }) => {
         )
         console.log(response)
         if (response.ok) {
-            window.location.href = "/app/loggedin";
+            navigate("/loggedin");
         } else {
             let errors = {}
             errors.password = "invalid password";
@@ -61,7 +63,7 @@ const UserForm = ({ onSave, user = {} }) => {
         }
     }
     const passwordReminder = async () => {
-        window.location.href = "/app/passwordreset";
+        return("/app/passwordreset");
     }
 
     return (

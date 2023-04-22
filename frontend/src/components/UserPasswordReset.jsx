@@ -5,6 +5,7 @@ import "./form.css";
 
 import * as Toast from '@radix-ui/react-toast';
 import Field from "./field";
+import { useNavigate } from "react-router-dom";
 
 const UserPasswordReset = ({ onSave, user = {} }) => {
     const [userData, setUserData] = useState(user);
@@ -63,7 +64,7 @@ const UserPasswordReset = ({ onSave, user = {} }) => {
         }, 150);
         if (response.status === 201) {
             window.setTimeout(() => {
-                window.location.href = "/app/passwordchange";
+                navigate("/passwordchange");
             }, 2000);
         }
     }

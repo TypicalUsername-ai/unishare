@@ -5,8 +5,10 @@ import "./form.css";
 
 import * as Toast from '@radix-ui/react-toast';
 import Field from "./field";
+import { useNavigate } from "react-router-dom";
 
 const UserForm = ({ onSave, user = {} }) => {
+    const navigate = useNavigate();
     const [userData, setUserData] = useState(user);
     const [errors, setErrors] = useState({});
     const specialCharacters = ['!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '-', '=', '+', '-', '/', '.', ',', '*', '-'];
@@ -92,8 +94,8 @@ const UserForm = ({ onSave, user = {} }) => {
 
         }, 150);
         if (response.status === 201) {
-            window.location.href = "/app/registrationsuc";
             onSave(userData);
+            navigate("/registrationsuc")
         }
     }
     const handleCheckboxChange = () => {
