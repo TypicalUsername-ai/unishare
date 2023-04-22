@@ -8,7 +8,7 @@ use crate::entities::error::UnishareError;
 use crate::schema::users;
 use crate::schema::sessions;
 use actix_web_httpauth::extractors::{bearer::BearerAuth, basic::BasicAuth};
-use super::tokenMiddleware::validate_token;
+use super::token_middleware::validate_token;
 
 /// Function for configuring the authorization and authentication based endpoints
 /// services:
@@ -28,9 +28,9 @@ type ConnectionPool = Pool<ConnectionManager<PgConnection>>;
 
 /// Test function for testing any boilerplate code with development
 #[get("/hello")]
-async fn test(auth: BearerAuth) -> impl Responder {
-    warn!("Authorization attempt with token <{}>", auth.token());
-    HttpResponse::Ok().body("{ message : hello from auth }")
+async fn test(auth: BearerAuth) -> Result<impl Responder, UnishareError> {
+    let (user_id, session_id) = validate_token(auth).await?;
+    Ok(HttpResponse::Ok().body(format!("user id: {}", user_id)))
 }
 
 /// Function for creation of new user objects
