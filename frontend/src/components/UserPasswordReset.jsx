@@ -63,13 +63,13 @@ const UserPasswordReset = ({ onSave, user = {} }) => {
             setOpen(true);
 
         }, 150);
+
         if (response.ok) {
             window.setTimeout(() => {
                 navigate("/login");
             }, 2000);
         }
     }
-
     return (
         <div className="formContainer">
 
