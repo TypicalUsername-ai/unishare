@@ -1,3 +1,5 @@
+use std::time::SystemTime;
+
 // authorization services go here
 use actix_web::{web, get, post, Responder, HttpResponse};
 use diesel::{prelude::*, r2d2::{Pool, ConnectionManager}, pg::PgConnection, insert_into};
@@ -8,7 +10,7 @@ use crate::entities::error::UnishareError;
 use crate::schema::users;
 use crate::schema::sessions;
 use actix_web_httpauth::extractors::{bearer::BearerAuth, basic::BasicAuth};
-use super::token_middleware::validate_token;
+use super::token_middleware::validate_request;
 
 /// Function for configuring the authorization and authentication based endpoints
 /// services:
@@ -28,9 +30,10 @@ type ConnectionPool = Pool<ConnectionManager<PgConnection>>;
 
 /// Test function for testing any boilerplate code with development
 #[get("/hello")]
-async fn test(auth: BearerAuth) -> Result<impl Responder, UnishareError> {
-    let (user_id, session_id) = validate_token(auth).await?;
-    Ok(HttpResponse::Ok().body(format!("user id: {}", user_id)))
+async fn test(auth: BearerAuth, pool: web::Data<ConnectionPool>) -> Result<impl Responder, UnishareError> {
+    let mut db_conn = pool.get()?;
+    let session = validate_request(auth, &mut db_conn).await?;
+    Ok(HttpResponse::Ok().json(session))
 }
 
 /// Function for creation of new user objects
@@ -66,15 +69,15 @@ async fn user_login(basic_auth: BasicAuth, pool: web::Data<ConnectionPool>) -> R
     let pass = User::hash_password(&plaintext);
     // find user in db
     let mut conn = pool.get()?;
-    let user: Vec<Uuid> = users::table
+    let user: Option<Vec<Uuid>> = users::table
         .select(users::id)
         .filter(users::username.eq(uname).and(users::password_hash.eq(pass)))
-        .load(& mut conn)?;
+        .get_results(& mut conn).optional()?;
 
-    match user.len() {
-        0 => Err(UnishareError::BadCredentials),
-        1 => {
-            let id = user[0];
+    match user {
+        None => Err(UnishareError::BadCredentials),
+        Some(data) => {
+            let id = data[0];
             // create a cookie
             let jwt = Session::new(id);
             // store a cookie in db
@@ -83,8 +86,7 @@ async fn user_login(basic_auth: BasicAuth, pool: web::Data<ConnectionPool>) -> R
                 .execute(& mut conn)?;
             // return cookie
             Ok(HttpResponse::Ok().json(AuthResponse::new(jwt.clone(), jwt.create_token())))
-        },
-        _ => Err(UnishareError::BadCredentials)
+        }
     }
 }
 
@@ -92,6 +94,9 @@ async fn user_login(basic_auth: BasicAuth, pool: web::Data<ConnectionPool>) -> R
 /// Not implemented yet
 #[post("/logout")]
 pub async fn user_logout(bearer_auth: BearerAuth, pool: web::Data<ConnectionPool>) -> Result<impl Responder, UnishareError> {
-    let user_id =  validate_token(bearer_auth).await?;
-    Ok(HttpResponse::Ok().json(user_id))
+    let mut db_conn = pool.get()?;
+    let session = validate_request(bearer_auth, &mut db_conn).await?;
+    let invalidate_session = diesel::delete(sessions::table.filter(sessions::session_id.eq(session.session_id)))
+        .execute(&mut db_conn)?;
+    Ok(HttpResponse::Ok().json(session.session_id))
 }
