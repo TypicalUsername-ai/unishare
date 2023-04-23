@@ -1,5 +1,3 @@
-use std::time::SystemTime;
-
 // authorization services go here
 use actix_web::{web, get, post, Responder, HttpResponse};
 use diesel::{prelude::*, r2d2::{Pool, ConnectionManager}, pg::PgConnection, insert_into};
@@ -18,7 +16,7 @@ use super::token_middleware::validate_request;
 ///     `create_user` - creates a new user
 ///     `user_login` - authorizes and existing user
 ///     `user_logout` - invalidates an existing session
-pub fn auth_config(cfg: &mut web::ServiceConfig) {
+pub fn config(cfg: &mut web::ServiceConfig) {
     cfg
         .service(test)
         .service(create_user)
