@@ -11,6 +11,8 @@ pub struct File {
     last_edit: SystemTime,
     price: u64,
     rating: f32,
+    primary_tag: String,
+    secondary_tag: String,
     available: Availability,
 }
 
@@ -18,6 +20,8 @@ pub struct FileOpt {
     name: Option<String>,
     last_edit: SystemTime,
     price: Option<u64>,
+    primary_tag: Option<String>,
+    secondary_tag: Option<String>,
     available: Option<Availability>,
 }
 

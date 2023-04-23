@@ -16,7 +16,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 
 type ConnectionPool = Pool<ConnectionManager<PgConnection>>;
 
-#[get("/{user_id}")]
+#[get("/{user_id}/profile")]
 async fn profile(bearer: BearerAuth, pool: web::Data<ConnectionPool>, path: web::Path<Uuid>) -> Result<impl Responder, UnishareError> {
     let mut db_conn = pool.get()?;
     let auth_result = validate_request(bearer, &mut db_conn).await;
@@ -34,4 +34,29 @@ async fn profile(bearer: BearerAuth, pool: web::Data<ConnectionPool>, path: web:
         // return basic user profile (for unregistered users)
         Ok(HttpResponse::Ok().json(profile.as_guest()))
     }
+}
+
+#[post("/{user_id}/profile")]
+async fn update_profile() -> () {
+    todo!()
+}
+
+#[delete("/{user_id}")]
+async fn delete_account() -> () {
+    todo!()
+}
+
+#[get("/{user_id}/files")]
+async fn get_files() -> () {
+    todo!();
+}
+
+#[get("/{user_id}/reviews")]
+async fn get_reviews() -> () {
+    todo!();
+}
+
+#[post("/{user_id}/reviews")]
+async fn add_review() -> () {
+    todo!()
 }
