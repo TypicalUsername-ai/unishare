@@ -22,7 +22,8 @@ pub fn config(cfg: &mut web::ServiceConfig) {
         .service(create_user)
         .service(user_login)
         .service(user_logout)
-        .service(password_reset);
+        .service(password_reset)
+        .service(new_password);
 }
 
 type ConnectionPool = Pool<ConnectionManager<PgConnection>>;
@@ -121,6 +122,32 @@ async fn password_reset(payload: web::Json<Email>, pool: web::Data<ConnectionPoo
         Ok(HttpResponse::Accepted().body("All previous sessions invalidated"))
     } else {
         Err(UnishareError::ResourceNotFound { resource: format!("account for mail {}", payload.email) })
+    }
+
+}
+
+#[derive(Debug, serde::Deserialize)]
+struct NewPass {
+    user_id: Uuid,
+    password: String,
+}
+
+/// Function for setting n existing user with a new password
+#[post("/newpassword")]
+async fn new_password(pass_data: web::Json<NewPass>, pool: web::Data<ConnectionPool>) -> Result<impl Responder, UnishareError> {
+    let mut db_conn = pool.get()?;
+    // get user
+    let user_opt: Option<User> = users::table.filter(users::id.eq(pass_data.user_id.clone())).first(&mut db_conn).optional()?;
+    if let Some(user) = user_opt {
+        // reset his password to the one in payload
+        let update = diesel::update(users::table.filter(users::id.eq(user.id)))
+                     .set(users::password_hash.eq(User::hash_password(&pass_data.password))).execute(&mut db_conn)?;
+        // send no content
+        Ok(HttpResponse::NoContent().finish())
+
+    }
+    else {
+        Err(UnishareError::ResourceNotFound { resource: format!("Account (id: {})", pass_data.user_id) })
     }
 
 }
