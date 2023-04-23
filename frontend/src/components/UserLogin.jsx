@@ -11,7 +11,6 @@ const UserForm = ({ onSave, user = {} }) => {
     const navigate = useNavigate();
     const [userData, setUserData] = useState(user);
     const [errors, setErrors] = useState({});
-
     const [open, setOpen] = React.useState(false);
     const timerRef = React.useRef(0);
 
@@ -63,7 +62,7 @@ const UserForm = ({ onSave, user = {} }) => {
         }
     }
     const passwordReminder = async () => {
-        return("/app/passwordreset");
+        navigate("/passwordreset");
     }
 
     return (
