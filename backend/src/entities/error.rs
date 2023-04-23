@@ -13,7 +13,9 @@ pub enum UnishareError {
     #[display(fmt = "Bad Credentials")]
     BadCredentials,
     #[display(fmt = "Internal Database Error ({})", reason)]
-    DatabaseError{ reason: String }
+    DatabaseError{ reason: String },
+    #[display(fmt = "Requested resource doesn't exist ({})", resource)]
+    ResourceNotFound{ resource: String }
 }
 
 impl error::ResponseError for UnishareError {
@@ -28,6 +30,7 @@ impl error::ResponseError for UnishareError {
             UnishareError::TokenInvalid => StatusCode::UNAUTHORIZED,
             UnishareError::BadCredentials => StatusCode::UNAUTHORIZED,
             UnishareError::DatabaseError{reason} => StatusCode::INTERNAL_SERVER_ERROR,
+            UnishareError::ResourceNotFound { resource } => StatusCode::NOT_FOUND,
         }
     }
 }

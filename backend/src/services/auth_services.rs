@@ -21,7 +21,8 @@ pub fn config(cfg: &mut web::ServiceConfig) {
         .service(test)
         .service(create_user)
         .service(user_login)
-        .service(user_logout);
+        .service(user_logout)
+        .service(password_reset);
 }
 
 type ConnectionPool = Pool<ConnectionManager<PgConnection>>;
@@ -89,12 +90,38 @@ async fn user_login(basic_auth: BasicAuth, pool: web::Data<ConnectionPool>) -> R
 }
 
 /// Endpoint for invalidating the token the user provides
-/// Not implemented yet
 #[post("/logout")]
-pub async fn user_logout(bearer_auth: BearerAuth, pool: web::Data<ConnectionPool>) -> Result<impl Responder, UnishareError> {
+async fn user_logout(bearer_auth: BearerAuth, pool: web::Data<ConnectionPool>) -> Result<impl Responder, UnishareError> {
     let mut db_conn = pool.get()?;
     let session = validate_request(bearer_auth, &mut db_conn).await?;
     let invalidate_session = diesel::delete(sessions::table.filter(sessions::session_id.eq(session.session_id)))
         .execute(&mut db_conn)?;
     Ok(HttpResponse::Ok().json(session.session_id))
 }
+
+/// Helper struct for the password reset function
+#[derive(Debug, serde::Deserialize)]
+struct Email {
+    email: String
+}
+
+/// Function for resetting password for a user
+/// requires an `Email` structure of `{email : $email}` inthe json request body
+/// replies with http 202 on success
+#[post("/passwordreset")]
+async fn password_reset(payload: web::Json<Email>, pool: web::Data<ConnectionPool>) -> Result<impl Responder, UnishareError> {
+    let mut db_conn = pool.get()?;
+    // mailer functionality to send the reset password
+    warn!("Mailer unimplemented");
+    // invalidater all existing sessions
+    let id_opt: Option<Uuid> = users::table.select(users::id).filter(users::user_email.eq(payload.email.clone())).first(&mut db_conn).optional()?;
+
+    if let Some(id) = id_opt {
+        let rem_sessions = diesel::delete(sessions::table.filter(sessions::user_id.eq(id))).execute(&mut db_conn)?;
+        Ok(HttpResponse::Accepted().body("All previous sessions invalidated"))
+    } else {
+        Err(UnishareError::ResourceNotFound { resource: format!("account for mail {}", payload.email) })
+    }
+
+}
+
