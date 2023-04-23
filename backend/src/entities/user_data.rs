@@ -60,7 +60,7 @@ impl UserData {
 }
 
 #[derive(Debug, Serialize)]
-struct GuestView {
+pub struct GuestView {
     username: String,
     id: Uuid,
     pub_files: u64,
@@ -73,7 +73,7 @@ impl From<UserData> for GuestView {
 }
 
 #[derive(Debug, Serialize)]
-struct UserView {
+pub struct UserView {
     username: String,
     id: Uuid,
     pub_files: u64,

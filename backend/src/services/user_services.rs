@@ -37,26 +37,31 @@ async fn profile(bearer: BearerAuth, pool: web::Data<ConnectionPool>, path: web:
 }
 
 #[post("/{user_id}/profile")]
-async fn update_profile() -> () {
-    todo!()
+async fn update_profile() -> Result<impl Responder, UnishareError> {
+    todo!();
+    Ok(HttpResponse::InternalServerError().finish())
 }
 
 #[delete("/{user_id}")]
-async fn delete_account() -> () {
-    todo!()
+async fn delete_account() -> Result<impl Responder, UnishareError> {
+    todo!();
+    Ok(HttpResponse::InternalServerError().finish())
 }
 
 #[get("/{user_id}/files")]
-async fn get_files() -> () {
+async fn get_files() -> Result<impl Responder, UnishareError> {
     todo!();
+    Ok(HttpResponse::InternalServerError().finish())
 }
 
 #[get("/{user_id}/reviews")]
-async fn get_reviews() -> () {
+async fn get_reviews() -> Result<impl Responder, UnishareError> {
     todo!();
+    Ok(HttpResponse::InternalServerError().finish())
 }
 
 #[post("/{user_id}/reviews")]
-async fn add_review() -> () {
-    todo!()
+async fn add_review() -> Result<impl Responder, UnishareError> {
+    todo!();
+    Ok(HttpResponse::InternalServerError().finish())
 }
