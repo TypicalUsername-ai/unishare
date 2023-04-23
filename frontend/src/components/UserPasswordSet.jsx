@@ -7,6 +7,8 @@ import * as Toast from '@radix-ui/react-toast';
 import Field from "./field";
 import { useNavigate } from "react-router-dom";
 
+import { useSearchParams } from "react-router-dom";
+
 const UserPasswordSet = ({ onSave, user = {} }) => {
     const navigate = useNavigate();
     const [userData, setUserData] = useState(user);
@@ -66,22 +68,27 @@ const UserPasswordSet = ({ onSave, user = {} }) => {
             return;
         }
         setErrors({});
-        let response = await fetch(
-            "http://localhost/api/passwordset",
-            {
-                method: 'POST',
-                headers: { 'Authorization': `Basic ${btoa(password + ":" + code)}` }
-            }
-        )
+        const [searchParams] = useSearchParams();
+
+        const userid = searchParams.get(id);
+
+        const options = {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: '{"user_id":"' + userid + '","password":"' + password + '"}'
+        };
+
+        let response = await fetch('http://localhost/api/newpassword', options)
+
         let resdata = await response.text();
         console.log(response, resdata);
-        if (response.status !== 201) {
+        if (!response.ok) {
             setTitle("Reminder error!");
             setText(`Reason: ${resdata}`);
         } else {
             setText(`Password has been reset!`);
         }
-        if (response.status === 201) {
+        if (response.ok) {
             window.setTimeout(() => {
                 navigate("/login");
             }, 3000);

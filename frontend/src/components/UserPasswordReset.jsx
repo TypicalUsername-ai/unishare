@@ -6,6 +6,7 @@ import "./form.css";
 import * as Toast from '@radix-ui/react-toast';
 import Field from "./field";
 import { useNavigate } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 
 const UserPasswordReset = ({ onSave, user = {} }) => {
     const [userData, setUserData] = useState(user);
@@ -27,6 +28,7 @@ const UserPasswordReset = ({ onSave, user = {} }) => {
         return errors;
     }
 
+
     const handleChange = (event) => {
         const { name, value } = event.target;
         setUserData((prevData) => ({ ...prevData, [name]: value }));
@@ -40,17 +42,16 @@ const UserPasswordReset = ({ onSave, user = {} }) => {
             return;
         }
         setErrors({});
-        let response = await fetch(
-            "http://localhost/api/passwordreset",
-            {
-                method: 'POST',
-                body: JSON.stringify({ email: userData.email }),
-                headers: { 'Content-Type': 'application/json' }
-            }
-        )
+        const options = {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: '{"email":"{' + userData.email + '}"}'
+        };
+
+        let response = await fetch('http://localhost/api/passwordreset', options)
         let resdata = await response.text();
         console.log(response, resdata);
-        if (response.status !== 201) {
+        if (!response.ok) {
             setTitle("Reminder error!");
             setText(`Reason: `);
         } else {
@@ -62,9 +63,9 @@ const UserPasswordReset = ({ onSave, user = {} }) => {
             setOpen(true);
 
         }, 150);
-        if (response.status === 201) {
+        if (response.ok) {
             window.setTimeout(() => {
-                navigate("/passwordchange");
+                navigate("/login");
             }, 2000);
         }
     }
