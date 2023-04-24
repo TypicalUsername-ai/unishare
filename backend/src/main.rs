@@ -2,7 +2,7 @@ use actix_web::{HttpServer, App, middleware::Logger, web};
 use env_logger::Env;
 use diesel::{r2d2::{ConnectionManager, Pool}, pg::PgConnection};
 use lettre::transport::smtp::{authentication::{Credentials, Mechanism}, PoolConfig};
-use lettre::{Message, SmtpTransport, Transport};
+use lettre::SmtpTransport;
 use services::{user_services, auth_services};
 
 mod services;

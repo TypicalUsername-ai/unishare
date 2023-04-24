@@ -6,5 +6,5 @@ CREATE TABLE users (
 	username TEXT NOT NULL,
 	user_email TEXT NOT NULL,
 	password_hash TEXT NOT NULL,
-	confirmed BOOLEAN
+	confirmed BOOLEAN NOT NULL DEFAULT false
 );

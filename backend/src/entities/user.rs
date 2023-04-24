@@ -11,6 +11,7 @@ pub struct User {
     pub username: String,
     pub user_email: String,
     password_hash: String,
+    pub confirmed: bool,
 }
 
 impl User {
@@ -30,7 +31,8 @@ impl User {
             id: Uuid::new_v4(), 
             username, 
             user_email: email, 
-            password_hash: Self::hash_password(&password)
+            password_hash: Self::hash_password(&password),
+            confirmed: false
         }
     }
 }

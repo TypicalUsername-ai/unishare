@@ -23,6 +23,7 @@ diesel::table! {
         username -> Text,
         user_email -> Text,
         password_hash -> Text,
+        confirmed -> Bool,
     }
 }
 
