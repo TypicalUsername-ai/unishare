@@ -5,11 +5,12 @@ import "./form.css";
 
 import * as Toast from '@radix-ui/react-toast';
 import Field from "./field";
+import { useNavigate } from "react-router-dom";
 
 const UserForm = ({ onSave, user = {} }) => {
+    const navigate = useNavigate();
     const [userData, setUserData] = useState(user);
     const [errors, setErrors] = useState({});
-
     const [open, setOpen] = React.useState(false);
     const timerRef = React.useRef(0);
 
@@ -51,7 +52,7 @@ const UserForm = ({ onSave, user = {} }) => {
         )
         console.log(response)
         if (response.ok) {
-            window.location.href = "/app/loggedin";
+            navigate("/loggedin");
         } else {
             let errors = {}
             errors.password = "invalid password";
@@ -59,6 +60,9 @@ const UserForm = ({ onSave, user = {} }) => {
             setErrors(errors);
             return;
         }
+    }
+    const passwordReminder = async () => {
+        navigate("/passwordreset");
     }
 
     return (
@@ -70,6 +74,14 @@ const UserForm = ({ onSave, user = {} }) => {
             <Field text="password" type="password" default="password" name="password" onChange={handleChange} />
             <div className="errorInformation">{errors.password}</div>
 
+            <Toast.Provider swipeDirection="right">
+                <button
+                    className="formButton"
+                    onClick={passwordReminder}>
+                    Forgot Password
+                        </button>
+                <Toast.Viewport className="ToastViewport" />
+            </Toast.Provider>
 
             <Toast.Provider swipeDirection="right">
                 <button

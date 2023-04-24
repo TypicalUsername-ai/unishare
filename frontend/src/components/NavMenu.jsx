@@ -1,6 +1,5 @@
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import './NavMenu.css'
-import { redirect } from 'react-router-dom';
 
 function NavMenu() {
 	return (
