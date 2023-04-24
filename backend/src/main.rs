@@ -1,7 +1,7 @@
 use actix_web::{HttpServer, App, middleware::Logger, web};
 use env_logger::Env;
 use diesel::{r2d2::{ConnectionManager, Pool}, pg::PgConnection};
-use services::auth;
+use services::{user_services, auth_services};
 
 mod services;
 mod entities;
@@ -29,7 +29,8 @@ async fn main() -> std::io::Result<()> {
             .configure(services::webapp::webapp_config)
             .service(
                 web::scope("/api")
-                .configure(auth::auth_config)
+                .configure(auth_services::config)
+                .configure(user_services::config)
             )
     })
     .bind(("0.0.0.0", 8080))?
