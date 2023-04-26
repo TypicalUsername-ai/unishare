@@ -16,11 +16,6 @@ pub struct UserData {
 
 impl UserData {
 
-    /// Retrieves user data by username
-    pub async fn by_name(name: String, db_conn: &mut PgConnection) -> Result <Self, UnishareError> {
-        todo!()
-    }
-
     /// Retrieves `UserData` object from the database matching the provided `Uuid`
     pub async fn by_uuid(id: Uuid, db_conn: &mut PgConnection) -> Result<Self, UnishareError> {
         todo!()

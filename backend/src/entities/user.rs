@@ -1,8 +1,10 @@
 use crate::schema::users;
 use serde::{Serialize, Deserialize};
 use uuid::Uuid;
-use diesel::{Insertable, Queryable};
+use diesel::{Insertable, Queryable, prelude::*};
 use argon2::{Argon2, PasswordHasher, password_hash::SaltString};
+
+use super::error::UnishareError;
 
 #[derive(Debug, Insertable, Queryable, Serialize, Deserialize)]
 #[diesel(table_name = users)]
@@ -33,6 +35,16 @@ impl User {
             user_email: email, 
             password_hash: Self::hash_password(&password),
             confirmed: false
+        }
+    }
+
+    /// Retrieves user data by username
+    pub async fn by_name(name: String, db_conn: &mut PgConnection) -> Result <Vec<Self>, UnishareError> {
+        let data: Option<Vec<Self>> = users::table.filter(users::username.like(name.clone())).load(db_conn).optional()?;
+        if let Some(results) = data {
+            Ok(results)
+        } else {
+            Err(UnishareError::ResourceNotFound { resource: format!("user {}", name) })
         }
     }
 }
