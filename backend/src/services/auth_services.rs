@@ -10,6 +10,9 @@ use crate::schema::sessions;
 use actix_web_httpauth::extractors::{bearer::BearerAuth, basic::BasicAuth};
 use super::token_middleware::validate_request;
 
+use lettre::{SmtpTransport, Transport, Message, Address, message::Mailbox};
+
+
 /// Function for configuring the authorization and authentication based endpoints
 /// services:
 ///     `test` - boilerplate testing function
@@ -23,7 +26,8 @@ pub fn config(cfg: &mut web::ServiceConfig) {
         .service(user_login)
         .service(user_logout)
         .service(password_reset)
-        .service(new_password);
+        .service(new_password)
+        .service(confirm_account);
 }
 
 type ConnectionPool = Pool<ConnectionManager<PgConnection>>;
@@ -36,11 +40,26 @@ async fn test(auth: BearerAuth, pool: web::Data<ConnectionPool>) -> Result<impl 
     Ok(HttpResponse::Ok().json(session))
 }
 
+#[derive(Debug, serde::Deserialize)]
+struct Uid {
+    uid: Uuid,
+}
+
+#[get("/confirm")]
+async fn confirm_account(id_payload: web::Query<Uid>, pool: web::Data<ConnectionPool>) -> Result<impl Responder, UnishareError> {
+    let uid = id_payload.uid;
+    let mut conn = pool.get()?;
+    let update_op = diesel::update(users::table)
+        .filter(users::id.eq(uid)).set(users::confirmed.eq(true))
+        .execute(&mut conn)?;
+    Ok(HttpResponse::Ok().json(()))
+}
+
 /// Function for creation of new user objects
 /// The function requires a `JSON` encoded `NewUser` entity to be provided in the request body
 /// This function errors if the provided username is a duplicate
 #[post("/register")]
-async fn create_user(data: web::Json<NewUser>, pool: web::Data<ConnectionPool>) -> Result<impl Responder, UnishareError> {
+async fn create_user(data: web::Json<NewUser>, pool: web::Data<ConnectionPool>, mailer: web::Data<SmtpTransport>) -> Result<impl Responder, UnishareError> {
     let to_register= User::from(data.into_inner());
     let mut conn = pool.get()?;
     let matches: Vec<User> = users::table
@@ -53,6 +72,15 @@ async fn create_user(data: web::Json<NewUser>, pool: web::Data<ConnectionPool>) 
     } else {
 
         let insert_op: Vec<User> = insert_into(users::table).values(to_register).get_results(&mut conn)?;
+        let link = format!("{}/api/confirm?uid={}", std::env!("HOSTNAME"), insert_op[0].id);
+        let email = Message::builder()
+            .from(Mailbox::new(None, std::env!("APP_MAIL").parse::<Address>().expect("error parsing user email")))
+            .to(Mailbox::new(None, (insert_op[0].user_email).parse::<Address>().expect("error parsing user email")))
+            .subject("Email authentication")
+            .body(String::from("Please click this link to confirm your account in Unishare: ".to_owned() + &link)).expect("error creating email");
+        let result = mailer.send(&email);
+        warn!("{}", std::env!("APP_MAIL"));
+        warn!("mail send result {:?}", result);
         Ok(HttpResponse::Created()
             .json(insert_op))
     }
