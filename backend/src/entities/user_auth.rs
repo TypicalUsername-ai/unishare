@@ -8,7 +8,7 @@ use super::error::UnishareError;
 
 #[derive(Debug, Insertable, Queryable, Serialize, Deserialize)]
 #[diesel(table_name = users)]
-pub struct User {
+pub struct UserAuth {
     pub id: Uuid,
     pub username: String,
     pub user_email: String,
@@ -16,7 +16,7 @@ pub struct User {
     pub confirmed: bool,
 }
 
-impl User {
+impl UserAuth {
 
     pub fn hash_password(plaintext: &String) -> String {
         let hash_salt = SaltString::from_b64(std::env!("HASH_SALT")).expect("Error extracting hash salt from env");
@@ -61,8 +61,8 @@ impl NewUser {
         Self { username, email, password }
     }
 }
-impl From<NewUser> for User {
+impl From<NewUser> for UserAuth {
     fn from(raw: NewUser) -> Self {
-        User::new(raw.username, raw.email, raw.password)
+        UserAuth::new(raw.username, raw.email, raw.password)
     }
 }

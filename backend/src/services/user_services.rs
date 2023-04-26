@@ -3,7 +3,7 @@ use actix_web_httpauth::extractors::bearer::BearerAuth;
 use diesel::{r2d2::ConnectionManager, PgConnection};
 use r2d2::Pool;
 use uuid::Uuid;
-use crate::entities::{error::UnishareError, user_data::UserData};
+use crate::entities::{error::UnishareError, user_data::User};
 use super::token_middleware::validate_request;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
@@ -21,7 +21,7 @@ async fn profile(bearer: BearerAuth, pool: web::Data<ConnectionPool>, path: web:
     let mut db_conn = pool.get()?;
     let auth_result = validate_request(bearer, &mut db_conn).await;
     let prof_uid = path.into_inner();
-    let profile = UserData::by_uuid(prof_uid, &mut db_conn).await?;// get user data here
+    let profile = User::by_uuid(prof_uid, &mut db_conn).await?;// get user data here
     if let Ok(session) = auth_result {
         let current_id = profile.id;
         match session.user_id {
