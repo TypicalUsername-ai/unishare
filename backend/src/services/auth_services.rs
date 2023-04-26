@@ -95,15 +95,15 @@ async fn user_login(basic_auth: BasicAuth, pool: web::Data<ConnectionPool>) -> R
     let pass = UserAuth::hash_password(&plaintext);
     // find user in db
     let mut conn = pool.get()?;
-    let user: Option<Vec<Uuid>> = users::table
+    let user: Option<Uuid> = users::table
         .select(users::id)
         .filter(users::username.eq(uname).and(users::password_hash.eq(pass)))
-        .get_results(& mut conn).optional()?;
+        .get_result(& mut conn).optional()?;
 
     match user {
         None => Err(UnishareError::BadCredentials),
         Some(data) => {
-            let id = data[0];
+            let id = data;
             // create a cookie
             let jwt = Session::new(id);
             // store a cookie in db

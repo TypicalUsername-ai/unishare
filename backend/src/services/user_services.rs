@@ -5,12 +5,15 @@ use r2d2::Pool;
 use uuid::Uuid;
 use crate::entities::{error::UnishareError, user_data::User, user_review::UserReview};
 use super::token_middleware::validate_request;
+use log::warn;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg
         .service(
              web::scope("/users")
              .service(profile)
+             .service(get_reviews)
+             .service(add_review)
             );
 }
 
@@ -61,19 +64,26 @@ async fn get_reviews(auth: BearerAuth, pool: web::Data<ConnectionPool>, path: we
     let mut db_conn = pool.get()?;
 
     let user = validate_request(auth, &mut db_conn).await?;
-    let data = UserReview::by_uuid(id, db_conn).await?;
+    let data = UserReview::by_uuid(id, &mut db_conn).await?;
     
     Ok(HttpResponse::Ok().json(data))
 }
 
-#[post("/{user_id}/reviews")]
-async fn add_review(auth: BearerAuth, pool: web::Data<ConnectionPool>, data: web::Json<UserReview>) -> Result<impl Responder, UnishareError> {
-    
-    let review = data.into_inner();
-    let mut db_conn = pool.get()?;
+#[derive(Debug, serde::Deserialize)]
+struct ReviewData {
+    rating: i32,
+    comment: Option<String>
+}
 
+#[post("/{user_id}/reviews")]
+async fn add_review(auth: BearerAuth, pool: web::Data<ConnectionPool>, data: web::Json<ReviewData>, path: web::Path<Uuid>) -> Result<impl Responder, UnishareError> {
+    
+    let review_data = data.into_inner();
+    let mut db_conn = pool.get()?;
+    let target_id = path.into_inner();
     let user = validate_request(auth, &mut db_conn).await?;
-    let data = UserReview::add_review(review, db_conn).await?;
+    let review = UserReview { reviewer_id: user.user_id, reviewed_id: target_id, review: review_data.rating, comment: review_data.comment };
+    let data = UserReview::add_review(review, &mut db_conn).await?;
     
     Ok(HttpResponse::Ok().json(data))
 }
