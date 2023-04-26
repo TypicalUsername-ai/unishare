@@ -3,7 +3,7 @@ use actix_web_httpauth::extractors::bearer::BearerAuth;
 use diesel::{r2d2::ConnectionManager, PgConnection};
 use r2d2::Pool;
 use uuid::Uuid;
-use crate::entities::{error::UnishareError, user_data::User};
+use crate::entities::{error::UnishareError, user_data::User, user_review::UserReview};
 use super::token_middleware::validate_request;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
@@ -55,13 +55,25 @@ async fn get_files() -> Result<impl Responder, UnishareError> {
 }
 
 #[get("/{user_id}/reviews")]
-async fn get_reviews() -> Result<impl Responder, UnishareError> {
-    todo!();
-    Ok(HttpResponse::InternalServerError().finish())
+async fn get_reviews(auth: BearerAuth, pool: web::Data<ConnectionPool>, path: web::Path<Uuid>) -> Result<impl Responder, UnishareError> {
+
+    let id = path.into_inner();
+    let mut db_conn = pool.get()?;
+
+    let user = validate_request(auth, &mut db_conn).await?;
+    let data = UserReview::by_uuid(id, db_conn).await?;
+    
+    Ok(HttpResponse::Ok().json(data))
 }
 
 #[post("/{user_id}/reviews")]
-async fn add_review() -> Result<impl Responder, UnishareError> {
-    todo!();
-    Ok(HttpResponse::InternalServerError().finish())
+async fn add_review(auth: BearerAuth, pool: web::Data<ConnectionPool>, data: web::Json<UserReview>) -> Result<impl Responder, UnishareError> {
+    
+    let review = data.into_inner();
+    let mut db_conn = pool.get()?;
+
+    let user = validate_request(auth, &mut db_conn).await?;
+    let data = UserReview::add_review(review, db_conn).await?;
+    
+    Ok(HttpResponse::Ok().json(data))
 }
