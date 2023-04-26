@@ -7,6 +7,8 @@ import Registrationsuc from './registrationsuc'
 import Tos from './Tos'
 import PasswordReset from './PasswordReset'
 import PasswordSet from './PasswordSet'
+import Profile from './Profile'
+
 
 
 
@@ -46,7 +48,17 @@ const routes = [
 	{
 		path: "/passwordchange",
 		element: <PasswordSet />
-	}
+	},
+	{
+		path: "/:userid",
+		children: [
+			{
+				path: "/profile",
+				element: <Profile />,
+				loader: teamLoader,
+			},
+		],
+	},
 ]
 
 export default routes
