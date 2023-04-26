@@ -1,7 +1,7 @@
-use crate::schema::users;
+use crate::schema::{users, users_data};
 use serde::{Serialize, Deserialize};
 use uuid::Uuid;
-use diesel::{Insertable, Queryable, prelude::*};
+use diesel::{Insertable, Queryable, prelude::*, insert_into};
 use argon2::{Argon2, PasswordHasher, password_hash::SaltString};
 
 use super::error::UnishareError;
@@ -47,6 +47,21 @@ impl UserAuth {
             Err(UnishareError::ResourceNotFound { resource: format!("user {}", name) })
         }
     }
+
+    pub async fn confirm_user(id: Uuid, db_conn: &mut PgConnection) -> Result<UserAuth, UnishareError> {
+        let update_opt = diesel::update(users::table)
+            .filter(users::id.eq(id.clone()))
+            .set(users::confirmed.eq(true))
+            .get_result(db_conn).optional()?;
+        if let Some(data) = update_opt {
+            let insert_op = insert_into(users_data::table).values(Some(users_data::user_id.eq(id))).execute(db_conn)?;
+            Ok(data)
+        } else {
+            Err(UnishareError::ResourceNotFound { resource: format!("User {}", id) })
+        }
+    }
+
+
 }
 
 #[derive(Debug, Serialize, Deserialize)]

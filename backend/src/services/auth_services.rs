@@ -49,11 +49,8 @@ struct Uid {
 async fn confirm_account(id_payload: web::Query<Uid>, pool: web::Data<ConnectionPool>) -> Result<impl Responder, UnishareError> {
     let uid = id_payload.uid;
     let mut conn = pool.get()?;
-    let update_op = diesel::update(users::table)
-        .filter(users::id.eq(uid)).set(users::confirmed.eq(true))
-        .execute(&mut conn)?;
-    let insert_op = insert_into(users_data::table).values(Some(users_data::user_id.eq(uid))).execute(&mut conn)?;
-    Ok(HttpResponse::Ok().json(()))
+    let data = UserAuth::confirm_user(uid, &mut conn).await?;
+    Ok(HttpResponse::Ok().json(data))
 }
 
 /// Function for creation of new user objects
