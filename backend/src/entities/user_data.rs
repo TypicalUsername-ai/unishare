@@ -50,6 +50,22 @@ impl User {
         }
     }
 
+    /// Retrieves user data by username
+    /// useful for text search functionality
+    pub async fn by_name(name: String, db_conn: &mut PgConnection) -> Result <Vec<GuestView>, UnishareError> {
+        let opt_data = users_data::table
+            .inner_join(users::table.on(users::id.eq(users_data::user_id)))
+            .filter(users::username.ilike(format!("{}%", name)))
+            .load::<(UserData, UserAuth)>(db_conn)
+            .optional()?;
+        if let Some(results) = opt_data {
+            let data = results.into_iter().map(|a| User::from(a).into()).collect();
+            Ok(data)
+        } else {
+            Ok(vec![])
+        }
+    }
+
     /// Retrieves `UserData` object from the database matching the provided `Uuid` of the file said
     /// user owns
     pub async fn by_file_id(file_id: Uuid, db_conn: &mut PgConnection) -> Result<Self, UnishareError> {

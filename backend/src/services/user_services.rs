@@ -14,6 +14,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
              .service(profile)
              .service(get_reviews)
              .service(add_review)
+             .service(search)
             );
 }
 
@@ -39,6 +40,22 @@ async fn profile(bearer: BearerAuth, pool: web::Data<ConnectionPool>, path: web:
         // return basic user profile (for unregistered users)
         Ok(HttpResponse::Ok().json(profile.as_guest()))
     }
+}
+
+#[derive(Debug, serde::Deserialize)]
+struct Uname {
+    name: String,
+}
+
+#[get("/search")]
+async fn search(pool: web::Data<ConnectionPool>, data: web::Query<Uname>) -> Result<impl Responder, UnishareError> {
+
+    let mut db_conn = pool.get()?;
+    let name = data.into_inner();
+
+    let results = User::by_name(name.name, &mut db_conn).await?;
+
+    Ok(HttpResponse::Ok().json(results))
 }
 
 #[post("/{user_id}/profile")]

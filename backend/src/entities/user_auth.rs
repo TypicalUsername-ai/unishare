@@ -40,7 +40,7 @@ impl UserAuth {
 
     /// Retrieves user data by username
     pub async fn by_name(name: String, db_conn: &mut PgConnection) -> Result <Vec<Self>, UnishareError> {
-        let data: Option<Vec<Self>> = users::table.filter(users::username.like(name.clone())).load(db_conn).optional()?;
+        let data: Option<Vec<Self>> = users::table.filter(users::username.ilike(name.clone())).load(db_conn).optional()?;
         if let Some(results) = data {
             Ok(results)
         } else {
