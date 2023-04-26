@@ -24,7 +24,9 @@ async fn profile(bearer: BearerAuth, pool: web::Data<ConnectionPool>, path: web:
     let mut db_conn = pool.get()?;
     let auth_result = validate_request(bearer, &mut db_conn).await;
     let prof_uid = path.into_inner();
-    let profile = User::by_uuid(prof_uid, &mut db_conn).await?;// get user data here
+    let profile = User::by_uuid(prof_uid, &mut db_conn).await?;
+    // get user data here
+    warn!("{:?} -> {:?}", prof_uid, profile);
     if let Ok(session) = auth_result {
         let current_id = profile.id;
         match session.user_id {

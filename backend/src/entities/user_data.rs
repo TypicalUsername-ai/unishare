@@ -38,7 +38,11 @@ impl User {
 
     /// Retrieves `UserData` object from the database matching the provided user's `Uuid`
     pub async fn by_uuid(id: Uuid, db_conn: &mut PgConnection) -> Result<Self, UnishareError> {
-        let opt_data = users_data::table.inner_join(users::table.on(users::id.eq(users_data::user_id))).first::<(UserData, UserAuth)>(db_conn).optional()?;
+        let opt_data = users_data::table
+            .inner_join(users::table.on(users::id.eq(users_data::user_id)))
+            .filter(users::id.eq(id.clone()))
+            .first::<(UserData, UserAuth)>(db_conn)
+            .optional()?;
         if let Some(result) = opt_data {
             Ok(result.into())
         } else {
