@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import validator from "validator";
 import "./form.css";
 // import "./index.css"; not necessary <?>
@@ -52,6 +52,10 @@ const UserForm = ({ onSave, user = {} }) => {
         )
         console.log(response)
         if (response.ok) {
+            
+            let data = await response.json();
+           // console.log(data);
+
             navigate("/loggedin");
         } else {
             let errors = {}
