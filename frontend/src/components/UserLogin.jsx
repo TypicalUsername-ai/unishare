@@ -54,8 +54,8 @@ const UserForm = ({ onSave, user = {} }) => {
         if (response.ok) {
             
             let data = await response.json();
-           // console.log(data);
-
+            console.log(data.access_token);
+            let access_token = data.access_token;
             navigate("/loggedin");
         } else {
             let errors = {}

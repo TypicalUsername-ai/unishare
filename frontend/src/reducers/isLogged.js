@@ -1,7 +1,14 @@
-const loggedReducer = (state=false, action) => {
+const initialState = {
+    authenticationToken: ,
+    userId: '',
+} 
+
+loggedReducer = (state=initialState, action) => {
     switch(action.type){
-        case 'SIGN_IN' :
-            return !state;
+        case 'GET_TOKEN' :
+            return state.authenticationToken;
+        case 'GET_USER' :
+            return state.userId;
             default:
                 return state;
     }
