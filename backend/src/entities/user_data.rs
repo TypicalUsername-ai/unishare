@@ -1,23 +1,69 @@
-use diesel::{PgConnection, Queryable};
+use diesel::{PgConnection, Queryable, prelude::*};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
-use super::{error::UnishareError, file::File};
+use super::{error::UnishareError, file::File, user_auth::UserAuth};
+use crate::schema::{users_data, users};
 
 #[derive(Debug, Serialize, Deserialize, Queryable)]
+#[diesel(table_name = users_data)]
 pub struct UserData {
-    pub username: String,
     pub id: Uuid,
-    pub email: String,
-    pub pub_files: u64,
-    pub priv_files: u64,
-    pub rating: f32,
-    pub tokens: u64,
+    pub pub_files: i32,
+    pub priv_files: i32,
+    pub tokens: i32,
 }
 
-impl UserData {
-    /// Retrieves `UserData` object from the database matching the provided `Uuid`
+#[derive(Debug, Serialize, Deserialize)]
+pub struct User {
+    pub id: Uuid,
+    pub username: String,
+    pub email: String,
+    pub pub_files: i32,
+    pub priv_files: i32,
+    pub tokens: i32,
+    pub rating: f32,
+
+}
+
+impl From<(UserData, UserAuth)> for User {
+    fn from(value: (UserData, UserAuth)) -> Self {
+        let data = value.0;
+        let auth = value.1;
+
+        Self { id: auth.id, username: auth.username, email: auth.user_email, pub_files: data.pub_files, priv_files: data.priv_files, tokens: data.tokens, rating: 5.0 }
+    }
+}
+
+impl User {
+
+    /// Retrieves `UserData` object from the database matching the provided user's `Uuid`
     pub async fn by_uuid(id: Uuid, db_conn: &mut PgConnection) -> Result<Self, UnishareError> {
-        todo!()
+        let opt_data = users_data::table
+            .inner_join(users::table.on(users::id.eq(users_data::user_id)))
+            .filter(users::id.eq(id.clone()))
+            .first::<(UserData, UserAuth)>(db_conn)
+            .optional()?;
+        if let Some(result) = opt_data {
+            Ok(result.into())
+        } else {
+            Err(UnishareError::ResourceNotFound { resource: format!("UserData {}", id) })
+        }
+    }
+
+    /// Retrieves user data by username
+    /// useful for text search functionality
+    pub async fn by_name(name: String, db_conn: &mut PgConnection) -> Result <Vec<GuestView>, UnishareError> {
+        let opt_data = users_data::table
+            .inner_join(users::table.on(users::id.eq(users_data::user_id)))
+            .filter(users::username.ilike(format!("{}%", name)))
+            .load::<(UserData, UserAuth)>(db_conn)
+            .optional()?;
+        if let Some(results) = opt_data {
+            let data = results.into_iter().map(|a| User::from(a).into()).collect();
+            Ok(data)
+        } else {
+            Ok(vec![])
+        }
     }
 
     /// Retrieves `UserData` object from the database matching the provided `Uuid` of the file said
@@ -63,11 +109,11 @@ impl UserData {
 pub struct GuestView {
     username: String,
     id: Uuid,
-    pub_files: u64,
+    pub_files: i32,
 }
 
-impl From<UserData> for GuestView {
-    fn from(value: UserData) -> Self {
+impl From<User> for GuestView {
+    fn from(value: User) -> Self {
         Self { username: value.username, id: value.id, pub_files: value.pub_files }
     }
 }
@@ -76,13 +122,13 @@ impl From<UserData> for GuestView {
 pub struct UserView {
     username: String,
     id: Uuid,
-    pub_files: u64,
-    priv_files: u64,
+    pub_files: i32,
+    priv_files: i32,
     email: String,
 }
 
-impl From<UserData> for UserView {
-    fn from(value: UserData) -> Self {
+impl From<User> for UserView {
+    fn from(value: User) -> Self {
         Self { username: value.username, id: value.id, pub_files: value.pub_files, priv_files: value.priv_files, email: value.email }
     }
 }
