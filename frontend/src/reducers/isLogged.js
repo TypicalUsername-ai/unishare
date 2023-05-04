@@ -1,16 +1,11 @@
-const initialState = {
-    authenticationToken: ,
-    userId: '',
-} 
 
-loggedReducer = (state=initialState, action) => {
+loggedReducer = (state='', action) => {
     switch(action.type){
         case 'GET_TOKEN' :
-            return state.authenticationToken;
-        case 'GET_USER' :
-            return state.userId;
-            default:
-                return state;
+            return state ;
+        default:
+            return state;
+        
     }
 };
 
