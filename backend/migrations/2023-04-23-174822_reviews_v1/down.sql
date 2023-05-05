@@ -1,3 +1,3 @@
 -- This file should undo anything in `up.sql`
 
-DROP TABLE user_reviews;
+DROP TABLE user_reviews CASCADE;

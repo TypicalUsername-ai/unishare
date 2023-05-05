@@ -18,7 +18,7 @@ diesel::table! {
 }
 
 diesel::table! {
-    users (id) {
+    users_auth (id) {
         id -> Uuid,
         username -> Text,
         user_email -> Text,
@@ -39,6 +39,6 @@ diesel::table! {
 diesel::allow_tables_to_appear_in_same_query!(
     sessions,
     user_reviews,
-    users,
+    users_auth,
     users_data,
 );

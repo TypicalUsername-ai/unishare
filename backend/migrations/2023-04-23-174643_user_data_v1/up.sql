@@ -7,5 +7,5 @@ CREATE TABLE users_data (
 	tokens integer NOT NULL DEFAULT 0,
 	CONSTRAINT fk_user_id
 		FOREIGN KEY (user_id)
-		REFERENCES users(id)
+		REFERENCES users_auth(id)
 );

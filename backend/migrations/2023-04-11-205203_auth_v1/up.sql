@@ -1,7 +1,7 @@
 -- Your SQL goes here
 -- basic table for user auth
 
-CREATE TABLE users (
+CREATE TABLE users_auth (
 	id uuid PRIMARY KEY,
 	username TEXT NOT NULL,
 	user_email TEXT NOT NULL,

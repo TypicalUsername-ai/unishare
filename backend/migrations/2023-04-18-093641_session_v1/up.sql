@@ -6,5 +6,5 @@ CREATE TABLE sessions (
 	expires_at timestamp NOT NULL,
 	CONSTRAINT fk_user_id 
 		FOREIGN KEY (user_id) 
-		REFERENCES users(id)
+		REFERENCES users_auth(id)
 )
