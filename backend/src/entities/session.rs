@@ -47,8 +47,8 @@ impl Session {
     }
 
     pub fn try_from_token(base64encoded: String) -> Result<Self, serde_json::Error> {
-        let json_bytes = general_purpose::STANDARD_NO_PAD.decode(base64encoded).expect("Failed b64 decode");
-        let json_string = String::from_utf8(json_bytes).expect("Failed [u8] string conversion");
+        let json_bytes = general_purpose::STANDARD_NO_PAD.decode(base64encoded).unwrap_or(vec![]);
+        let json_string = String::from_utf8(json_bytes).unwrap_or("".to_owned());
         serde_json::from_str(&json_string)
     }
 

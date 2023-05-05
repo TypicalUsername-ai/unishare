@@ -1,6 +1,8 @@
 use actix_web::{HttpServer, App, middleware::Logger, web};
 use env_logger::Env;
 use diesel::{r2d2::{ConnectionManager, Pool}, pg::PgConnection};
+use lettre::transport::smtp::{authentication::{Credentials, Mechanism}, PoolConfig};
+use lettre::SmtpTransport;
 use services::{user_services, auth_services};
 
 mod services;
@@ -21,11 +23,21 @@ async fn main() -> std::io::Result<()> {
         .build(conn_manager)
         .expect("Error in connecting to PSQL database, failed to create pool");
 
+    let sender = SmtpTransport::starttls_relay("smtp.office365.com").expect("Failed to establish tls mailer")
+    .credentials(Credentials::new(
+        std::env!("APP_MAIL").to_owned(),
+        std::env!("MAIL_PASSWORD").to_owned()
+    ))
+    .authentication(vec![Mechanism::Login])
+    .pool_config(PoolConfig::new().max_size(20))
+    .build();
+
     HttpServer::new( move || {
         App::new()
             .wrap(Logger::default())
             .wrap(Logger::new("%a %{User-Agent}i"))
             .app_data(web::Data::new(conn_pool.clone()))
+            .app_data(web::Data::new(sender.clone()))
             .configure(services::webapp::webapp_config)
             .service(
                 web::scope("/api")
