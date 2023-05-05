@@ -1,7 +1,9 @@
+import UserInformations from "./components/UserInformations"
+
 function Account() {
 	return (
-		<div>
-		Hello from account
+		<div style={{textAlign: "center"}}>
+			<UserInformations/>
 		</div>
 	)
 }
