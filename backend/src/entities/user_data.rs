@@ -2,7 +2,7 @@ use diesel::{PgConnection, Queryable, prelude::*};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 use super::{error::UnishareError, file::File, user_auth::UserAuth};
-use crate::schema::{users_data, users};
+use crate::schema::{users_data, users_auth};
 
 #[derive(Debug, Serialize, Deserialize, Queryable)]
 #[diesel(table_name = users_data)]
@@ -39,8 +39,8 @@ impl User {
     /// Retrieves `UserData` object from the database matching the provided user's `Uuid`
     pub async fn by_uuid(id: Uuid, db_conn: &mut PgConnection) -> Result<Self, UnishareError> {
         let opt_data = users_data::table
-            .inner_join(users::table.on(users::id.eq(users_data::user_id)))
-            .filter(users::id.eq(id.clone()))
+            .inner_join(users_auth::table.on(users_auth::id.eq(users_data::user_id)))
+            .filter(users_auth::id.eq(id.clone()))
             .first::<(UserData, UserAuth)>(db_conn)
             .optional()?;
         if let Some(result) = opt_data {
@@ -54,8 +54,8 @@ impl User {
     /// useful for text search functionality
     pub async fn by_name(name: String, db_conn: &mut PgConnection) -> Result <Vec<GuestView>, UnishareError> {
         let opt_data = users_data::table
-            .inner_join(users::table.on(users::id.eq(users_data::user_id)))
-            .filter(users::username.ilike(format!("{}%", name)))
+            .inner_join(users_auth::table.on(users_auth::id.eq(users_data::user_id)))
+            .filter(users_auth::username.ilike(format!("{}%", name)))
             .load::<(UserData, UserAuth)>(db_conn)
             .optional()?;
         if let Some(results) = opt_data {

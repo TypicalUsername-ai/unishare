@@ -1,4 +1,4 @@
-use crate::schema::{users, users_data};
+use crate::schema::{users_auth, users_data};
 use serde::{Serialize, Deserialize};
 use uuid::Uuid;
 use diesel::{Insertable, Queryable, prelude::*, insert_into};
@@ -7,7 +7,7 @@ use argon2::{Argon2, PasswordHasher, password_hash::SaltString};
 use super::error::UnishareError;
 
 #[derive(Debug, Insertable, Queryable, Serialize, Deserialize)]
-#[diesel(table_name = users)]
+#[diesel(table_name = users_auth)]
 pub struct UserAuth {
     pub id: Uuid,
     pub username: String,
@@ -40,7 +40,7 @@ impl UserAuth {
 
     /// Retrieves user data by username
     pub async fn by_name(name: String, db_conn: &mut PgConnection) -> Result <Vec<Self>, UnishareError> {
-        let data: Option<Vec<Self>> = users::table.filter(users::username.ilike(name.clone())).load(db_conn).optional()?;
+        let data: Option<Vec<Self>> = users_auth::table.filter(users_auth::username.ilike(name.clone())).load(db_conn).optional()?;
         if let Some(results) = data {
             Ok(results)
         } else {
@@ -49,9 +49,9 @@ impl UserAuth {
     }
 
     pub async fn confirm_user(id: Uuid, db_conn: &mut PgConnection) -> Result<UserAuth, UnishareError> {
-        let update_opt = diesel::update(users::table)
-            .filter(users::id.eq(id.clone()))
-            .set(users::confirmed.eq(true))
+        let update_opt = diesel::update(users_auth::table)
+            .filter(users_auth::id.eq(id.clone()))
+            .set(users_auth::confirmed.eq(true))
             .get_result(db_conn).optional()?;
         if let Some(data) = update_opt {
             let insert_op = insert_into(users_data::table).values(Some(users_data::user_id.eq(id))).execute(db_conn)?;

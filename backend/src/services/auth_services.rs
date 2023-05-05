@@ -5,7 +5,7 @@ use log::warn;
 use uuid::Uuid;
 use crate::{entities::{user_auth::{NewUser, UserAuth}, session::{Session, AuthResponse}}, schema::users_data};
 use crate::entities::error::UnishareError;
-use crate::schema::users;
+use crate::schema::users_auth;
 use crate::schema::sessions;
 use actix_web_httpauth::extractors::{bearer::BearerAuth, basic::BasicAuth};
 use super::token_middleware::validate_request;
@@ -60,16 +60,16 @@ async fn confirm_account(id_payload: web::Query<Uid>, pool: web::Data<Connection
 async fn create_user(data: web::Json<NewUser>, pool: web::Data<ConnectionPool>, mailer: web::Data<SmtpTransport>) -> Result<impl Responder, UnishareError> {
     let to_register= UserAuth::from(data.into_inner());
     let mut conn = pool.get()?;
-    let matches: Vec<UserAuth> = users::table
-        .filter(users::user_email.eq(&to_register.user_email.clone()))
-        .or_filter(users::username.eq(&to_register.username.clone()))
+    let matches: Vec<UserAuth> = users_auth::table
+        .filter(users_auth::user_email.eq(&to_register.user_email.clone()))
+        .or_filter(users_auth::username.eq(&to_register.username.clone()))
         .get_results(&mut conn)?;
     if matches.len() != 0 {
         warn!("{:?}", matches);
         Err(UnishareError::DuplicateCredentials)
     } else {
 
-        let insert_op: Vec<UserAuth> = insert_into(users::table).values(to_register).get_results(&mut conn)?;
+        let insert_op: Vec<UserAuth> = insert_into(users_auth::table).values(to_register).get_results(&mut conn)?;
         let link = format!("{}/api/confirm?uid={}", std::env!("HOSTNAME"), insert_op[0].id);
         let email = Message::builder()
             .from(Mailbox::new(None, std::env!("APP_MAIL").parse::<Address>().expect("error parsing user email")))
@@ -95,9 +95,9 @@ async fn user_login(basic_auth: BasicAuth, pool: web::Data<ConnectionPool>) -> R
     let pass = UserAuth::hash_password(&plaintext);
     // find user in db
     let mut conn = pool.get()?;
-    let user: Option<Uuid> = users::table
-        .select(users::id)
-        .filter(users::username.eq(uname).and(users::password_hash.eq(pass)))
+    let user: Option<Uuid> = users_auth::table
+        .select(users_auth::id)
+        .filter(users_auth::username.eq(uname).and(users_auth::password_hash.eq(pass)))
         .get_result(& mut conn).optional()?;
 
     match user {
@@ -141,7 +141,10 @@ async fn password_reset(payload: web::Json<Email>, pool: web::Data<ConnectionPoo
     // mailer functionality to send the reset password
     warn!("Mailer unimplemented");
     // invalidater all existing sessions
-    let id_opt: Option<Uuid> = users::table.select(users::id).filter(users::user_email.eq(payload.email.clone())).first(&mut db_conn).optional()?;
+    let id_opt: Option<Uuid> = users_auth::table
+        .select(users_auth::id)
+        .filter(users_auth::user_email.eq(payload.email.clone()))
+        .first(&mut db_conn).optional()?;
 
     if let Some(id) = id_opt {
         let rem_sessions = diesel::delete(sessions::table.filter(sessions::user_id.eq(id))).execute(&mut db_conn)?;
@@ -163,11 +166,11 @@ struct NewPass {
 async fn new_password(pass_data: web::Json<NewPass>, pool: web::Data<ConnectionPool>) -> Result<impl Responder, UnishareError> {
     let mut db_conn = pool.get()?;
     // get user
-    let user_opt: Option<UserAuth> = users::table.filter(users::id.eq(pass_data.user_id.clone())).first(&mut db_conn).optional()?;
+    let user_opt: Option<UserAuth> = users_auth::table.filter(users_auth::id.eq(pass_data.user_id.clone())).first(&mut db_conn).optional()?;
     if let Some(user) = user_opt {
         // reset his password to the one in payload
-        let update = diesel::update(users::table.filter(users::id.eq(user.id)))
-                     .set(users::password_hash.eq(UserAuth::hash_password(&pass_data.password))).execute(&mut db_conn)?;
+        let update = diesel::update(users_auth::table.filter(users_auth::id.eq(user.id)))
+                     .set(users_auth::password_hash.eq(UserAuth::hash_password(&pass_data.password))).execute(&mut db_conn)?;
         // send no content
         Ok(HttpResponse::NoContent().finish())
 
