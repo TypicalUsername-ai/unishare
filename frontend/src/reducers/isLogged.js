@@ -1,8 +1,8 @@
 
-loggedReducer = (state='', action) => {
+const loggedReducer = (state="", action) => {
     switch(action.type){
         case 'GET_TOKEN' :
-            return state ;
+            return state;
         default:
             return state;
         
