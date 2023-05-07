@@ -11,7 +11,7 @@ export default function File (props) {
                 </Avatar.Root>
                 <section style={{textAlign: "left"}}>
                     <h3 style={{marginBottom: "8px"}}>{props.title}</h3>
-                    <button className='seeMore'>See more</button>
+                    <button className='seeMore'>Details</button>
                 </section>
             
         </div>

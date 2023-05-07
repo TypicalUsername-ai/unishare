@@ -25,7 +25,7 @@ export default function UserInformations () {
                     <h3 style={{marginTop: "0px"}}>Khalimov</h3>
                 </div>
             </section>
-            <UserFiles/>
+            
 
         </div>
     );

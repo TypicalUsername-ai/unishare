@@ -13,6 +13,8 @@ export default function UserFiles () {
             <File 
                 title="Abstract Algebra"
                 picture="https://static2.strzelce360.pl/data/articles/xl-ernest-khalimov-czy-istnieje-kto-to-wiek-wzrost-waga-wikipedia-1669905523-full.jpg"/>
+
+            <button className="seeMore" style={{backgroundColor: "#4CA1AF", marginBottom: "20px"}}>See more</button>
         </div>
     );
 }
