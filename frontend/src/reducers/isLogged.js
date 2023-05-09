@@ -1,10 +1,18 @@
+const initialState = {
+    token: false,
+    authenticationCode: ""
+}
 
-const loggedReducer = (state="", action) => {
+const loggedReducer = (state=initialState, action) => {
     switch(action.type){
-        case 'GET_TOKEN' :
-            return state;
+        case 'IS_TRUE' :
+            return state.token;
+        case 'GET_TOKEN': return {
+            ...state,
+            authenticationCode: action.payload
+        }
         default:
-            return state;
+            return state.token;
         
     }
 };

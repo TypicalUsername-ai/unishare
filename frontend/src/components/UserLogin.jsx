@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import validator from "validator";
 import "./form.css";
-// import "./index.css"; not necessary <?>
+import { connect } from 'react-redux';
+import { getToken } from "../action/getToken";
+
 
 import * as Toast from '@radix-ui/react-toast';
 import Field from "./field";
