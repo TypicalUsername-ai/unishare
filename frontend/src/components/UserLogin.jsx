@@ -3,7 +3,8 @@ import validator from "validator";
 import "./form.css";
 import { connect } from 'react-redux';
 import { getToken } from "../action/getToken";
-
+import { setLogged } from "../action/setLogged";
+import {store} from './store.jsx'
 
 import * as Toast from '@radix-ui/react-toast';
 import Field from "./field";
@@ -58,6 +59,11 @@ const UserForm = ({ onSave, user = {} }) => {
             let data = await response.json();
             console.log(data.access_token);
             let access_token = data.access_token;
+            store.subscribe(() => console.log(store.getState()))
+
+            store.dispatch(getToken(access_token));
+            store.dispatch(setLogged());
+
             navigate("/loggedin");
         } else {
             let errors = {}

@@ -11,6 +11,11 @@ const loggedReducer = (state=initialState, action) => {
             ...state,
             authenticationCode: action.payload
         }
+        case 'SET_LOGGED' :
+            return {
+                ...state,
+                token: true
+            }
         default:
             return state.token;
         
