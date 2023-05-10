@@ -2,8 +2,10 @@ use actix_web::{web, Responder, HttpResponse, get, post, delete};
 use actix_web_httpauth::extractors::bearer::BearerAuth;
 use diesel::{r2d2::ConnectionManager, PgConnection};
 use r2d2::Pool;
+use serde::{Serialize, Deserialize};
+use serde_json::json;
 use uuid::Uuid;
-use crate::entities::{error::UnishareError, user_data::User, user_review::UserReview};
+use crate::entities::{error::UnishareError, user_data::{User, self}, user_review::UserReview, file::File};
 use super::token_middleware::validate_request;
 use log::warn;
 
@@ -70,10 +72,18 @@ async fn delete_account() -> Result<impl Responder, UnishareError> {
     Ok(HttpResponse::InternalServerError().finish())
 }
 
+#[derive(Serialize, Deserialize)]
+struct Files {
+    pub files : Vec<File>
+}
+
 #[get("/{user_id}/files")]
-async fn get_files() -> Result<impl Responder, UnishareError> {
-    todo!();
-    Ok(HttpResponse::InternalServerError().finish())
+async fn get_files(bearer: BearerAuth, pool: web::Data<ConnectionPool>, path: web::Path<Uuid>) -> Result<impl Responder, UnishareError> {
+    let mut db_conn = pool.get()?;
+    let auth_result = validate_request(bearer, &mut db_conn).await?;
+    let user = User::by_uuid(path.to_owned(), &mut db_conn).await?;
+    let files = user.get_owned_files(&mut db_conn).await?;
+    Ok(HttpResponse::Ok().json(Files{files}))
 }
 
 #[get("/{user_id}/reviews")]

@@ -23,21 +23,22 @@ diesel::table! {
 }
 
 diesel::table! {
-    purchases (id) {
-        id -> Uuid,
-        creator_id -> Uuid,
-        buyer_id -> Uuid,
-        file_id -> Uuid,
-        purchase_time -> Timestamp,
-        price -> Int4,
-    }
-}
-
-diesel::table! {
     sessions (session_id) {
         session_id -> Uuid,
         user_id -> Uuid,
         expires_at -> Timestamp,
+    }
+}
+
+diesel::table! {
+    transactions (id) {
+        id -> Uuid,
+        transaction_type -> Int4,
+        creator_id -> Uuid,
+        buyer_id -> Uuid,
+        file_id -> Uuid,
+        transaction_time -> Timestamp,
+        price -> Int4,
     }
 }
 
@@ -70,14 +71,14 @@ diesel::table! {
 }
 
 diesel::joinable!(files_content -> files_data (id));
-diesel::joinable!(purchases -> files_data (file_id));
-diesel::joinable!(purchases -> users (buyer_id));
+diesel::joinable!(transactions -> files_data (file_id));
+diesel::joinable!(transactions -> users (buyer_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
     files_content,
     files_data,
-    purchases,
     sessions,
+    transactions,
     user_reviews,
     users,
     users_data,

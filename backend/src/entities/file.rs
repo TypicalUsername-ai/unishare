@@ -1,17 +1,19 @@
 use std::time::SystemTime;
-use diesel::{PgConnection, RunQueryDsl, OptionalExtension};
+use diesel::{PgConnection, prelude::*};
 use uuid::Uuid;
-use crate::schema::{users_data::tokens, purchases::{file_id, self}};
+use crate::schema::{users_data::{tokens, self}, transactions::{file_id, self}};
+use serde::{Serialize, Deserialize};
 
 use super::error::UnishareError;
 
+#[derive(Debug, Serialize, Deserialize)]
 pub struct File {
     name: String,
     id: Uuid,
     creator: Uuid,
     created: SystemTime,
     last_edit: SystemTime,
-    price: u64,
+    price: i32,
     rating: f32,
     primary_tag: String,
     secondary_tag: String,
@@ -27,12 +29,8 @@ pub struct FileOpt {
     available: Option<bool>,
 }
 
-impl File {
-    /// Checks if file is available (for purchase or viewing)
-    async fn available(db_conn: &mut PgConnection) -> Result<Self, UnishareError> {
-        todo!();
-    }
 
+impl File {
     /// Adds a new file authored by the provided user id
     pub async fn add_new(user: Uuid, db_conn: &mut PgConnection)-> Result<Self, UnishareError> {
         todo!();
@@ -41,8 +39,8 @@ impl File {
     /// Attempts to purchase the provided file by the user with the provided id
     pub async fn purchase(&self, buyer_id: Uuid, db_conn: &mut PgConnection) -> Result<(), UnishareError> {
         if(self.available == true) {
-            let update_owner = self.update_tokens(self.creator, -self.price, db_conn);
-            let update_buyer = self.update_tokens(buyer_id, self.price, db_conn);
+            let update_owner = self.update_tokens(self.creator, self.price, db_conn).await?;
+            let update_buyer = self.update_tokens(buyer_id, -self.price, db_conn).await?;
             let create_transaction = diesel::insert_into(purchases::table)
             .values((
                 purchases::creator_id.eq(self.creator.clone()), 
@@ -51,6 +49,10 @@ impl File {
                 purchases::purchase_time.eq(SystemTime::now()),
                 purchases::price.eq(self.price.clone())
             )).execute(db_conn)?;
+            Ok(())
+        }
+        else {
+            Err(UnishareError::ResourceNotFound { resource: self.name.to_owned() })
         }
     }
 
@@ -65,10 +67,11 @@ impl File {
         todo!();
     }
 
-    async fn update_tokens(&self, user_id: Uuid, tokens_amount: u64, db_conn: &mut PgConnection) -> Result<Self, UnishareError> {
-        let update_user = diesel::update(users::table)
-            .filter(users::id.eq(user_id.clone()))
-            .set(users::tokens.eq(users::tokens + tokens_amount))
-            .get_result(db_conn).optional()?;
+    async fn update_tokens(&self, user_id: Uuid, tokens_amount: i32, db_conn: &mut PgConnection) -> Result<(), UnishareError> {
+        let update_user = diesel::update(users_data::table)
+            .filter(users_data::user_id.eq(user_id.clone()))
+            .set(users_data::tokens.eq(users_data::tokens + tokens_amount))
+            .execute(db_conn)?;
+        Ok(())
     }
 }

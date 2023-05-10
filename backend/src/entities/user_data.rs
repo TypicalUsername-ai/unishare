@@ -2,7 +2,8 @@ use diesel::{PgConnection, Queryable, prelude::*};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 use super::{error::UnishareError, file::File, user_auth::UserAuth};
-use crate::schema::{users_data, users};
+use crate::schema::{users_data, users, files_data};
+use std::ptr::eq;
 
 #[derive(Debug, Serialize, Deserialize, Queryable)]
 #[diesel(table_name = users_data)]
@@ -79,7 +80,11 @@ impl User {
 
     /// Returns the vector of file objects which the user owns
     pub async fn get_owned_files(&self, db_conn: &mut PgConnection) -> Result<Vec<File>, UnishareError> {
-        todo!();
+        let files = files_data::table
+        .filter(files_data::creator.eq(self.id))
+        .load::<(File)>(db_conn)
+        .optional()?;
+        Ok(files.unwrap())
     }
 
     /// Adds a new reting to the user and updates the cumulative rating

@@ -1,11 +1,12 @@
 -- Your SQL goes here
 
-CREATE TABLE purchases (
+CREATE TABLE transactions (
     id uuid NOT NULL,
+    transaction_type int NOT NULL,
     creator_id uuid NOT NULL,
     buyer_id uuid NOT NULL,
     file_id uuid NOT NULL,
-    purchase_time timestamp NOT NULL,
+    transaction_time timestamp NOT NULL,
     price integer NOT NULL,
     CONSTRAINT fk_creator
         FOREIGN KEY (creator_id)
