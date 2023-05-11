@@ -15,7 +15,7 @@ diesel::table! {
         created_time -> Timestamp,
         last_edit_time -> Timestamp,
         price -> Int4,
-        rating -> Numeric,
+        rating -> Float4,
         primary_tag -> Nullable<Text>,
         secondary_tag -> Nullable<Text>,
         available -> Bool,

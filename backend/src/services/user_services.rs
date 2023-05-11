@@ -3,9 +3,8 @@ use actix_web_httpauth::extractors::bearer::BearerAuth;
 use diesel::{r2d2::ConnectionManager, PgConnection};
 use r2d2::Pool;
 use serde::{Serialize, Deserialize};
-use serde_json::json;
 use uuid::Uuid;
-use crate::entities::{error::UnishareError, user_data::{User, self}, user_review::UserReview, file::File};
+use crate::entities::{error::UnishareError, user_data::User, user_review::UserReview, file::File};
 use super::token_middleware::validate_request;
 use log::warn;
 
