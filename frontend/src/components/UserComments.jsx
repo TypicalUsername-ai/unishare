@@ -2,6 +2,7 @@ import Review from "./Review";
 
 
 export default function UserComments () {
+
     return (
         <div className="GlobalContainer">
             <h2>Reviews</h2>
