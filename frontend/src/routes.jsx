@@ -3,10 +3,12 @@ import Account from './Account'
 import Registration from './Registration'
 import Login from './Login'
 import Loggedin from './Loggedin'
-import Registrationsuc from './registrationsuc'
+import Registrationsuc from './Registrationsuc'
 import Tos from './Tos'
 import PasswordReset from './PasswordReset'
 import PasswordSet from './PasswordSet'
+import Explore from './Explore'
+
 
 
 
@@ -46,6 +48,10 @@ const routes = [
 	{
 		path: "/passwordchange",
 		element: <PasswordSet />
+	},
+	{
+		path: "/explore",
+		element: <Explore />
 	}
 ]
 
