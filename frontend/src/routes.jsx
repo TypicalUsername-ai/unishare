@@ -7,6 +7,8 @@ import Registrationsuc from './Registrationsuc'
 import Tos from './Tos'
 import PasswordReset from './PasswordReset'
 import PasswordSet from './PasswordSet'
+import Explore from './Explore'
+
 
 
 
@@ -46,6 +48,10 @@ const routes = [
 	{
 		path: "/passwordchange",
 		element: <PasswordSet />
+	},
+	{
+		path: "/explore",
+		element: <Explore />
 	}
 ]
 
