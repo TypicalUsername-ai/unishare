@@ -2,12 +2,12 @@ import React, { useEffect, useState } from "react";
 import validator from "validator";
 import "./form.css";
 import { connect } from 'react-redux';
-import { getToken } from "../action/getToken";
-import { setLogged } from "../action/setLogged";
-import { store } from './store.jsx'
+import { getToken } from "../../action/getToken";
+import { setLogged } from "../../action/setLogged";
+import { store } from '../store.jsx'
 
 import * as Toast from '@radix-ui/react-toast';
-import Field from "./field";
+import Field from "../field";
 import { useNavigate } from "react-router-dom";
 
 const UserLoginForm = ({ onSave, user = {} }) => {

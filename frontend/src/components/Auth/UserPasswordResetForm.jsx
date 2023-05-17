@@ -4,7 +4,7 @@ import "./form.css";
 // import "./index.css"; not necessary <?>
 
 import * as Toast from '@radix-ui/react-toast';
-import Field from "./field";
+import Field from "../field";
 import { useNavigate } from "react-router-dom";
 import { useSearchParams } from "react-router-dom";
 
