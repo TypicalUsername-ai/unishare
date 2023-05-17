@@ -6,7 +6,7 @@ use serde::{Serialize, Deserialize};
 
 use super::error::UnishareError;
 
-#[derive(Debug, Serialize, Deserialize, Queryable)]
+#[derive(Debug, Serialize, Deserialize, Queryable, Insertable)]
 #[diesel(table_name = files_data)]
 pub struct File {
     name: String,
