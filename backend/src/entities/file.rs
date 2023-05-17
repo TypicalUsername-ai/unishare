@@ -15,7 +15,7 @@ pub struct File {
     created: SystemTime,
     last_edit: SystemTime,
     price: i32,
-    rating: f64,
+    rating: f32,
     primary_tag: Option<String>,
     secondary_tag: Option<String>,
     available: bool,
