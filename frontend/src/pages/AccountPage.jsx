@@ -13,7 +13,7 @@ function AccountPage() {
 			<UserInformation />
 			<UserFilesContainer />
 			<UserComments />
-			<AddReview />
+			<UserReviewForm />
 
 		</div>
 	)
