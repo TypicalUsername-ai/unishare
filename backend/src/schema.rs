@@ -1,10 +1,44 @@
 // @generated automatically by Diesel CLI.
 
 diesel::table! {
+    files_content (id) {
+        id -> Uuid,
+        content -> Bytea,
+    }
+}
+
+diesel::table! {
+    files_data (id) {
+        name -> Text,
+        id -> Uuid,
+        creator -> Uuid,
+        created_time -> Timestamp,
+        last_edit_time -> Timestamp,
+        price -> Int4,
+        rating -> Float4,
+        primary_tag -> Nullable<Text>,
+        secondary_tag -> Nullable<Text>,
+        available -> Bool,
+    }
+}
+
+diesel::table! {
     sessions (session_id) {
         session_id -> Uuid,
         user_id -> Uuid,
         expires_at -> Timestamp,
+    }
+}
+
+diesel::table! {
+    transactions (id) {
+        id -> Uuid,
+        transaction_type -> Int4,
+        creator_id -> Uuid,
+        buyer_id -> Uuid,
+        file_id -> Uuid,
+        transaction_time -> Timestamp,
+        price -> Int4,
     }
 }
 
@@ -36,8 +70,15 @@ diesel::table! {
     }
 }
 
+diesel::joinable!(files_content -> files_data (id));
+diesel::joinable!(transactions -> files_data (file_id));
+diesel::joinable!(transactions -> users (buyer_id));
+
 diesel::allow_tables_to_appear_in_same_query!(
+    files_content,
+    files_data,
     sessions,
+    transactions,
     user_reviews,
     users,
     users_data,

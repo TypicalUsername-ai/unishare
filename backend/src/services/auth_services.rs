@@ -3,13 +3,13 @@ use actix_web::{web, get, post, Responder, HttpResponse};
 use diesel::{prelude::*, r2d2::{Pool, ConnectionManager}, pg::PgConnection, insert_into};
 use log::warn;
 use uuid::Uuid;
-use crate::{entities::{user_auth::{NewUser, UserAuth}, session::{Session, AuthResponse}}, schema::users_data};
+use crate::entities::{user_auth::{NewUser, UserAuth}, session::{Session, AuthResponse}};
 use crate::entities::error::UnishareError;
 use crate::schema::users;
 use crate::schema::sessions;
 use actix_web_httpauth::extractors::{bearer::BearerAuth, basic::BasicAuth};
 use super::token_middleware::validate_request;
-
+use serde::Deserialize;
 use lettre::{SmtpTransport, Transport, Message, Address, message::Mailbox};
 
 
@@ -40,7 +40,7 @@ async fn test(auth: BearerAuth, pool: web::Data<ConnectionPool>) -> Result<impl 
     Ok(HttpResponse::Ok().json(session))
 }
 
-#[derive(Debug, serde::Deserialize)]
+#[derive(Debug, Deserialize)]
 struct Uid {
     uid: Uuid,
 }
