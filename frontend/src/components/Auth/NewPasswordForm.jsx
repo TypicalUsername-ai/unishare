@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import validator from "validator";
-import "./form.css";
+import "../form.css";
 // import "./index.css"; not necessary <?>
 
 import * as Toast from '@radix-ui/react-toast';

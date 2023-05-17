@@ -1,5 +1,5 @@
-import UserPasswordReset from "../components/UserPasswordReset";
-import "./components/form.css";
+import UserPasswordReset from "../components/Auth/UserPasswordResetForm";
+import "../components/form.css";
 
 function ForgotPasswordPage() {
     const user = {

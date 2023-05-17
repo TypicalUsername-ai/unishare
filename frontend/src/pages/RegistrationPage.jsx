@@ -1,6 +1,6 @@
-import UserForm from "../components/UserForm";
-import "./components/form.css";
-import RegSuccess from "../components/RegSuccess";
+import UserRegistrationForm from "../components/Auth/UserRegistrationForm";
+import "../components/form.css";
+import RegistrationSuccess from "../components/Auth/RegistrationSuccess";
 
 function RegistrationPage () {
 
@@ -17,7 +17,7 @@ function RegistrationPage () {
     return (
         <div className="registrationContainer">
             <h1>UniShare Registration</h1>
-            <UserForm onSave={handleSave} {...{ user }}/>
+            <UserRegistrationForm onSave={handleSave} {...{ user }}/>
         </div>
     );
 }

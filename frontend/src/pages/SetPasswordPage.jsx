@@ -1,5 +1,5 @@
-import UserPasswordSet from "../components/UserPasswordSet";
-import "./components/form.css";
+import NewPasswordForm from "../components/Auth/NewPasswordForm";
+import "../components/form.css";
 
 function SetPasswordPage() {
     const user = {
@@ -15,7 +15,7 @@ function SetPasswordPage() {
     return (
         <div className="registrationContainer">
             <h1>Password Reminder</h1>
-            <UserPasswordSet onSave={handleSave} {...{ user }} />
+            <NewPasswordForm onSave={handleSave} {...{ user }} />
         </div>
     );
 }

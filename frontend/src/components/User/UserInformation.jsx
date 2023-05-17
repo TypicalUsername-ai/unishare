@@ -1,7 +1,7 @@
 import * as Avatar from '@radix-ui/react-avatar';
-import UserFiles from '../UserFiles';
+import UserFilesContainer from './UserFilesContainer';
 
-export default function UserInformations () {
+function UserInformation () {
     return (
         <div className='GlobalContainer'>
             <section style={{display: "flex", verticalAlign: "middle"}}>
@@ -30,3 +30,5 @@ export default function UserInformations () {
         </div>
     );
 }
+
+export default UserInformation

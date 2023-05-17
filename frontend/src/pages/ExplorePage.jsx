@@ -1,5 +1,5 @@
 import ExploreSearch from "../components/ExploreSearch";
-import "./components/form.css";
+import "../components/form.css";
 
 function ExplorePage() {
     const user = {

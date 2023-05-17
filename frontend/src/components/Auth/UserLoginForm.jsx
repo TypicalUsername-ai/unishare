@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import validator from "validator";
-import "./form.css";
+import "../form.css";
 import { connect } from 'react-redux';
 import { getToken } from "../../action/getToken";
 import { setLogged } from "../../action/setLogged";
