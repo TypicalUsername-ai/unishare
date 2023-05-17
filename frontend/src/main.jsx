@@ -7,15 +7,20 @@ import {
 import './index.css'
 import routes from './routes'
 import NavMenu from './components/NavMenu'
-
+import {createStore} from 'redux'
+import allReducers from './reducers'
+import {Provider} from 'react-redux'
+import {store} from './components/store.jsx'
 const router = createBrowserRouter(routes, {basename: '/app/'});
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-	<div className="TopMenu">
-		<div> UniShare </div>
-		<NavMenu/>
-	</div>
-    <RouterProvider router={router}/>
-  </React.StrictMode>,
+<Provider store={store}>
+	<React.StrictMode>
+		<div className="TopMenu">
+			<div> UniShare </div>
+			<NavMenu/>
+		</div>
+		<RouterProvider router={router}/>
+	</React.StrictMode>,
+</Provider>
 )
