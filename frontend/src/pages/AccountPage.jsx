@@ -1,7 +1,7 @@
 import UserInformations from "./components/UserInformations"
 import UserFiles from "./components/UserFiles"
 import UserComments from "./components/UserComments"
-import AddReview from "./components/UserAddReview"
+import UserReviewForm from "./components/UserAddReview"
 import './account.css'
 
 

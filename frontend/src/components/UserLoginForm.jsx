@@ -4,13 +4,13 @@ import "./form.css";
 import { connect } from 'react-redux';
 import { getToken } from "../action/getToken";
 import { setLogged } from "../action/setLogged";
-import {store} from './store.jsx'
+import { store } from './store.jsx'
 
 import * as Toast from '@radix-ui/react-toast';
 import Field from "./field";
 import { useNavigate } from "react-router-dom";
 
-const UserForm = ({ onSave, user = {} }) => {
+const UserLoginForm = ({ onSave, user = {} }) => {
     const navigate = useNavigate();
     const [userData, setUserData] = useState(user);
     const [errors, setErrors] = useState({});
@@ -55,7 +55,7 @@ const UserForm = ({ onSave, user = {} }) => {
         )
         console.log(response)
         if (response.ok) {
-            
+
             let data = await response.json();
             console.log(data.access_token);
             let access_token = data.access_token;
@@ -91,7 +91,7 @@ const UserForm = ({ onSave, user = {} }) => {
                     className="formButton"
                     onClick={passwordReminder}>
                     Forgot Password
-                        </button>
+                </button>
                 <Toast.Viewport className="ToastViewport" />
             </Toast.Provider>
 
@@ -100,7 +100,7 @@ const UserForm = ({ onSave, user = {} }) => {
                     className="formButton"
                     onClick={handleSave}>
                     Login
-                        </button>
+                </button>
                 <Toast.Viewport className="ToastViewport" />
             </Toast.Provider>
 
@@ -108,4 +108,4 @@ const UserForm = ({ onSave, user = {} }) => {
     );
 }
 
-export default UserForm;
+export default UserLoginForm;

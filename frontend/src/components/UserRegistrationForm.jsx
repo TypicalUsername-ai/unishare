@@ -7,7 +7,7 @@ import * as Toast from '@radix-ui/react-toast';
 import Field from "./field";
 import { useNavigate } from "react-router-dom";
 
-const UserForm = ({ onSave, user = {} }) => {
+const UserRegistrationForm = ({ onSave, user = {} }) => {
     const navigate = useNavigate();
     const [userData, setUserData] = useState(user);
     const [errors, setErrors] = useState({});
@@ -126,7 +126,7 @@ const UserForm = ({ onSave, user = {} }) => {
                     className="formButton"
                     onClick={handleSave}>
                     Register
-                        </button>
+                </button>
 
                 <Toast.Root className="ToastRoot" open={open} onOpenChange={setOpen}>
                     <Toast.Title className="ToastTitle">{title}</Toast.Title>
@@ -143,4 +143,4 @@ const UserForm = ({ onSave, user = {} }) => {
     );
 }
 
-export default UserForm;
+export default UserRegistrationForm;

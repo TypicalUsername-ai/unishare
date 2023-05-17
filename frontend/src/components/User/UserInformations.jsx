@@ -1,5 +1,5 @@
 import * as Avatar from '@radix-ui/react-avatar';
-import UserFiles from './UserFiles';
+import UserFiles from '../UserFiles';
 
 export default function UserInformations () {
     return (

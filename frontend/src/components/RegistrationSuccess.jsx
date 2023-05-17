@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as Toast from '@radix-ui/react-toast';
 
-const RegSuccess = ({handleSave}) => {
+const RegistrationSuccess = ({handleSave}) => {
 
     const [open, setOpen] = React.useState(false);
     const timerRef = React.useRef(0);
@@ -34,4 +34,4 @@ const RegSuccess = ({handleSave}) => {
     </Toast.Provider>
     );
 }    
-export default RegSuccess;
+export default RegistrationSuccess;
