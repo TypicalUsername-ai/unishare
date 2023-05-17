@@ -1,4 +1,4 @@
-function Home() {
+function HomePage() {
 	return (
 		<div className="HomeScreen">
 		Welcome to unishare, nice to have you here
@@ -6,4 +6,4 @@ function Home() {
 	)
 }
 
-export default Home
+export default HomePage

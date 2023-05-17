@@ -1,8 +1,8 @@
-import UserForm from "./components/UserForm";
+import UserForm from "../components/UserForm";
 import "./components/form.css";
-import RegSuccess from "./components/RegSuccess";
+import RegSuccess from "../components/RegSuccess";
 
-export default function Registration () {
+function RegistrationPage () {
 
     const user = {
         username: "",
@@ -21,3 +21,5 @@ export default function Registration () {
         </div>
     );
 }
+
+export default RegistrationPage

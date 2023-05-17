@@ -1,4 +1,4 @@
-function Registrationsuc() {
+function RegistrationConfirmPage() {
     return (
         <div className="HomeScreen">
             Registered!
@@ -6,4 +6,4 @@ function Registrationsuc() {
     )
 }
 
-export default Registrationsuc
+export default RegistrationConfirmPage

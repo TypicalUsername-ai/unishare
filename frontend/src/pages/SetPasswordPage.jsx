@@ -1,7 +1,7 @@
-import ExploreSearch from "../components/ExploreSearch";
+import UserPasswordSet from "../components/UserPasswordSet";
 import "./components/form.css";
 
-function Explore() {
+function SetPasswordPage() {
     const user = {
         username: "",
         email: "",
@@ -14,10 +14,10 @@ function Explore() {
 
     return (
         <div className="registrationContainer">
-            <h1>Explore</h1>
-            <ExploreSearch onSave={handleSave} {...{ user }} />
+            <h1>Password Reminder</h1>
+            <UserPasswordSet onSave={handleSave} {...{ user }} />
         </div>
     );
 }
 
-export default Explore
+export default SetPasswordPage

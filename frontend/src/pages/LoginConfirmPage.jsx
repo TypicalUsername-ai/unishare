@@ -1,4 +1,4 @@
-function Loggedin() {
+function LoginConfirmPage() {
     return (
         <div className="HomeScreen">
             Logged in successfully;
@@ -6,4 +6,4 @@ function Loggedin() {
     )
 }
 
-export default Loggedin
+export default LoginConfirmPage

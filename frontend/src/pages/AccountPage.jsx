@@ -6,7 +6,7 @@ import './account.css'
 
 
 
-function Account() {
+function AccountPage() {
 
 	return (
 		<div style={{ textAlign: "center" }} className="GlobalContainer">
@@ -19,4 +19,4 @@ function Account() {
 	)
 }
 
-export default Account
+export default AccountPage

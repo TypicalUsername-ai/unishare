@@ -1,7 +1,9 @@
-import UserPasswordSet from "./components/UserPasswordSet";
+import UserForm from "../components/UserLogin";
 import "./components/form.css";
+import RegSuccess from "../components/RegSuccess";
 
-function PasswordSet() {
+function LoginPage() {
+
     const user = {
         username: "",
         email: "",
@@ -14,10 +16,10 @@ function PasswordSet() {
 
     return (
         <div className="registrationContainer">
-            <h1>Password Reminder</h1>
-            <UserPasswordSet onSave={handleSave} {...{ user }} />
+            <h1>UniShare Login</h1>
+            <UserForm onSave={handleSave} {...{ user }} />
         </div>
     );
 }
 
-export default PasswordSet
+export default LoginPage

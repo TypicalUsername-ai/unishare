@@ -1,9 +1,7 @@
-import UserForm from "../components/UserLogin";
+import UserPasswordReset from "../components/UserPasswordReset";
 import "./components/form.css";
-import RegSuccess from "../components/RegSuccess";
 
-export default function Registration() {
-
+function ForgotPasswordPage() {
     const user = {
         username: "",
         email: "",
@@ -16,8 +14,10 @@ export default function Registration() {
 
     return (
         <div className="registrationContainer">
-            <h1>UniShare Login</h1>
-            <UserForm onSave={handleSave} {...{ user }} />
+            <h1>Password Reminder</h1>
+            <UserPasswordReset onSave={handleSave} {...{ user }} />
         </div>
     );
 }
+
+export default ForgotPasswordPage
