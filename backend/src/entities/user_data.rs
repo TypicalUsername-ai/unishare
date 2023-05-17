@@ -82,7 +82,7 @@ impl User {
     pub async fn get_owned_files(&self, db_conn: &mut PgConnection) -> Result<Vec<File>, UnishareError> {
         let files = files_data::table
         .filter(files_data::creator.eq(self.id))
-        .load::<(File)>(db_conn)
+        .load::<File>(db_conn)
         .optional()?;
         Ok(files.unwrap())
     }

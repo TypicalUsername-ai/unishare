@@ -7,7 +7,7 @@ CREATE TABLE files_data (
     created_time timestamp NOT NULL,
     last_edit_time timestamp NOT NULL,
     price integer NOT NULL,
-    rating numeric NOT NULL DEFAULT 0,
+    rating real NOT NULL DEFAULT 0,
     primary_tag text DEFAULT NULL,
     secondary_tag text DEFAULT NULL,
     available boolean NOT NULL DEFAULT TRUE,

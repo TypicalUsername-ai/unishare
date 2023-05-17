@@ -6,7 +6,8 @@ use serde::{Serialize, Deserialize};
 
 use super::error::UnishareError;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Queryable)]
+#[diesel(table_name = files_data)]
 pub struct File {
     name: String,
     id: Uuid,
@@ -14,9 +15,9 @@ pub struct File {
     created: SystemTime,
     last_edit: SystemTime,
     price: i32,
-    rating: f32,
-    primary_tag: String,
-    secondary_tag: String,
+    rating: f64,
+    primary_tag: Option<String>,
+    secondary_tag: Option<String>,
     available: bool,
 }
 
@@ -41,13 +42,13 @@ impl File {
         if(self.available == true) {
             let update_owner = self.update_tokens(self.creator, self.price, db_conn).await?;
             let update_buyer = self.update_tokens(buyer_id, -self.price, db_conn).await?;
-            let create_transaction = diesel::insert_into(purchases::table)
+            let create_transaction = diesel::insert_into(transactions::table)
             .values((
-                purchases::creator_id.eq(self.creator.clone()), 
-                purchases::buyer_id.eq(buyer_id.clone()), 
-                purchases::file_id.eq(self.id.clone()), 
-                purchases::purchase_time.eq(SystemTime::now()),
-                purchases::price.eq(self.price.clone())
+                transactions::creator_id.eq(self.creator.clone()), 
+                transactions::buyer_id.eq(buyer_id.clone()), 
+                transactions::file_id.eq(self.id.clone()), 
+                transactions::transaction_time.eq(SystemTime::now()),
+                transactions::price.eq(self.price.clone())
             )).execute(db_conn)?;
             Ok(())
         }
