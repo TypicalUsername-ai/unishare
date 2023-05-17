@@ -1,4 +1,4 @@
-import UserPasswordReset from "./components/UserPasswordReset";
+import UserPasswordReset from "../components/UserPasswordReset";
 import "./components/form.css";
 
 function PasswordReset() {

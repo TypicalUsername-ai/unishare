@@ -1,7 +1,9 @@
-import ExploreSearch from "./components/ExploreSearch";
+import UserForm from "../components/UserLogin";
 import "./components/form.css";
+import RegSuccess from "../components/RegSuccess";
 
-function Explore() {
+export default function Registration() {
+
     const user = {
         username: "",
         email: "",
@@ -14,10 +16,8 @@ function Explore() {
 
     return (
         <div className="registrationContainer">
-            <h1>Explore</h1>
-            <ExploreSearch onSave={handleSave} {...{ user }} />
+            <h1>UniShare Login</h1>
+            <UserForm onSave={handleSave} {...{ user }} />
         </div>
     );
 }
-
-export default Explore
