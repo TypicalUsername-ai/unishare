@@ -1,7 +1,13 @@
 import * as Avatar from '@radix-ui/react-avatar';
 import UserFilesContainer from './UserFilesContainer';
+import { useSelector } from 'react-redux';
 
 function UserInformation () {
+
+    const id = useSelector((state) => state.user.id);
+    const auth = useSelector((state) => state.token);
+    console.log(auth.token);
+
     return (
         <div className='GlobalContainer'>
             <section style={{display: "flex", verticalAlign: "middle"}}>
@@ -23,6 +29,11 @@ function UserInformation () {
                 <div style={{display: "flex", verticalAlign: "middle"}}>
                     <h3 style={{marginTop: "0px", marginLeft: "20px"}}>Surname:&nbsp;&nbsp;</h3>
                     <h3 style={{marginTop: "0px"}}>Khalimov</h3>
+                </div>
+
+                <div style={{display: "flex", verticalAlign: "middle"}}>
+                    <h3 style={{marginTop: "0px", marginLeft: "20px"}}>Id:&nbsp;&nbsp;</h3>
+                    <h3 style={{marginTop: "0px"}}>{id}</h3>
                 </div>
             </section>
             

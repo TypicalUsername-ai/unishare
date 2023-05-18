@@ -1,23 +1,25 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import validator from "validator";
 import "../form.css";
-import { connect } from 'react-redux';
-import { getToken } from "../../action/getToken";
-import { setLogged } from "../../action/setLogged";
-import { store } from '../store.jsx'
 
 import * as Toast from '@radix-ui/react-toast';
 import Field from "../field";
 import { useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from 'react-redux';
+import { setToken } from '../../reducers/tokenSlice';
+import { setUserId } from '../../reducers/userSlice'
 
 const UserLoginForm = ({ onSave, user = {} }) => {
     const navigate = useNavigate();
     const [userData, setUserData] = useState(user);
     const [errors, setErrors] = useState({});
-    const [open, setOpen] = React.useState(false);
-    const timerRef = React.useRef(0);
+    const [open, setOpen] = useState(false);
 
     const { username, email, password } = userData;
+
+    const token = useSelector((state) => state.token);
+    const user_data = useSelector((state) => state.user);
+    const dispatch = useDispatch();
 
     const validateData = () => {
         let errors = {};
@@ -57,13 +59,12 @@ const UserLoginForm = ({ onSave, user = {} }) => {
         if (response.ok) {
 
             let data = await response.json();
-            console.log(data.access_token);
+            console.log(data);
             let access_token = data.access_token;
-            store.subscribe(() => console.log(store.getState()))
-
-            store.dispatch(getToken(access_token));
-            store.dispatch(setLogged());
-
+            let user_id = data.user;
+            console.log(user_id);
+            dispatch(setToken(access_token));
+            dispatch(setUserId(user_id));
             navigate("/loggedin");
         } else {
             let errors = {}
