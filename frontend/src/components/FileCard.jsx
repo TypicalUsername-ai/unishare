@@ -1,6 +1,6 @@
 import * as Avatar from '@radix-ui/react-avatar';
 
-export default function File (props) {
+function FileCard (props) {
     return (
         <div style={{display: "flex", backgroundColor: "#4CA1AF", borderRadius: "45px", marginBottom: "20px"}} >
             <Avatar.Root className="AvatarRoot" style={{borderRadius: "20px"}}>
@@ -17,3 +17,5 @@ export default function File (props) {
         </div>
     );
 } 
+
+export default FileCard

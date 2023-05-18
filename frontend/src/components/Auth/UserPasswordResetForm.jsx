@@ -1,19 +1,19 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import validator from "validator";
-import "./form.css";
+import "../form.css";
 // import "./index.css"; not necessary <?>
 
 import * as Toast from '@radix-ui/react-toast';
-import Field from "./field";
+import Field from "../field";
 import { useNavigate } from "react-router-dom";
 import { useSearchParams } from "react-router-dom";
 
-const UserPasswordReset = ({ onSave, user = {} }) => {
+const UserPasswordResetForm = ({ onSave, user = {} }) => {
     const [userData, setUserData] = useState(user);
     const [errors, setErrors] = useState({});
 
-    const [open, setOpen] = React.useState(false);
-    const timerRef = React.useRef(0);
+    const [open, setOpen] = useState(false);
+    const timerRef = useRef(0);
     const [title, setTitle] = useState("Reset succesful");
     const [text, setText] = useState("Verification sent to provided email");
 
@@ -98,4 +98,4 @@ const UserPasswordReset = ({ onSave, user = {} }) => {
     );
 }
 
-export default UserPasswordReset;
+export default UserPasswordResetForm;

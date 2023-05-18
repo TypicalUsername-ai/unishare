@@ -1,6 +1,6 @@
-import File from "./File";
+import File from "../FileCard";
 
-export default function UserFiles () {
+function UserFilesContainer () {
     return (
         <div style={{backgroundColor: "AliceBlue"}}>
             <h2>Latest files</h2>
@@ -18,3 +18,5 @@ export default function UserFiles () {
         </div>
     );
 }
+
+export default UserFilesContainer

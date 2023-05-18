@@ -1,7 +1,7 @@
-import ExploreSearch from "./components/ExploreSearch";
-import "./components/form.css";
+import ExploreSearch from "../components/ExploreSearch";
+import "../components/form.css";
 
-function Explore() {
+function ExplorePage() {
     const user = {
         username: "",
         email: "",
@@ -20,4 +20,4 @@ function Explore() {
     );
 }
 
-export default Explore
+export default ExplorePage

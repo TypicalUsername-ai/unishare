@@ -1,13 +1,13 @@
-import Home from './Home'
-import Account from './Account'
-import Registration from './Registration'
-import Login from './Login'
-import Loggedin from './Loggedin'
-import Registrationsuc from './Registrationsuc'
-import Tos from './Tos'
-import PasswordReset from './PasswordReset'
-import PasswordSet from './PasswordSet'
-import Explore from './Explore'
+import HomePage from './pages/HomePage'
+import AccountPage from './pages/AccountPage'
+import RegistrationPage from './pages/RegistrationPage'
+import LoginPage from './pages/LoginPage'
+import LoginConfirmPage from './pages/LoginConfirmPage'
+import RegistrationConfirmPage from './pages/RegistrationConfirmPage'
+import TosPage from './pages/TosPage'
+import ForgotPasswordPage from './pages/ForgotPasswordPage'
+import SetPasswordPage from './pages/SetPasswordPage'
+import ExplorePage from './pages/ExplorePage'
 
 
 
@@ -15,43 +15,43 @@ import Explore from './Explore'
 const routes = [
 	{
 		path: "/home",
-		element: <Home />
+		element: <HomePage/>
 	},
 	{
 		path: "/account",
-		element: <Account />
+		element: <AccountPage />
 	},
 	{
 		path: "/register",
-		element: <Registration />
+		element: <RegistrationPage />
 	},
 	{
 		path: "/login",
-		element: <Login />
+		element: <LoginPage />
 	},
 	{
 		path: "/loggedin",
-		element: <Loggedin />
+		element: <LoginConfirmPage />
 	},
 	{
 		path: "/registrationsuc",
-		element: <Registrationsuc />
+		element: <RegistrationConfirmPage />
 	},
 	{
 		path: "/tos",
-		element: <Tos />
+		element: <TosPage />
 	},
 	{
 		path: "/passwordreset",
-		element: <PasswordReset />
+		element: <ForgotPasswordPage />
 	},
 	{
 		path: "/passwordchange",
-		element: <PasswordSet />
+		element: <SetPasswordPage />
 	},
 	{
-		path: "/explore",
-		element: <Explore />
+	path: "/explore",
+		element: <ExplorePage />
 	}
 ]
 

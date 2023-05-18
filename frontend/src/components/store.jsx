@@ -1,5 +1,10 @@
-import {createStore} from 'redux'
-import allReducers from '../reducers'
+import { configureStore } from '@reduxjs/toolkit'
+import tokenReducer from '../reducers/tokenSlice'
+import userReducer from '../reducers/userSlice'
 
-export const store = createStore(allReducers,
-	window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
+export default configureStore({
+	reducer: {
+		token: tokenReducer,
+		user: userReducer,
+	}
+})

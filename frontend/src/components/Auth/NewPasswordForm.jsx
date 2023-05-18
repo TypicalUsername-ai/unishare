@@ -1,15 +1,15 @@
 import React, { useState } from "react";
 import validator from "validator";
-import "./form.css";
+import "../form.css";
 // import "./index.css"; not necessary <?>
 
 import * as Toast from '@radix-ui/react-toast';
-import Field from "./field";
+import Field from "../field";
 import { useNavigate } from "react-router-dom";
 
 import { useSearchParams } from "react-router-dom";
 
-const UserPasswordSet = ({ onSave, user = {} }) => {
+const NewPasswordForm = ({ onSave, user = {} }) => {
     const navigate = useNavigate();
     const [userData, setUserData] = useState(user);
     const [errors, setErrors] = useState({});
@@ -127,4 +127,4 @@ const UserPasswordSet = ({ onSave, user = {} }) => {
     );
 }
 
-export default UserPasswordSet;
+export default NewPasswordForm;

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const AddReview = () => {
+const UserReviewForm = () => {
     const [isPopupOpen, setPopupOpen] = useState(false);
     const [reviewText, setReviewText] = useState('');
 
@@ -40,4 +40,4 @@ const AddReview = () => {
     );
 };
 
-export default AddReview;
+export default UserReviewForm;

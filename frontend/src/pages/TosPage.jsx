@@ -1,4 +1,4 @@
-function Tos() {
+function TosPage() {
     return (
         <div className="HomeScreen">
             Eligibility: To use the UniShare portal, users must be at least 18 years old or have the consent of a legal guardian. Users must also provide accurate and complete information when creating an account and must not impersonate others or use false identities.
@@ -18,4 +18,4 @@ Changes to the Terms of Service: UniShare may modify these terms of service at a
     )
 }
 
-export default Tos
+export default TosPage

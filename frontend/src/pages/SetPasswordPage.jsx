@@ -1,7 +1,7 @@
-import UserPasswordReset from "./components/UserPasswordReset";
-import "./components/form.css";
+import NewPasswordForm from "../components/Auth/NewPasswordForm";
+import "../components/form.css";
 
-function PasswordReset() {
+function SetPasswordPage() {
     const user = {
         username: "",
         email: "",
@@ -15,9 +15,9 @@ function PasswordReset() {
     return (
         <div className="registrationContainer">
             <h1>Password Reminder</h1>
-            <UserPasswordReset onSave={handleSave} {...{ user }} />
+            <NewPasswordForm onSave={handleSave} {...{ user }} />
         </div>
     );
 }
 
-export default PasswordReset
+export default SetPasswordPage

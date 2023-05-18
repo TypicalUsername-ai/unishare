@@ -1,6 +1,6 @@
 import * as Avatar from '@radix-ui/react-avatar';
 
-export default function Review (props) {
+function ReviewCard (props) {
     return (
         <div style={{backgroundColor: "aliceblue", borderRadius: "50px", display: "inline-block", marginBottom: "20px"}}>
                 <Avatar.Root className="AvatarRoot" style={{borderRadius: "20px"}}>
@@ -17,3 +17,5 @@ export default function Review (props) {
         </div>
     );
 }
+
+export default ReviewCard

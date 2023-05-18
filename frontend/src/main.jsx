@@ -7,10 +7,9 @@ import {
 import './index.css'
 import routes from './routes'
 import NavMenu from './components/NavMenu'
-import {createStore} from 'redux'
-import allReducers from './reducers'
 import {Provider} from 'react-redux'
-import {store} from './components/store.jsx'
+import store from './components/store'
+
 const router = createBrowserRouter(routes, {basename: '/app/'});
 
 ReactDOM.createRoot(document.getElementById('root')).render(
