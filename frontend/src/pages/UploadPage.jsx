@@ -1,6 +1,6 @@
 import Field from '../components/field';
 import React, { useState } from "react";
-import Upload from '../components/Upload'
+
 
 const UploadPage = ({onSave, file={}}) => {
 
@@ -8,6 +8,7 @@ const UploadPage = ({onSave, file={}}) => {
     const [FileData, setFileData] = useState(file);
     const [errors, setErrors] = useState({});
     const [open, setOpen] = React.useState(false);
+    const [selectedFile, setSelectedFile] = useState(null);
     const {title, description, price} = FileData;
 
     const validateData = () => {
@@ -69,7 +70,7 @@ const UploadPage = ({onSave, file={}}) => {
             <Field default="Price (PLN)" name="price" onChange={handleChange}/>
                 <div className="errorInformation"></div>
 
-            <Upload/>
+            <input type='file' value={selectedFile}   ></input>
 
 
 
