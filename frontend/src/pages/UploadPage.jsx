@@ -1,6 +1,6 @@
 import Field from '../components/field';
 import React, { useState } from "react";
-import { FileUpload } from 'primereact/fileupload';
+import Upload from '../components/Upload'
 
 const UploadPage = ({onSave, file={}}) => {
 
@@ -69,7 +69,7 @@ const UploadPage = ({onSave, file={}}) => {
             <Field default="Price (PLN)" name="price" onChange={handleChange}/>
                 <div className="errorInformation"></div>
 
-        
+            <Upload/>
 
 
 
