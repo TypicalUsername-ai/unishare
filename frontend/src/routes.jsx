@@ -8,6 +8,7 @@ import TosPage from './pages/TosPage'
 import ForgotPasswordPage from './pages/ForgotPasswordPage'
 import SetPasswordPage from './pages/SetPasswordPage'
 import ExplorePage from './pages/ExplorePage'
+import UploadPage from './pages/UploadPage'
 
 
 
@@ -52,6 +53,10 @@ const routes = [
 	{
 	path: "/explore",
 		element: <ExplorePage />
+	},
+	{
+			path: "/upload",
+			element: <UploadPage />
 	}
 ]
 

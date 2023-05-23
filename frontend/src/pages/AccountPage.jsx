@@ -4,6 +4,7 @@ import UserComments from "../components/User/UserComments"
 import UserReviewForm from "../components/User/UserReviewForm"
 import './account.css'
 import { useSelector } from "react-redux"
+import FileUpload from "../components/FileUpload"
 
 
 
@@ -14,6 +15,7 @@ function AccountPage() {
 	return (
 		<div style={{ textAlign: "center" }} className="GlobalContainer">
 			<UserInformation />
+			<FileUpload/>
 			<UserFilesContainer />
 			<UserComments />
 			<UserReviewForm />
