@@ -1,16 +1,26 @@
 import React, { useState } from 'react';
+import { useParams } from 'react-router-dom';
+
 
 const UserReviewForm = () => {
     const [isPopupOpen, setPopupOpen] = useState(false);
     const [reviewText, setReviewText] = useState('');
+    const { userId } = useParams();
 
     const handleButtonClick = () => {
         setPopupOpen(true);
     };
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
-        // Same as in search need to do api search but I have no idea which one to use so Mateusz will need to guide me through the process
+        const options = {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: '{"user_id":"' + userId + '","review":"' + reviewText + "reviewerId" + userId + '"}'
+        };
+
+        let response = await fetch('http://localhost/api/add_review', options)
+
         console.log('Review:', reviewText);
         setReviewText('');
         setPopupOpen(false);
