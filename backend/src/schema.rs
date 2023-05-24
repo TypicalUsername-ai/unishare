@@ -1,6 +1,15 @@
 // @generated automatically by Diesel CLI.
 
 diesel::table! {
+    file_reviews (file_id, reviewer_id) {
+        file_id -> Uuid,
+        reviewer_id -> Uuid,
+        review -> Int4,
+        comment -> Nullable<Text>,
+    }
+}
+
+diesel::table! {
     files_content (id) {
         id -> Uuid,
         content -> Bytea,
@@ -75,6 +84,7 @@ diesel::joinable!(transactions -> files_data (file_id));
 diesel::joinable!(transactions -> users (buyer_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
+    file_reviews,
     files_content,
     files_data,
     sessions,
