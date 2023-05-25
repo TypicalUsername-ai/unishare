@@ -2,11 +2,13 @@ import * as Avatar from '@radix-ui/react-avatar';
 import UserFilesContainer from './UserFilesContainer';
 import { useSelector } from 'react-redux';
 
-function UserInformation () {
+function UserInformation (props) {
 
-    const id = useSelector((state) => state.user.id);
+    const id = props.id;
     const auth = useSelector((state) => state.token);
     console.log(auth.token);
+
+    
 
     return (
         <div className='GlobalContainer'>

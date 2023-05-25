@@ -1,8 +1,13 @@
+import Header from "../components/Header"
+
 function RegistrationConfirmPage() {
     return (
-        <div className="HomeScreen">
-            Registered!
-		</div>
+        <div>
+            <Header/>
+            <div className="HomeScreen">
+                Registered!
+            </div>
+        </div>
     )
 }
 
