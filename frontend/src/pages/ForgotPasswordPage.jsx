@@ -1,4 +1,5 @@
 import UserPasswordReset from "../components/Auth/UserPasswordResetForm";
+import Header from "../components/Header";
 import "../components/form.css";
 
 function ForgotPasswordPage() {
@@ -14,6 +15,7 @@ function ForgotPasswordPage() {
 
     return (
         <div className="registrationContainer">
+            <Header/>
             <h1>Password Reminder</h1>
             <UserPasswordReset onSave={handleSave} {...{ user }} />
         </div>

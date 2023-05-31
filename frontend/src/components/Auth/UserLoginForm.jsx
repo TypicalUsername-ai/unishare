@@ -25,7 +25,6 @@ const UserLoginForm = ({ onSave, user = {} }) => {
         let errors = {};
         if (!username) {
             errors.name = "Name is required!";
-            console.log(errors.name);
         }
 
         if (!password) {
@@ -47,7 +46,6 @@ const UserLoginForm = ({ onSave, user = {} }) => {
             return;
         }
         setErrors({});
-        console.log(userData);
         let response = await fetch(
             "http://localhost/api/login",
             {
@@ -55,14 +53,11 @@ const UserLoginForm = ({ onSave, user = {} }) => {
                 headers: { 'Authorization': `Basic ${btoa(username + ":" + password)}` }
             }
         )
-        console.log(response)
         if (response.ok) {
 
             let data = await response.json();
-            console.log(data);
             let access_token = data.access_token;
             let user_id = data.user;
-            console.log(user_id);
             dispatch(setToken(access_token));
             dispatch(setUserId(user_id));
             navigate("/loggedin");

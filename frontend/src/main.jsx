@@ -15,10 +15,6 @@ const router = createBrowserRouter(routes, {basename: '/app/'});
 ReactDOM.createRoot(document.getElementById('root')).render(
 <Provider store={store}>
 	<React.StrictMode>
-		<div className="TopMenu">
-			<div> UniShare </div>
-			<NavMenu/>
-		</div>
 		<RouterProvider router={router}/>
 	</React.StrictMode>,
 </Provider>
