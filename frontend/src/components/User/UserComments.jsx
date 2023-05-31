@@ -1,15 +1,32 @@
+import { useEffect, useState } from "react";
 import ReviewCard from "../ReviewCard";
+import { useNavigate } from "react-router-dom";
+import getUserReviews from "../../functions/getUserReviews";
+import { useSelector } from "react-redux";
 
+export default function UserComments (props) {
 
-export default function UserComments () {
+    const navigate = useNavigate();
+    let [reviews, setReviews] = useState([]);
+    const id = props.id;
+    const auth = useSelector((state) => state.token);
+
+    useEffect(() => {
+        id && getUserReviews(id, auth.token).then(
+            (reviews) => {console.log(reviews); setReviews(reviews)},
+            (err) => {console.warn("getUserReviews error", err); navigate("/error")}
+        )
+    }, [id, auth]);
 
     return (
         <div className="GlobalContainer">
             <h2>Reviews</h2>
-            <ReviewCard 
-                name="Piotr Rogowski" 
-                picture="https://static2.strzelce360.pl/data/articles/xl-ernest-khalimov-czy-istnieje-kto-to-wiek-wzrost-waga-wikipedia-1669905523-full.jpg"
-                text="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It ha"/>
+            {reviews.map((review) => 
+                <ReviewCard 
+                    name={review.reviewer_id}
+                    picture="https://static2.strzelce360.pl/data/articles/xl-ernest-khalimov-czy-istnieje-kto-to-wiek-wzrost-waga-wikipedia-1669905523-full.jpg"
+                    text={review.comment}/>
+            )}
         </div>
     );
 }

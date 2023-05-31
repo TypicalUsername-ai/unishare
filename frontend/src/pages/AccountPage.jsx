@@ -22,7 +22,7 @@ function AccountPage() {
 			<Header/>
 			<UserInformation id={id}/>
 			<UserFilesContainer />
-			<UserComments />
+			<UserComments id={id}/>
 			<UserReviewForm />
 
 		</div>
