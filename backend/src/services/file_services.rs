@@ -1,12 +1,11 @@
 use actix_web::{web, Responder, HttpResponse, get, post, delete};
 use actix_web_httpauth::extractors::bearer::BearerAuth;
 use diesel::{r2d2::ConnectionManager, PgConnection};
+use diesel::prelude::*;
 use r2d2::Pool;
-use serde::{Serialize, Deserialize};
 use uuid::Uuid;
 use crate::entities::{error::UnishareError, files_data::File, files_content::FileContent, file_reviews::FileReview};
 use super::token_middleware::validate_request;
-use log::warn;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg
@@ -16,7 +15,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .service(buy_file)
             .service(get_reviews)
             .service(add_review)
-        )
+        );
 }
 
 type ConnectionPool = Pool<ConnectionManager<PgConnection>>;

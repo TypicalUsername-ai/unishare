@@ -3,7 +3,7 @@ use env_logger::Env;
 use diesel::{r2d2::{ConnectionManager, Pool}, pg::PgConnection};
 use lettre::transport::smtp::{authentication::{Credentials, Mechanism}, PoolConfig};
 use lettre::SmtpTransport;
-use services::{user_services, auth_services};
+use services::{user_services, auth_services, file_services};
 
 mod services;
 mod entities;
@@ -43,6 +43,7 @@ async fn main() -> std::io::Result<()> {
                 web::scope("/api")
                 .configure(auth_services::config)
                 .configure(user_services::config)
+                .configure(file_services::config)
             )
     })
     .bind(("0.0.0.0", 8080))?

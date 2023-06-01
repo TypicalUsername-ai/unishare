@@ -1,9 +1,11 @@
-use diesel::{Insertable, Queryable, PgConnection, QueryDsl, insert_into, expression::functions::sql_function};
+use diesel::{Insertable, Queryable, PgConnection, QueryDsl, insert_into, expression::functions::sql_function, dsl::avg};
 use serde::{Serialize, Deserialize};
 use uuid::Uuid;
-use crate::schema::file_reviews::{self, file_id};
+use diesel::pg::data_types::PgNumeric;
+use crate::schema::file_reviews;
 use diesel::prelude::*;
 use super::error::UnishareError;
+use bigdecimal::{BigDecimal, ToPrimitive};
 
 #[derive(Debug, Serialize, Deserialize, Insertable, Queryable)]
 #[diesel(table_name = file_reviews)]
@@ -18,7 +20,7 @@ impl FileReview {
 
     // Get all reviews of some file
     pub async fn by_uuid(id: Uuid, db_conn: &mut PgConnection) -> Result<Vec<FileReview>, UnishareError> {
-        let reviews_opt = file_reviews::table.filter(file_id.eq(id)).load::<FileReview>(db_conn).optional()?;
+        let reviews_opt = file_reviews::table.filter(file_reviews::file_id.eq(id)).load::<FileReview>(db_conn).optional()?;
         if let Some(v) = reviews_opt {
             Ok(v)
         } else {
@@ -34,13 +36,15 @@ impl FileReview {
     }
 
     // Get average rating if the file
-    pub async fn get_average(file_id: Uuid, db_conn: &mut PgConnection) -> Result<f64, diesel::result::Error> {
-        let average = file_reviews::table
-        .select(avg(file_reviews::review))
+    pub async fn get_average(file_id: Uuid, db_conn: &mut PgConnection) -> Result<f32, UnishareError> {
+        let average: Option<BigDecimal> = file_reviews::table
         .filter(file_reviews::file_id.eq(file_id))
-        .first(db_conn)
-        .optional()?;
-        Ok(average.unwrap_or(0.0))
+        .select(avg(file_reviews::review))
+        .first(db_conn)?;
+        match average {
+            Some(avg) => Ok(avg.to_f32().unwrap_or(0.0)),
+            None => Err(UnishareError::ResourceNotFound { resource: format!("file: {}", file_id) })
+        }
     }
 
 }

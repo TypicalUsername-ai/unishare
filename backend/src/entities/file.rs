@@ -4,7 +4,7 @@ use uuid::Uuid;
 use crate::schema::{users_data, transactions, files_data::name};
 use serde::{Serialize, Deserialize};
 use crate::schema::files_data;
-use super::error::UnishareError;
+use super::{error::UnishareError, file_review::FileReview};
 
 #[derive(Debug, Serialize, Deserialize, Queryable, Insertable)]
 #[diesel(table_name = files_data)]
@@ -114,7 +114,7 @@ impl File {
     /// Adds a new rating to the file and retireves an updated object
     /// Updates rating of the file and retireves an updated object
     pub async fn update_rating(self, db_conn: &mut PgConnection) -> Result<Self, UnishareError> {
-        let av_rating = FileReview::get_average(self.id, db_conn).unwrap()?;
+        let av_rating = FileReview::get_average(self.id, db_conn).await?;
         let update_rating = diesel::update(files_data::table)
         .filter(files_data::id.eq(self.id.clone()))
         .set(files_data::rating.eq(av_rating))
