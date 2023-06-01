@@ -1,12 +1,23 @@
 import * as Avatar from '@radix-ui/react-avatar';
 import UserFilesContainer from './UserFilesContainer';
 import { useSelector } from 'react-redux';
+import { useEffect, useState } from 'react';
+import { redirect, useNavigate } from 'react-router-dom';
+import getProfile from '../../functions/getProfile';
 
-function UserInformation () {
+function UserInformation (props) {
 
-    const id = useSelector((state) => state.user.id);
+    const navigate = useNavigate();
+    const id = props.id;
     const auth = useSelector((state) => state.token);
+    const [user, setUser] = useState(null);
     console.log(auth.token);
+    useEffect(() => {
+        id && getProfile(id, auth.token).then(
+            (user) => setUser(user),
+            (err) => {console.warn(err); redirect("/error")}
+        )
+    }, [id, auth])
 
     return (
         <div className='GlobalContainer'>
@@ -22,13 +33,8 @@ function UserInformation () {
             <section style={{backgroundColor: "AliceBlue"}}>
                 <h2>Information</h2>
                 <div style={{display: "flex", verticalAlign: "middle"}}>
-                    <h3 style={{marginBottom: "0px", marginLeft: "20px"}}>Name:&nbsp;&nbsp;</h3>
-                    <h3>Ernest</h3>
-                </div>
-
-                <div style={{display: "flex", verticalAlign: "middle"}}>
-                    <h3 style={{marginTop: "0px", marginLeft: "20px"}}>Surname:&nbsp;&nbsp;</h3>
-                    <h3 style={{marginTop: "0px"}}>Khalimov</h3>
+                    <h3 style={{marginBottom: "0px", marginLeft: "20px"}}>Username:&nbsp;&nbsp;</h3>
+                    <h3>{user ? user.username : ""}</h3>
                 </div>
 
                 <div style={{display: "flex", verticalAlign: "middle"}}>

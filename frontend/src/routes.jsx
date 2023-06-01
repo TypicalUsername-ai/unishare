@@ -8,14 +8,13 @@ import TosPage from './pages/TosPage'
 import ForgotPasswordPage from './pages/ForgotPasswordPage'
 import SetPasswordPage from './pages/SetPasswordPage'
 import ExplorePage from './pages/ExplorePage'
-
-
-
+import FileOverviewPage from './pages/FileOverviewPage'
+import UploadPage from './pages/UploadPage'
 
 const routes = [
 	{
 		path: "/home",
-		element: <HomePage/>
+		element: <HomePage />
 	},
 	{
 		path: "/account",
@@ -50,8 +49,16 @@ const routes = [
 		element: <SetPasswordPage />
 	},
 	{
-	path: "/explore",
+		path: "/explore",
 		element: <ExplorePage />
+	},
+	{
+		path: "/examplefile",
+		element: <FileOverviewPage /> //This will need to be changed to be dynamic by file ids, simillary like users will need to be changed
+	},
+	{
+		path: "/upload",
+		element: <UploadPage/>
 	}
 ]
 

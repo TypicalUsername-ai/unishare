@@ -91,17 +91,17 @@ impl File {
     /// Returns all available files
     pub async fn get_files(db_conn: &mut PgConnection) -> Result<(), UnishareError> {
         let files = files_data::table
-            .select((
-                files_data::name, 
-                files_data::creator, 
-                files_data::created_time,
-                files_data::price,
-                files_data::rating,
-                files_data::primary_tag,
-                files_data::secondary_tag
-            ))
+            // .select((
+            //     files_data::name, 
+            //     files_data::creator, 
+            //     files_data::created_time,
+            //     files_data::price,
+            //     files_data::rating,
+            //     files_data::primary_tag,
+            //     files_data::secondary_tag
+            // ))
             .filter(files_data::available.eq(true))
-            .get_result(db_conn)?;
+            .get_result::<File>(db_conn)?;
         Ok(())
     }
 
