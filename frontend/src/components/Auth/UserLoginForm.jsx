@@ -4,7 +4,7 @@ import "../form.css";
 
 import * as Toast from '@radix-ui/react-toast';
 import Field from "../field";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useSelector, useDispatch } from 'react-redux';
 import { setToken } from '../../reducers/tokenSlice';
 import { setUserId } from '../../reducers/userSlice'
@@ -14,7 +14,7 @@ const UserLoginForm = ({ onSave, user = {} }) => {
     const [userData, setUserData] = useState(user);
     const [errors, setErrors] = useState({});
     const [open, setOpen] = useState(false);
-
+    const [params, setParams] = useSearchParams();
     const { username, email, password } = userData;
 
     const token = useSelector((state) => state.token);
@@ -60,7 +60,8 @@ const UserLoginForm = ({ onSave, user = {} }) => {
             let user_id = data.user;
             dispatch(setToken(access_token));
             dispatch(setUserId(user_id));
-            navigate("/loggedin");
+            let redirect = params.get("r");
+            navigate(redirect ? "/"+redirect : "/loggedin");
         } else {
             let errors = {}
             errors.password = "invalid password";
