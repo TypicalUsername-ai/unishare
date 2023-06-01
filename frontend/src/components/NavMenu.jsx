@@ -1,11 +1,13 @@
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import './NavMenu.css'
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 function NavMenu() {
 
 	const navigate = useNavigate();
 	const nav = (route) => navigate(route);
+	const token = useSelector((state) => state.token);
 
 	return (
 		<NavigationMenu.Root className='NavigationMenuRoot' orientation="horizontal">
@@ -14,16 +16,19 @@ function NavMenu() {
 					<button className='NavigationMenuLink' onClick={() => nav("/home")}> Home </button>
 				</NavigationMenu.Item>
 
-				<NavigationMenu.Item className='NavigationMenuItem'>
+				{ token.authorized ? <NavigationMenu.Item className='NavigationMenuItem'>
 					<button className='NavigationMenuLink' onClick={() => nav("/account")}> Account </button>
-				</NavigationMenu.Item>
+				</NavigationMenu.Item> : null }
 
+				{!token.authorized ? <>
 				<NavigationMenu.Item className='NavigationMenuItem'>
 					<button className='NavigationMenuLink' onClick={() => nav("/register")}> Register </button>
 				</NavigationMenu.Item>
 				<NavigationMenu.Item className='NavigationMenuItem'>
 					<button className='NavigationMenuLink' onClick={() => nav("/login")}>Login </button>
 				</NavigationMenu.Item>
+				</>
+				: null }
 				<NavigationMenu.Item className='NavigationMenuItem'>
 					<button className='NavigationMenuLink' onClick={() => nav("/tos")}> ToS </button>
 				</NavigationMenu.Item>

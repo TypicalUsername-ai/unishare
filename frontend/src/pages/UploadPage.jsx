@@ -1,6 +1,8 @@
 import Field from '../components/field';
 import React, { useState } from "react";
-
+import { Navigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import Header from '../components/Header';
 
 const UploadPage = ({onSave, file={}}) => {
 
@@ -10,6 +12,10 @@ const UploadPage = ({onSave, file={}}) => {
     const [open, setOpen] = React.useState(false);
     const [selectedFile, setSelectedFile] = useState(null);
     const {title, description, price} = FileData;
+
+    const token = useSelector((state) => state.token.token);
+	const authorized = useSelector((state) => state.token.authorized);
+	const id = useSelector((state) => state.user.id);
 
     const validateData = () => {
         let errors = {};
@@ -57,6 +63,8 @@ const UploadPage = ({onSave, file={}}) => {
 
     return(
         <div className="GlobalContainer">
+            {!authorized ? <Navigate to="/login?r=upload"/> : null }
+			<Header/>
             <h1>Upload File</h1>
              <Field default="Title" name="title" onChange={handleChange}/>
                 <div className="errorInformation"></div>
