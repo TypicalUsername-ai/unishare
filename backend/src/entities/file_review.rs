@@ -1,9 +1,9 @@
-use diesel::{Insertable, Queryable, PgConnection, QueryDsl, insert_into, expression::functions::sql_function, dsl::avg};
+use diesel::{Insertable, Queryable, PgConnection, QueryDsl, insert_into};
 use serde::{Serialize, Deserialize};
 use uuid::Uuid;
-use diesel::pg::data_types::PgNumeric;
 use crate::schema::file_reviews;
 use diesel::prelude::*;
+use diesel::dsl::avg;
 use super::error::UnishareError;
 use bigdecimal::{BigDecimal, ToPrimitive};
 
@@ -24,7 +24,7 @@ impl FileReview {
         if let Some(v) = reviews_opt {
             Ok(v)
         } else {
-            Ok(vec![])
+            Err(UnishareError::ResourceNotFound { resource: format!("File {}", id) })
         }
     }
 

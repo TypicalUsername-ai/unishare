@@ -1,7 +1,7 @@
 use std::time::SystemTime;
 use diesel::{PgConnection, prelude::*};
 use uuid::Uuid;
-use crate::schema::{users_data, transactions, files_data::name};
+use crate::schema::{users_data, transactions, files_content};
 use serde::{Serialize, Deserialize};
 use crate::schema::files_data;
 use super::{error::UnishareError, file_review::FileReview};
@@ -10,7 +10,7 @@ use super::{error::UnishareError, file_review::FileReview};
 #[diesel(table_name = files_data)]
 pub struct File {
     name: String,
-    id: Uuid,
+    pub id: Uuid,
     creator: Uuid,
     #[diesel(column_name = created_time)]
     created: SystemTime,
@@ -34,26 +34,26 @@ pub struct FileOpt {
     available: Option<bool>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Insertable)]
+#[diesel(table_name=files_content)]
 pub struct FileContent {
     id: Uuid,
-    content: u8,
+    content: Vec<u8>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct NewFile {
     filename: String,
-    creator: Uuid,
     price: i32,
     primary_tag: Option<String>,
     secondary_tag: Option<String>,
-    content: u8,
+    pub content: Vec<u8>,
 }
 
 
 impl File {
 
-    fn new(filename: String, creator: Uuid, price: i32, primary_tag: Option<String>, secondary_tag: Option<String>, content: u8) -> Self {
+    pub fn new(filename: String, creator: Uuid, price: i32, primary_tag: Option<String>, secondary_tag: Option<String>) -> Self {
         Self { 
             name: filename, 
             id: Uuid::new_v4(), 
@@ -131,21 +131,20 @@ impl File {
             .execute(db_conn)?;
         Ok(())
     }
+
+    pub fn create(data: NewFile, user_id: Uuid) -> Self {
+        File::new(data.filename, user_id, data.price, data.primary_tag, data.secondary_tag)
+    }
 }
 
 impl FileContent {
-    fn new(id: Uuid, content: u8) -> Self {
+    pub fn new(id: Uuid, content: Vec<u8>) -> Self {
         Self { id, content }
     }
 }
 
 impl NewFile {
-    fn new(filename: String, creator: Uuid, price: i32, primary_tag: Option<String>, secondary_tag: Option<String>, content: u8) -> Self {
-        Self {filename, creator, price, primary_tag, secondary_tag, content }
-    }
-}
-impl From<NewFile> for File {
-    fn from(raw: NewFile) -> Self {
-        File::new(raw.filename, raw.creator, raw.price, raw.primary_tag, raw.secondary_tag, raw.content)
+    pub fn new(filename: String, creator: Uuid, price: i32, primary_tag: Option<String>, secondary_tag: Option<String>, content: Vec<u8>) -> Self {
+        Self {filename, price, primary_tag, secondary_tag, content }
     }
 }
