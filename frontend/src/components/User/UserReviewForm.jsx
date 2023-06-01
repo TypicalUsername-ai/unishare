@@ -1,25 +1,40 @@
 import React, { useState } from 'react';
+import { useParams } from 'react-router-dom';
+
 
 const UserReviewForm = () => {
     const [isPopupOpen, setPopupOpen] = useState(false);
     const [reviewText, setReviewText] = useState('');
+    const [rating, setRating] = useState(0);
+    const { userId } = useParams();
 
     const handleButtonClick = () => {
         setPopupOpen(true);
     };
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
-        // Same as in search need to do api search but I have no idea which one to use so Mateusz will need to guide me through the process
-        console.log('Review:', reviewText);
+        // const options = {
+        //     method: 'POST',
+        //     headers: { 'content-type': 'application/json' },
+        //     body: '{"user_id":"' + userId + '","review":"' + reviewText + "reviewerId" + userId + '"}'
+        // };
+
+        // let response = await fetch('http://localhost/api/add_review', options)
+
+        console.log('Review:', reviewText); // reviewtext is holding the text for the review
+        console.log('Rating:', rating); // rating is just star rating 0-5
         setReviewText('');
+        setRating(0);
         setPopupOpen(false);
     };
 
     const handleInputChange = (event) => {
         setReviewText(event.target.value);
     };
-
+    const handleRatingChange = (value) => {
+        setRating(value);
+    };
     return (
         <div>
             <button onClick={handleButtonClick}>Add Review</button>
@@ -32,7 +47,16 @@ const UserReviewForm = () => {
                             placeholder="Enter your review"
                             className="popup-textarea"
                         />
-                        <button type="submit" className="popup-submit-button">Submit</button>
+                        <div className="rating-container">
+                            {[...Array(5)].map((_, index) => (
+                                <span
+                                    key={index}
+                                    className={`star ${index < rating ? 'selected' : ''}`}
+                                    onClick={() => handleRatingChange(index + 1)}
+                                />
+                            ))}
+                        </div>
+                        <button type="submit">Submit</button>
                     </form>
                 </div>
             )}

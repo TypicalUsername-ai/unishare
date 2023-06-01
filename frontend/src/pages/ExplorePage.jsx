@@ -1,4 +1,5 @@
 import ExploreSearch from "../components/ExploreSearch";
+import Header from "../components/Header";
 import "../components/form.css";
 
 function ExplorePage() {
@@ -14,6 +15,7 @@ function ExplorePage() {
 
     return (
         <div className="registrationContainer">
+            <Header/>
             <h1>Explore</h1>
             <ExploreSearch onSave={handleSave} {...{ user }} />
         </div>
