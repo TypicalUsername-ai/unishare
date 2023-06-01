@@ -112,8 +112,15 @@ impl File {
     }
 
     /// Adds a new rating to the file and retireves an updated object
-    pub async fn add_rating(self, reviewer_id: Uuid, db_conn: &mut PgConnection) -> Result<Self, UnishareError> {
-        todo!();
+    /// Updates rating of the file and retireves an updated object
+    pub async fn update_rating(self, db_conn: &mut PgConnection) -> Result<Self, UnishareError> {
+        let av_rating = FileReview::get_average(self.id, db_conn).unwrap()?;
+        let update_rating = diesel::update(files_data::table)
+        .filter(files_data::id.eq(self.id.clone()))
+        .set(files_data::rating.eq(av_rating))
+        .get_result(db_conn)?;
+        
+        Ok(update_rating)
     }
 
     /// Changes token balance of both buyer and seller after a transaction to buy access to the file

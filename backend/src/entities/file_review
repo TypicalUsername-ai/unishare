@@ -16,6 +16,7 @@ pub struct FileReview {
 
 impl FileReview {
 
+    // Get all reviews of some file
     pub async fn by_uuid(id: Uuid, db_conn: &mut PgConnection) -> Result<Vec<FileReview>, UnishareError> {
         let reviews_opt = file_reviews::table.filter(file_id.eq(id)).load::<FileReview>(db_conn).optional()?;
         if let Some(v) = reviews_opt {
@@ -25,16 +26,18 @@ impl FileReview {
         }
     }
 
+    // Add a review for a file
     pub async fn add_review(review: FileReview, db_conn: &mut PgConnection) -> Result<FileReview, UnishareError> {
         let inserted_opt = insert_into(file_reviews::table).values(review).get_result::<FileReview>(db_conn)?;
 
         Ok(inserted_opt)
     }
 
-    pub async fn get_average(&self, db_conn: &mut PgConnection) -> Result<f64, diesel::result::Error> {
+    // Get average rating if the file
+    pub async fn get_average(file_id: Uuid, db_conn: &mut PgConnection) -> Result<f64, diesel::result::Error> {
         let average = file_reviews::table
         .select(avg(file_reviews::review))
-        .filter(file_reviews::file_id.eq(self.file_id))
+        .filter(file_reviews::file_id.eq(file_id))
         .first(db_conn)
         .optional()?;
         Ok(average.unwrap_or(0.0))

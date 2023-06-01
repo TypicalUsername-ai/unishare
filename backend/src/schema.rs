@@ -80,7 +80,6 @@ diesel::table! {
 }
 
 diesel::joinable!(files_content -> files_data (id));
-diesel::joinable!(transactions -> files_data (file_id));
 diesel::joinable!(transactions -> users (buyer_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
