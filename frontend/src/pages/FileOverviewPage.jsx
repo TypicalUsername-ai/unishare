@@ -1,4 +1,5 @@
 import FilePage from "../components/FilePage"
+import Header from "../components/Header";
 import './account.css'
 import { useSelector } from "react-redux"
 
@@ -10,6 +11,7 @@ function FileOverview() {
 
 	return (
 		<div style={{ textAlign: "center" }} className="GlobalContainer">
+			<Header/>
 			<FilePage />
 		</div>
 	)

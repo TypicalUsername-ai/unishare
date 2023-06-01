@@ -7,7 +7,7 @@ function NavMenu() {
 
 	const navigate = useNavigate();
 	const nav = (route) => navigate(route);
-	const token = useSelector((state) => state.token);
+	const authorized = useSelector((state) => state.token.authorized);
 
 	return (
 		<NavigationMenu.Root className='NavigationMenuRoot' orientation="horizontal">
@@ -16,11 +16,16 @@ function NavMenu() {
 					<button className='NavigationMenuLink' onClick={() => nav("/home")}> Home </button>
 				</NavigationMenu.Item>
 
-				{ token.authorized ? <NavigationMenu.Item className='NavigationMenuItem'>
+				{ authorized ? <>
+				<NavigationMenu.Item className='NavigationMenuItem'>
 					<button className='NavigationMenuLink' onClick={() => nav("/account")}> Account </button>
-				</NavigationMenu.Item> : null }
+				</NavigationMenu.Item>
+				<NavigationMenu.Item className='NavigationMenuItem'>
+					<button className='NavigationMenuLink' onClick={() => nav("/upload")}> Upload </button>
+				</NavigationMenu.Item>
+				</> : null }
 
-				{!token.authorized ? <>
+				{!authorized ? <>
 				<NavigationMenu.Item className='NavigationMenuItem'>
 					<button className='NavigationMenuLink' onClick={() => nav("/register")}> Register </button>
 				</NavigationMenu.Item>

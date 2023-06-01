@@ -8,7 +8,7 @@ import TosPage from './pages/TosPage'
 import ForgotPasswordPage from './pages/ForgotPasswordPage'
 import SetPasswordPage from './pages/SetPasswordPage'
 import ExplorePage from './pages/ExplorePage'
-import FileOverview from './pages/FileOverview'
+import FileOverviewPage from './pages/FileOverviewPage'
 import UploadPage from './pages/UploadPage'
 
 const routes = [
@@ -54,7 +54,7 @@ const routes = [
 	},
 	{
 		path: "/examplefile",
-		element: <FileOverview /> //This will need to be changed to be dynamic by file ids, simillary like users will need to be changed
+		element: <FileOverviewPage /> //This will need to be changed to be dynamic by file ids, simillary like users will need to be changed
 	},
 	{
 		path: "/upload",
