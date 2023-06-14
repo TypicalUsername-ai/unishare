@@ -10,13 +10,17 @@ const UploadPage = ({onSave, file={}}) => {
     const [FileData, setFileData] = useState(file);
     const [errors, setErrors] = useState({});
     const [open, setOpen] = React.useState(false);
-    const [selectedFile, setSelectedFile] = useState(null);
     const {title, description, price} = FileData;
-
+    const [selectedFile, setSelectedFile] = useState();
+    const [isFilePicked, setIsFilePicked] = useState(false);
+    const timerRef = React.useRef(0)
     const token = useSelector((state) => state.token.token);
 	const authorized = useSelector((state) => state.token.authorized);
 	const id = useSelector((state) => state.user.id);
 
+
+
+    /*Validates data*/
     const validateData = () => {
         let errors = {};
         if (!title){
@@ -37,16 +41,18 @@ const UploadPage = ({onSave, file={}}) => {
     }
 
 
+    /*Handling of change in data*/ 
     const handleChange = (event) => {
         const {name, value} = event.target;
         setFileData((prevData) => ({...prevData, [name]: value }));
     };
 
+
+    /*Save and upload file*/
     const handleSave = async () => {
         const errors = validateData();
         if (Object.keys(errors).length){
             setErrors(errors);
-            
             return;
         }
         setErrors({});
@@ -57,39 +63,68 @@ const UploadPage = ({onSave, file={}}) => {
         timerRef.current = window.setTimeout(() => {
         setOpen(true);
         }, 100);
-        onSave(FileData);
+        
+        /*Upload of file*/
+        console.log(selectedFile);
+        const formData = new FormData();
+        formData.append('File', selectedFile);
+        try{ 
+            const response2 = await fetch(
+                "http://localhost/api/files/create",
+                {
+                    method: 'POST',
+                    body: formData,
+                }
+            );
+            if (response2.ok) {
+                console.log('Images uploaded successfully');
+                // Perform any necessary actions after successful upload
+              } else {
+                console.log('Image upload failed');
+                // Handle the failure scenario
+              }
+        } catch (error) {
+            console.error('Error uploading images:', error);
+            // Handle any network or other errors that occurred during the upload
+        }
 
     }
 
+    /*Sets the file in state and set isSelected to true*/
+    const changeHandler = (event) => {
+		setSelectedFile(event.target.files[0]);
+        console.log(selectedFile);
+	};
+
     return(
-        <div className="GlobalContainer">
-            {!authorized ? <Navigate to="/login?r=upload"/> : null }
+        <div className="GlobalContainer"> {!authorized ? <Navigate to="/login?r=upload"/> : null }
 			<Header/>
             <h1>Upload File</h1>
-             <Field default="Title" name="title" onChange={handleChange}/>
-                <div className="errorInformation"></div>
+            <Field default="Title" name="title" onChange={handleChange}/>
+            <div className="errorInformation"></div>
             <div
                 style={{ display: 'flex', padding: '0 20px', flexWrap: 'wrap', gap: 15, alignItems: 'center'   }}
             >
             <textarea
-                className="Input" name='description' style={{position: 'relative', left: '15px', width: '380px', height: '200px', marginBottom: '25px'}} id="TextArea" placeholder="Description" text="message" default="Jak możemy ci pomóc?" onChange={handleChange}></textarea>
-                 <div className="errorInformation"></div>
+                className="Input" 
+                name='description' 
+                style={{position: 'relative', left: '15px', width: '380px', height: '200px', marginBottom: '25px'}} 
+                id="TextArea" placeholder="Description" text="message" default="Jak możemy ci pomóc?" 
+                onChange={handleChange}>
+            </textarea>
+            <div className="errorInformation"></div>
             </div>
             <Field default="Price (PLN)" name="price" onChange={handleChange}/>
-                <div className="errorInformation"></div>
+            <div className="errorInformation"></div>
+            <input type='file' onChange={changeHandler}></input>
+            <button 
+                className='TopPageButton'
+                style={{width: "135px", height: "45px", backgroundColor: 'white', margin: '10px', borderRadius: '50px', textAlign: 'center'}} 
+                onClick={handleSave}> 
+                        Send
+            </button>
 
-            <input type='file' value={selectedFile}   ></input>
-
-
-
-                    
-                        <button className='TopPageButton' style={{width: "135px", height: "45px", backgroundColor: 'white', margin: '10px', borderRadius: '50px', textAlign: 'center'}} 
-                            onClick={handleSave}> 
-                            Send
-                        </button>
-
-</div>
+        </div>
     );
 }
-
 export default UploadPage;
