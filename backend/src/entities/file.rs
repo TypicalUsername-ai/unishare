@@ -5,6 +5,7 @@ use crate::schema::{users_data, transactions, files_content};
 use serde::{Serialize, Deserialize};
 use crate::schema::files_data;
 use super::{error::UnishareError, file_review::FileReview};
+use std::convert::TryInto;
 
 #[derive(Debug, Serialize, Deserialize, Queryable, Insertable)]
 #[diesel(table_name = files_data)]
@@ -24,6 +25,7 @@ pub struct File {
 }
 
 /// WARNING! rating to be made as Option<f32>
+#[derive(Debug, Serialize, Deserialize, Queryable)]
 pub struct FileOpt {
     name: Option<String>,
     last_edit: SystemTime,
@@ -33,6 +35,44 @@ pub struct FileOpt {
     secondary_tag: Option<String>,
     available: Option<bool>,
 }
+
+impl From<File> for FileOpt {
+    fn from(value: File) -> Self {
+        Self { 
+            name: string_to_option(value.name), 
+            last_edit: value.last_edit, 
+            price: i32_to_option_u64(value.price), 
+            rating: value.rating, 
+            primary_tag: value.primary_tag, 
+            secondary_tag: value.secondary_tag, 
+            available: bool_to_option(value.available) 
+        }
+    }
+}
+
+pub fn string_to_option(s: String) -> Option<String> {
+    if s.is_empty() {
+        None
+    } else {
+        Some(s)
+    }
+}
+
+pub fn bool_to_option(b: bool) -> Option<bool> {
+    if b {
+        Some(b)
+    } else {
+        None
+    }
+}
+
+pub fn i32_to_option_u64(n: i32) -> Option<u64> {
+    match n.try_into() {
+        Ok(value) => Some(value),
+        Err(_) => None,
+    }
+}
+
 
 #[derive(Debug, Serialize, Deserialize, Insertable)]
 #[diesel(table_name=files_content)]
@@ -103,6 +143,21 @@ impl File {
             .filter(files_data::available.eq(true))
             .get_result::<File>(db_conn)?;
         Ok(())
+    }
+
+    /// Retrieves file data by username
+    /// useful for text search functionality
+    pub async fn by_name(name: String, db_conn: &mut PgConnection) -> Result <Vec<FileOpt>, UnishareError> {
+        let opt_data = files_data::table
+            .filter(files_data::name.ilike(format!("{}%", name)))
+            .load::<File>(db_conn)
+            .optional()?;
+        if let Some(results) = opt_data {
+            let data = results.into_iter().map(|a| FileOpt::from(a).into()).collect();
+            Ok(data)
+        } else {
+            Ok(vec![])
+        }
     }
 
     /// Edits the file data such as price or availability

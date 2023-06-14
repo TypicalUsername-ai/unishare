@@ -48,6 +48,22 @@ async fn buy_file(auth: BearerAuth, pool: web::Data<ConnectionPool>, path: web::
     Ok(HttpResponse::Ok().json(purchase_result))
 }
 
+#[derive(Debug, serde::Deserialize)]
+struct Fname {
+    name: String,
+}
+
+#[get("/search")]
+async fn search(pool: web::Data<ConnectionPool>, data: web::Query<Fname>) -> Result<impl Responder, UnishareError> {
+
+    let mut db_conn = pool.get()?;
+    let name = data.into_inner();
+
+    let results = File::by_name(name.name, &mut db_conn).await?;
+
+    Ok(HttpResponse::Ok().json(results))
+}
+
 #[get("/{file_id}/reviews")]
 async fn get_reviews(auth: BearerAuth, pool: web::Data<ConnectionPool>, path: web::Path<Uuid>) -> Result<impl Responder, UnishareError> {
     let id = path.into_inner();
