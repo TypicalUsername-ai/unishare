@@ -10,7 +10,7 @@ const UploadPage = ({onSave, file={}}) => {
     const [FileData, setFileData] = useState(file);
     const [errors, setErrors] = useState({});
     const [open, setOpen] = React.useState(false);
-    const {title, description, price} = FileData;
+    const {name, creator, price, primary_tag, secondary_tag, content, description} = FileData;
     const [selectedFile, setSelectedFile] = useState();
     const [isFilePicked, setIsFilePicked] = useState(false);
     const timerRef = React.useRef(0)
@@ -23,13 +23,13 @@ const UploadPage = ({onSave, file={}}) => {
     /*Validates data*/
     const validateData = () => {
         let errors = {};
-        if (!title){
+        if (!name){
             errors.title = "Title is required!";
             console.log(errors.title);
         }
 
         if (!description) { 
-                errors.description = "Description is required!";
+            errors.description = "Description is required!";
         }
 
         if (!price) {
@@ -56,6 +56,7 @@ const UploadPage = ({onSave, file={}}) => {
             return;
         }
         setErrors({});
+        
         console.log(FileData);
 
         setOpen(false);
@@ -71,9 +72,16 @@ const UploadPage = ({onSave, file={}}) => {
         try{ 
             const response2 = await fetch(
                 "http://localhost/api/files/create",
-                {
-                    method: 'POST',
-                    body: formData,
+                {method: 'POST',
+                    body: JSON.stringify({ 
+                        filename: FileData.name, 
+                        creator: FileData.creator, 
+                        price: FileData.price, 
+                        primary_tag: FileData.primary_tag,
+                        secondary_tag: FileData.secondary_tag,
+                        content: FileData.content
+                    }),
+                    headers: { 'Content-Type': 'application/json' }
                 }
             );
             if (response2.ok) {
@@ -100,7 +108,11 @@ const UploadPage = ({onSave, file={}}) => {
         <div className="GlobalContainer"> {!authorized ? <Navigate to="/login?r=upload"/> : null }
 			<Header/>
             <h1>Upload File</h1>
-            <Field default="Title" name="title" onChange={handleChange}/>
+            <Field default="Title" name="name" onChange={handleChange}/>
+            <Field default="Primary Tag" name="primary_tag" onChange={handleChange}/>
+            <Field default="Secondary Tag" name="secondary_tag" onChange={handleChange}/>
+            <Field default="Content" name="content" onChange={handleChange}/>
+            <Field default="Creator" name="creator" onChange={handleChange}/>
             <div className="errorInformation"></div>
             <div
                 style={{ display: 'flex', padding: '0 20px', flexWrap: 'wrap', gap: 15, alignItems: 'center'   }}
