@@ -17,6 +17,10 @@ const routes = [
 		element: <HomePage />
 	},
 	{
+		path: "/:username/profile",
+		element: <AccountPage />
+	},
+	{
 		path: "/account",
 		element: <AccountPage />
 	},
@@ -53,12 +57,12 @@ const routes = [
 		element: <ExplorePage />
 	},
 	{
-		path: "/examplefile",
-		element: <FileOverviewPage /> //This will need to be changed to be dynamic by file ids, simillary like users will need to be changed
+		path: "/:username/examplefile",
+		element: <FileOverviewPage /> //This will need to be changed to be dynamic by file ids, similar to how users will need to be changed
 	},
 	{
 		path: "/upload",
-		element: <UploadPage/>
+		element: <UploadPage />
 	}
 ]
 

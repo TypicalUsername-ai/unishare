@@ -1,13 +1,15 @@
 import * as Avatar from '@radix-ui/react-avatar';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+
 
 
 function FileCard(props) {
     const navigate = useNavigate();
-
+    const { username } = useParams();
     const handleClick = () => {
-        navigate('/examplefile'); // Static for now
+        navigate(`/${username}/examplefile`); //statick for now
     };
     return (
         <div style={{ display: "flex", backgroundColor: "#4CA1AF", borderRadius: "45px", marginBottom: "20px" }} >
