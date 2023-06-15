@@ -3,6 +3,8 @@ import React, { useState } from "react";
 import { Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import Header from '../components/Header';
+import getProfile from '../functions/getProfile';
+import { render } from 'react-dom';
 
 const UploadPage = ({onSave, file={}}) => {
 
@@ -10,7 +12,8 @@ const UploadPage = ({onSave, file={}}) => {
     const [FileData, setFileData] = useState(file);
     const [errors, setErrors] = useState({});
     const [open, setOpen] = React.useState(false);
-    const {name, creator, price, primary_tag, secondary_tag, content, description} = FileData;
+    const {name, price, primary_tag, secondary_tag} = FileData;
+    const [content, setContent] = useState("Hello world");
     const [selectedFile, setSelectedFile] = useState();
     const [isFilePicked, setIsFilePicked] = useState(false);
     const timerRef = React.useRef(0)
@@ -26,10 +29,6 @@ const UploadPage = ({onSave, file={}}) => {
         if (!name){
             errors.title = "Title is required!";
             console.log(errors.title);
-        }
-
-        if (!description) { 
-            errors.description = "Description is required!";
         }
 
         if (!price) {
@@ -67,6 +66,7 @@ const UploadPage = ({onSave, file={}}) => {
         
         /*Upload of file*/
         console.log(selectedFile);
+        console.log(content)
         const formData = new FormData();
         formData.append('File', selectedFile);
         try{ 
@@ -75,13 +75,15 @@ const UploadPage = ({onSave, file={}}) => {
                 {method: 'POST',
                     body: JSON.stringify({ 
                         filename: FileData.name, 
-                        creator: FileData.creator, 
                         price: FileData.price, 
                         primary_tag: FileData.primary_tag,
                         secondary_tag: FileData.secondary_tag,
-                        content: FileData.content
+                        content: content
                     }),
-                    headers: { 'Content-Type': 'application/json' }
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                 }
                 }
             );
             if (response2.ok) {
@@ -99,9 +101,19 @@ const UploadPage = ({onSave, file={}}) => {
     }
 
     /*Sets the file in state and set isSelected to true*/
-    const changeHandler = (event) => {
-		setSelectedFile(event.target.files[0]);
-        console.log(selectedFile);
+    const changeHandler = event => {
+        console.log(content)
+		const file = event.target.files[0];
+        const reader = new FileReader();
+        reader.readAsText(file);
+        console.log(reader.result); 
+        render.onload = () => {
+            setContent(reader.result);
+        }
+        reader.onerror = () => {
+            console.log('file error', reader.error)
+        }
+        console.log(content)
 	};
 
     return(
@@ -111,20 +123,10 @@ const UploadPage = ({onSave, file={}}) => {
             <Field default="Title" name="name" onChange={handleChange}/>
             <Field default="Primary Tag" name="primary_tag" onChange={handleChange}/>
             <Field default="Secondary Tag" name="secondary_tag" onChange={handleChange}/>
-            <Field default="Content" name="content" onChange={handleChange}/>
-            <Field default="Creator" name="creator" onChange={handleChange}/>
             <div className="errorInformation"></div>
             <div
                 style={{ display: 'flex', padding: '0 20px', flexWrap: 'wrap', gap: 15, alignItems: 'center'   }}
             >
-            <textarea
-                className="Input" 
-                name='description' 
-                style={{position: 'relative', left: '15px', width: '380px', height: '200px', marginBottom: '25px'}} 
-                id="TextArea" placeholder="Description" text="message" default="Jak możemy ci pomóc?" 
-                onChange={handleChange}>
-            </textarea>
-            <div className="errorInformation"></div>
             </div>
             <Field default="Price (PLN)" name="price" onChange={handleChange}/>
             <div className="errorInformation"></div>
