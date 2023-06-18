@@ -16,6 +16,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
              .service(get_reviews)
              .service(add_review)
              .service(search)
+             .service(get_files)
             );
 }
 
