@@ -22,7 +22,7 @@ function AccountPage() {
 			{!authorized ? <Navigate to="/login?r=account"/> : null }
 			<Header/>
 			<UserInformation id={id}/>
-			<UserFilesContainer />
+			<UserFilesContainer userid={id}/>
 			<UserComments id={id}/>
 			<UserReviewForm />
 

@@ -5,22 +5,21 @@ import { useParams } from 'react-router-dom';
 
 
 
-function FileCard(props) {
+const FileCard = ({username, fileid, picture, title}) => {
     const navigate = useNavigate();
-    const { username } = useParams();
     const handleClick = () => {
-        navigate(`/${username}/examplefile`); //statick for now
+        navigate(`/${username}/${fileid}`);
     };
     return (
         <div style={{ display: "flex", backgroundColor: "#4CA1AF", borderRadius: "45px", marginBottom: "20px" }} >
             <Avatar.Root className="AvatarRoot" style={{ borderRadius: "20px" }}>
                 <Avatar.Image
                     className="AvatarImage"
-                    src={props.picture} />
+                    src={picture} />
                 <Avatar.Fallback />
             </Avatar.Root>
             <section style={{ textAlign: "left" }}>
-                <h3 style={{ marginBottom: "8px" }}>{props.title}</h3>
+                <h3 style={{ marginBottom: "8px" }}>{title}</h3>
                 <button onClick={handleClick} className='seeMore'>Details</button>
             </section>
 
