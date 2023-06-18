@@ -1,16 +1,17 @@
 use std::time::SystemTime;
 use diesel::{PgConnection, prelude::*};
 use uuid::Uuid;
-use crate::schema::{users_data, transactions, files_data::name};
+use crate::schema::{users_data, transactions, files_content};
 use serde::{Serialize, Deserialize};
 use crate::schema::files_data;
-use super::error::UnishareError;
+use super::{error::UnishareError, file_review::FileReview};
+use std::convert::TryInto;
 
 #[derive(Debug, Serialize, Deserialize, Queryable, Insertable)]
 #[diesel(table_name = files_data)]
 pub struct File {
     name: String,
-    id: Uuid,
+    pub id: Uuid,
     creator: Uuid,
     #[diesel(column_name = created_time)]
     created: SystemTime,
@@ -24,6 +25,7 @@ pub struct File {
 }
 
 /// WARNING! rating to be made as Option<f32>
+#[derive(Debug, Serialize, Deserialize, Queryable)]
 pub struct FileOpt {
     name: Option<String>,
     last_edit: SystemTime,
@@ -34,26 +36,64 @@ pub struct FileOpt {
     available: Option<bool>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+impl From<File> for FileOpt {
+    fn from(value: File) -> Self {
+        Self { 
+            name: string_to_option(value.name), 
+            last_edit: value.last_edit, 
+            price: i32_to_option_u64(value.price), 
+            rating: value.rating, 
+            primary_tag: value.primary_tag, 
+            secondary_tag: value.secondary_tag, 
+            available: bool_to_option(value.available) 
+        }
+    }
+}
+
+pub fn string_to_option(s: String) -> Option<String> {
+    if s.is_empty() {
+        None
+    } else {
+        Some(s)
+    }
+}
+
+pub fn bool_to_option(b: bool) -> Option<bool> {
+    if b {
+        Some(b)
+    } else {
+        None
+    }
+}
+
+pub fn i32_to_option_u64(n: i32) -> Option<u64> {
+    match n.try_into() {
+        Ok(value) => Some(value),
+        Err(_) => None,
+    }
+}
+
+
+#[derive(Debug, Serialize, Deserialize, Insertable)]
+#[diesel(table_name=files_content)]
 pub struct FileContent {
     id: Uuid,
-    content: u8,
+    content: Vec<u8>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct NewFile {
     filename: String,
-    creator: Uuid,
     price: i32,
     primary_tag: Option<String>,
     secondary_tag: Option<String>,
-    content: u8,
+    pub content: Vec<u8>,
 }
 
 
 impl File {
 
-    fn new(filename: String, creator: Uuid, price: i32, primary_tag: Option<String>, secondary_tag: Option<String>, content: u8) -> Self {
+    pub fn new(filename: String, creator: Uuid, price: i32, primary_tag: Option<String>, secondary_tag: Option<String>) -> Self {
         Self { 
             name: filename, 
             id: Uuid::new_v4(), 
@@ -105,6 +145,21 @@ impl File {
         Ok(())
     }
 
+    /// Retrieves file data by username
+    /// useful for text search functionality
+    pub async fn by_name(name: String, db_conn: &mut PgConnection) -> Result <Vec<FileOpt>, UnishareError> {
+        let opt_data = files_data::table
+            .filter(files_data::name.ilike(format!("{}%", name)))
+            .load::<File>(db_conn)
+            .optional()?;
+        if let Some(results) = opt_data {
+            let data = results.into_iter().map(|a| FileOpt::from(a).into()).collect();
+            Ok(data)
+        } else {
+            Ok(vec![])
+        }
+    }
+
     /// Edits the file data such as price or availability
     /// WARNING! does not allow for editing the file contents
     pub async fn edit(&mut self, edits: FileOpt, db_conn: &mut PgConnection) -> Result<Self, UnishareError> {
@@ -112,8 +167,15 @@ impl File {
     }
 
     /// Adds a new rating to the file and retireves an updated object
-    pub async fn add_rating(self, reviewer_id: Uuid, db_conn: &mut PgConnection) -> Result<Self, UnishareError> {
-        todo!();
+    /// Updates rating of the file and retireves an updated object
+    pub async fn update_rating(self, db_conn: &mut PgConnection) -> Result<Self, UnishareError> {
+        let av_rating = FileReview::get_average(self.id, db_conn).await?;
+        let update_rating = diesel::update(files_data::table)
+        .filter(files_data::id.eq(self.id.clone()))
+        .set(files_data::rating.eq(av_rating))
+        .get_result(db_conn)?;
+        
+        Ok(update_rating)
     }
 
     /// Changes token balance of both buyer and seller after a transaction to buy access to the file
@@ -124,21 +186,20 @@ impl File {
             .execute(db_conn)?;
         Ok(())
     }
+
+    pub fn create(data: NewFile, user_id: Uuid) -> Self {
+        File::new(data.filename, user_id, data.price, data.primary_tag, data.secondary_tag)
+    }
 }
 
 impl FileContent {
-    fn new(id: Uuid, content: u8) -> Self {
+    pub fn new(id: Uuid, content: Vec<u8>) -> Self {
         Self { id, content }
     }
 }
 
 impl NewFile {
-    fn new(filename: String, creator: Uuid, price: i32, primary_tag: Option<String>, secondary_tag: Option<String>, content: u8) -> Self {
-        Self {filename, creator, price, primary_tag, secondary_tag, content }
-    }
-}
-impl From<NewFile> for File {
-    fn from(raw: NewFile) -> Self {
-        File::new(raw.filename, raw.creator, raw.price, raw.primary_tag, raw.secondary_tag, raw.content)
+    pub fn new(filename: String, creator: Uuid, price: i32, primary_tag: Option<String>, secondary_tag: Option<String>, content: Vec<u8>) -> Self {
+        Self {filename, price, primary_tag, secondary_tag, content }
     }
 }
