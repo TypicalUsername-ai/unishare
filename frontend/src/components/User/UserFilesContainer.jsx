@@ -1,6 +1,6 @@
 import File from "../FileCard";
 
-function UserFilesContainer () {
+const UserFilesContainer = ({ userid }) => {
     return (
         <div style={{backgroundColor: "AliceBlue"}}>
             <h2>Latest files</h2>

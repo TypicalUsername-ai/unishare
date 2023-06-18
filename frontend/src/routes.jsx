@@ -57,7 +57,7 @@ const routes = [
 		element: <ExplorePage />
 	},
 	{
-		path: "/:username/examplefile",
+		path: "/:username/:fileid",
 		element: <FileOverviewPage /> //This will need to be changed to be dynamic by file ids, similar to how users will need to be changed
 	},
 	{
