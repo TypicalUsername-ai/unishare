@@ -55,7 +55,9 @@ async fn search(pool: web::Data<ConnectionPool>, data: web::Query<Uname>) -> Res
     let mut db_conn = pool.get()?;
     let name = data.into_inner();
 
-    let results = User::by_name(name.name, &mut db_conn).await?;
+    let mut results = User::by_name(name.name.clone(), &mut db_conn).await?;
+    let mut mail_results = User::by_email(name.name, &mut db_conn).await?;
+    results.append(&mut mail_results);
 
     Ok(HttpResponse::Ok().json(results))
 }
