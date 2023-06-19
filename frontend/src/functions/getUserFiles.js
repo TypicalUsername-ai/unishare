@@ -7,7 +7,7 @@ async function getUserFiles(user_id, token) {
     };
 
     let response = await fetch(`http://localhost/api/users/${user_id}/files`, options)
-    if (!response.ok) {throw new Error(response.status)}
+    if (!response.ok) {throw new Error("GetUserFiles : " + response.status)}
     return (await response.json()).files
 }
 

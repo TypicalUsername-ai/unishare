@@ -82,10 +82,18 @@ struct Files {
 #[get("/{user_id}/files")]
 async fn get_files(bearer: BearerAuth, pool: web::Data<ConnectionPool>, path: web::Path<Uuid>) -> Result<impl Responder, UnishareError> {
     let mut db_conn = pool.get()?;
-    let auth_result = validate_request(bearer, &mut db_conn).await?;
+    let auth_result = validate_request(bearer, &mut db_conn).await;
     let user = User::by_uuid(path.to_owned(), &mut db_conn).await?;
-    let files = user.get_owned_files(&mut db_conn).await?;
-    Ok(HttpResponse::Ok().json(Files{files}))
+    let mut files = user.get_owned_files(&mut db_conn).await?;
+    match auth_result {
+        Ok(_) => {
+            Ok(HttpResponse::Ok().json(Files{files}))
+        }
+        Err(_) => {
+            files.truncate(5);
+            Ok(HttpResponse::Ok().json(Files{files}))
+        }
+    }
 }
 
 #[get("/{user_id}/reviews")]
