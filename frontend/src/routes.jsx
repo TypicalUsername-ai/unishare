@@ -10,6 +10,7 @@ import SetPasswordPage from './pages/SetPasswordPage'
 import ExplorePage from './pages/ExplorePage'
 import FileOverviewPage from './pages/FileOverviewPage'
 import UploadPage from './pages/UploadPage'
+import ProfilePage from './pages/ProfilePage'
 
 const routes = [
 	{
@@ -18,7 +19,7 @@ const routes = [
 	},
 	{
 		path: "/:username/profile",
-		element: <AccountPage />
+		element: <ProfilePage />
 	},
 	{
 		path: "/account",
