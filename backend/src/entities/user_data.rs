@@ -130,7 +130,7 @@ pub struct GuestView {
     username: String,
     id: Uuid,
     pub_files: i32,
-    rating: i16,
+    rating: f32,
 }
 
 impl From<User> for GuestView {
@@ -146,7 +146,7 @@ pub struct UserView {
     pub_files: i32,
     priv_files: i32,
     email: String,
-    rating: i16,
+    rating: f32,
 }
 
 impl From<User> for UserView {
