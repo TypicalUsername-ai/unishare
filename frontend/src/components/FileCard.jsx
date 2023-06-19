@@ -8,7 +8,7 @@ import { useParams } from 'react-router-dom';
 const FileCard = ({username, fileid, picture, title}) => {
     const navigate = useNavigate();
     const handleClick = () => {
-        navigate(`/${username}/${fileid}`);
+        navigate(`/file/${fileid}`);
     };
     return (
         <div style={{ display: "flex", backgroundColor: "#4CA1AF", borderRadius: "45px", marginBottom: "20px" }} >

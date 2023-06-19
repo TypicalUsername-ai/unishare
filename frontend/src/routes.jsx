@@ -18,7 +18,7 @@ const routes = [
 		element: <HomePage />
 	},
 	{
-		path: "/:username/profile",
+		path: "/profile/:username",
 		element: <ProfilePage />
 	},
 	{
@@ -58,7 +58,7 @@ const routes = [
 		element: <ExplorePage />
 	},
 	{
-		path: "/:username/:fileid",
+		path: "/file/:fileid",
 		element: <FileOverviewPage /> //This will need to be changed to be dynamic by file ids, similar to how users will need to be changed
 	},
 	{
