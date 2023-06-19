@@ -20,6 +20,7 @@ const FileCard = ({username, fileid, picture, title}) => {
             </Avatar.Root>
             <section style={{ textAlign: "left" }}>
                 <h3 style={{ marginBottom: "8px" }}>{title}</h3>
+                <h4>author : {username}</h4>
                 <button onClick={handleClick} className='seeMore'>Details</button>
             </section>
 
