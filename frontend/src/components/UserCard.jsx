@@ -10,7 +10,7 @@ const UserCard = ({ data }) => {
             <img src={imagelink} style={{width : "40px" , height : "40px"}}/>
             <div>{data.username} public files: {data.pub_files}</div>
             <div/>
-            <button onClick={() => navigate("/"+data.username+"/profile")} > profile </button>
+            <button onClick={() => navigate(`/profile/${data.id}`)} > profile </button>
         </div>
     )
 };

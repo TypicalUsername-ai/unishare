@@ -130,11 +130,12 @@ pub struct GuestView {
     username: String,
     id: Uuid,
     pub_files: i32,
+    rating: i16,
 }
 
 impl From<User> for GuestView {
     fn from(value: User) -> Self {
-        Self { username: value.username, id: value.id, pub_files: value.pub_files }
+        Self { username: value.username, id: value.id, pub_files: value.pub_files, rating: value.rating }
     }
 }
 
@@ -145,10 +146,11 @@ pub struct UserView {
     pub_files: i32,
     priv_files: i32,
     email: String,
+    rating: i16,
 }
 
 impl From<User> for UserView {
     fn from(value: User) -> Self {
-        Self { username: value.username, id: value.id, pub_files: value.pub_files, priv_files: value.priv_files, email: value.email }
+        Self { username: value.username, id: value.id, pub_files: value.pub_files, priv_files: value.priv_files, email: value.email, rating: value.rating }
     }
 }

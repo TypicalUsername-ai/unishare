@@ -10,7 +10,7 @@ async function getProfile(id, token) {
     };
 
     let response = await fetch(`http://localhost/api/users/${id}/profile`, options)
-    if (!response.ok) {throw new Error(response.status)}
+    if (!response.ok) {throw new Error("GetProfile : " + response.status)}
     return await response.json()
 }
 

@@ -8,7 +8,7 @@ import { useParams } from 'react-router-dom';
 const FileCard = ({username, fileid, picture, title}) => {
     const navigate = useNavigate();
     const handleClick = () => {
-        navigate(`/${username}/${fileid}`);
+        navigate(`/file/${fileid}`);
     };
     return (
         <div style={{ display: "flex", backgroundColor: "#4CA1AF", borderRadius: "45px", marginBottom: "20px" }} >
@@ -20,6 +20,7 @@ const FileCard = ({username, fileid, picture, title}) => {
             </Avatar.Root>
             <section style={{ textAlign: "left" }}>
                 <h3 style={{ marginBottom: "8px" }}>{title}</h3>
+                <h4>author : {username}</h4>
                 <button onClick={handleClick} className='seeMore'>Details</button>
             </section>
 
