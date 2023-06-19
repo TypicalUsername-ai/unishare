@@ -1,19 +1,25 @@
+import { useEffect, useState } from "react";
 import File from "../FileCard";
+import getUserFiles from "../../functions/getUserFiles";
+import { useSelector } from 'react-redux';
 
-function UserFilesContainer () {
+const UserFilesContainer = ({ userid }) => {
+
+    const token = useSelector((state) => state.token.token);
+    const [files, setFiles] = useState([]);
+
+    useEffect(() => {
+        getUserFiles(userid, token).then(
+            (data) => setFiles(data)
+        );
+    }, [])
+
     return (
         <div style={{backgroundColor: "AliceBlue"}}>
             <h2>Latest files</h2>
-            <File 
-                title="Mateusz notes" 
-                picture="https://static2.strzelce360.pl/data/articles/xl-ernest-khalimov-czy-istnieje-kto-to-wiek-wzrost-waga-wikipedia-1669905523-full.jpg"/>
-            <File 
-                title="NanoTechnology"
-                picture="https://static2.strzelce360.pl/data/articles/xl-ernest-khalimov-czy-istnieje-kto-to-wiek-wzrost-waga-wikipedia-1669905523-full.jpg"/>
-            <File 
-                title="Abstract Algebra"
-                picture="https://static2.strzelce360.pl/data/articles/xl-ernest-khalimov-czy-istnieje-kto-to-wiek-wzrost-waga-wikipedia-1669905523-full.jpg"/>
-
+            {files.map(
+                (entry) => <File username={userid} title={entry.name} fileid={entry.id} picture={null}/>
+            )}
             <button className="seeMore" style={{backgroundColor: "#4CA1AF", marginBottom: "20px"}}>See more</button>
         </div>
     );
