@@ -4,6 +4,7 @@ import getProfile from "../functions/getProfile";
 import getUserFiles from "../functions/getUserFiles";
 import { useSelector } from "react-redux";
 import Header from "../components/Header";
+import File from '../components/FileCard';
 
 const ProfilePage = () => {
     const { username } = useParams();
@@ -37,7 +38,12 @@ const ProfilePage = () => {
             {JSON.stringify(userData)}
             <button onClick={handleRatingAction}> Rate user </button>
             {userFiles.map(
-                (file) => <div>{JSON.stringify(file)}</div>
+                (file) => <File 
+                    username={file.creator} 
+                    fileid={file.id}
+                    picture={null}
+                    title={file.name}
+                />
             )}
         </div>
     )
