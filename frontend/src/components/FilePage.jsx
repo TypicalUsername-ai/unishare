@@ -7,8 +7,8 @@ export default function FilePage() {
         <div className="GlobalContainer">
             <h2>FILE</h2>
             HERE WILL BE DISPLAYED THE CONTENTS OF THE FILE 
-            <FileReviewsBox/>
-            <UserReviewForm />
+            <FileReviewsBox />
+            <FileReviewForm />
 
         </div>
     );
