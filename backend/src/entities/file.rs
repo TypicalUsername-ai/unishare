@@ -4,7 +4,7 @@ use uuid::Uuid;
 use crate::schema::{users_data, transactions, files_content};
 use serde::{Serialize, Deserialize};
 use crate::schema::files_data;
-use super::{error::UnishareError, file_review::FileReview};
+use super::{error::UnishareError, file_review::FileReview, transaction::{Transaction, TransactionType}};
 use std::convert::TryInto;
 
 #[derive(Debug, Serialize, Deserialize, Queryable, Insertable)]
@@ -111,16 +111,11 @@ impl File {
     /// Attempts to purchase the provided file by the user with the provided id
     pub async fn purchase(&self, buyer_id: Uuid, db_conn: &mut PgConnection) -> Result<(), UnishareError> {
         if self.available == true {
+            let transaction = Transaction::new(TransactionType::PURCHASE, buyer_id, self.creator, self.id, self.price);
             let update_owner = self.update_tokens(self.creator, self.price, db_conn).await?;
             let update_buyer = self.update_tokens(buyer_id, -self.price, db_conn).await?;
             let create_transaction = diesel::insert_into(transactions::table)
-            .values((
-                transactions::creator_id.eq(self.creator.clone()), 
-                transactions::buyer_id.eq(buyer_id.clone()), 
-                transactions::file_id.eq(self.id.clone()), 
-                transactions::transaction_time.eq(SystemTime::now()),
-                transactions::price.eq(self.price.clone())
-            )).execute(db_conn)?;
+            .values(transaction).execute(db_conn)?;
             Ok(())
         }
         else {

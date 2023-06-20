@@ -38,12 +38,12 @@ async fn add_file(auth: BearerAuth, data: web::Json::<NewFile>, pool: web::Data<
 
 #[post("/{file_id}/purchase")]
 async fn buy_file(auth: BearerAuth, pool: web::Data<ConnectionPool>, path: web::Path<Uuid>) -> Result<impl Responder, UnishareError> {
-    let buyer_id = path.into_inner();
+    let file_id = path.into_inner();
     let mut db_conn = pool.get()?;
 
     let user = validate_request(auth, &mut db_conn).await?;
-    let file = files_data::table.filter(files_data::id.eq(buyer_id)).first::<File>(&mut db_conn)?;
-    let purchase_result = file.purchase(buyer_id, &mut db_conn).await?;
+    let file = files_data::table.filter(files_data::id.eq(file_id)).first::<File>(&mut db_conn)?;
+    let purchase_result = file.purchase(user.user_id, &mut db_conn).await?;
 
     Ok(HttpResponse::Ok().json(purchase_result))
 }
