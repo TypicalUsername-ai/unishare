@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import getFileReviews from "../functions/getFileReviews";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
+import ReviewCard from './ReviewCard';
 
 const FileReviewsBox = () => {
 
@@ -17,8 +18,15 @@ const FileReviewsBox = () => {
 
     return (
         <div>
-            File reviews
-            {JSON.stringify(reviews)}
+            Reviews:
+            {reviews.map(
+                (review) => <ReviewCard
+                    picture={null}
+                    name={review.reviewer_id}
+                    text={review.comment}
+                    rating={review.review}
+                />
+            )}
         </div>
     )
 

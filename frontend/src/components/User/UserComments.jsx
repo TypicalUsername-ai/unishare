@@ -25,7 +25,9 @@ export default function UserComments (props) {
                 <ReviewCard 
                     name={review.reviewer_id}
                     picture="https://static2.strzelce360.pl/data/articles/xl-ernest-khalimov-czy-istnieje-kto-to-wiek-wzrost-waga-wikipedia-1669905523-full.jpg"
-                    text={review.comment}/>
+                    text={review.comment}
+                    rating={review.review}
+                />
             )}
         </div>
     );
