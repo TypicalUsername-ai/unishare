@@ -1,13 +1,19 @@
 import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
 
 const FileReviewForm = () => {
     const [isPopupOpen, setPopupOpen] = useState(false);
     const [reviewText, setReviewText] = useState('');
     const [rating, setRating] = useState(0);
     const { fileid } = useParams();
+    const authorized = useSelector((state) => state.token.authorized);
+    const navigate = useNavigate();
 
     const handleButtonClick = () => {
+        if(!authorized) {
+            navigate(`/login?r=/file/${fileid}`);
+        }
         setPopupOpen(true);
     };
 
@@ -39,6 +45,7 @@ const FileReviewForm = () => {
             <button onClick={handleButtonClick}>Add Review</button>
             {isPopupOpen && (
                 <div className="popup-container">
+                    <button onClick={() => setPopupOpen(false)}>close</button>
                     <form onSubmit={handleSubmit} className="popup-form">
                         <textarea
                             value={reviewText}
