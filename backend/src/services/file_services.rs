@@ -4,6 +4,7 @@ use diesel::{r2d2::ConnectionManager, PgConnection};
 use diesel::{prelude::*, insert_into};
 use r2d2::Pool;
 use uuid::Uuid;
+use crate::entities::transaction::Transaction;
 use crate::entities::{error::UnishareError, file::{File, FileContent, NewFile}, file_review::FileReview};
 use crate::schema::{files_data, files_content};
 use super::token_middleware::validate_request;
@@ -16,6 +17,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .service(buy_file)
             .service(get_reviews)
             .service(add_review)
+            .service(get_content)
         );
 }
 
@@ -62,6 +64,21 @@ async fn search(pool: web::Data<ConnectionPool>, data: web::Query<Fname>) -> Res
     let results = File::by_name(name.name, &mut db_conn).await?;
 
     Ok(HttpResponse::Ok().json(results))
+}
+
+#[get("/{file_id}/content")]
+async fn get_content(auth: BearerAuth, pool: web::Data<ConnectionPool>, path: web::Path<Uuid>) -> Result<impl Responder, UnishareError> {
+    let file_id = path.into_inner();
+    let mut db_conn = pool.get()?;
+
+    let user = validate_request(auth, &mut db_conn).await?;
+    let is_owner: bool = Transaction::user_owns_file(file_id, user.user_id, db_conn)?;
+    if(is_owner) {
+        let content = FileContent::get_content(file_id, db_conn).await?;
+        Ok(HttpResponse::Ok().json(content))
+    } else {
+        Ok(HttpResponse::NoContent())
+    }
 }
 
 #[get("/{file_id}/reviews")]

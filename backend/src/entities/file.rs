@@ -4,7 +4,7 @@ use uuid::Uuid;
 use crate::schema::{users_data, transactions, files_content};
 use serde::{Serialize, Deserialize};
 use crate::schema::files_data;
-use super::{error::UnishareError, file_review::FileReview};
+use super::{error::UnishareError, file_review::FileReview, user_data::UserData};
 use std::convert::TryInto;
 
 #[derive(Debug, Serialize, Deserialize, Queryable, Insertable)]
@@ -195,6 +195,18 @@ impl File {
 impl FileContent {
     pub fn new(id: Uuid, content: Vec<u8>) -> Self {
         Self { id, content }
+    }
+
+    pub async fn by_file_id(file_id: Uuid, db_conn: &mut PgConnection) -> Result<Vec<u8>, UnishareError> {
+        let content_opt = files_content::table
+            .select(files_content::content)
+            .filter(files_content::id.eq(file_id.clone()))
+            .get_result::<Vec<u8>>(db_conn).optional()?;
+        if let Some(result) = content_opt {
+            Ok(result)
+        } else {
+            Err(UnishareError::ResourceNotFound { resource: format!("FileContent {}", file_id) })
+        }
     }
 }
 
