@@ -128,7 +128,7 @@ impl User {
 #[derive(Debug, Serialize)]
 pub struct GuestView {
     username: String,
-    id: Uuid,
+    pub id: Uuid,
     pub_files: i32,
     rating: f32,
 }
