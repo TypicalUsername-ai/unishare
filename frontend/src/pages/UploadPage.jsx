@@ -55,8 +55,9 @@ const UploadPage = ({onSave, file={}}) => {
             return;
         }
         setErrors({});
-        
+        console.log("FileData");
         console.log(FileData);
+        console.log(FileData.name);
 
         setOpen(false);
         window.clearTimeout(timerRef.current);
