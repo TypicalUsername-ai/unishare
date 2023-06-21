@@ -142,14 +142,13 @@ impl File {
 
     /// Retrieves file data by username
     /// useful for text search functionality
-    pub async fn by_name(name: String, db_conn: &mut PgConnection) -> Result <Vec<FileOpt>, UnishareError> {
+    pub async fn by_name(name: String, db_conn: &mut PgConnection) -> Result <Vec<File>, UnishareError> {
         let opt_data = files_data::table
             .filter(files_data::name.ilike(format!("{}%", name)))
             .load::<File>(db_conn)
             .optional()?;
         if let Some(results) = opt_data {
-            let data = results.into_iter().map(|a| FileOpt::from(a).into()).collect();
-            Ok(data)
+            Ok(results)
         } else {
             Ok(vec![])
         }

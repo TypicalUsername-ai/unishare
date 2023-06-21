@@ -1,5 +1,5 @@
-import UserReviewForm from "./User/UserReviewForm"
 import FileReviewsBox from "./FileReviewsBox";
+import FileReviewForm from './FileReviewForm'
 
 export default function FilePage() {
 

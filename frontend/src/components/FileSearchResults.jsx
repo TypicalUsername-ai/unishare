@@ -5,8 +5,8 @@ const FileSearchResults = ({ data }) => {
         <div>
             {data.map(
                 (file) => <FileCard 
-                    username={"need still"} 
-                    fileid={"need still"}
+                    username={file.creator} 
+                    fileid={file.id}
                     picture={null}
                     title={file.name}
                 />
