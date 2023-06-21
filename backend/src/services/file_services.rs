@@ -88,8 +88,12 @@ async fn get_reviews(auth: BearerAuth, pool: web::Data<ConnectionPool>, path: we
     let id = path.into_inner();
     let mut db_conn = pool.get()?;
 
-    let user = validate_request(auth, &mut db_conn).await?;
-    let data = FileReview::by_uuid(id, &mut db_conn).await?;
+    let user = validate_request(auth, &mut db_conn).await;
+    let mut data = FileReview::by_uuid(id, &mut db_conn).await?;
+
+    if let Err(_) = user {
+        data.truncate(5);
+    }
 
     Ok(HttpResponse::Ok().json(data))
 }
