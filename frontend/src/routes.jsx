@@ -11,6 +11,7 @@ import ExplorePage from './pages/ExplorePage'
 import FileOverviewPage from './pages/FileOverviewPage'
 import UploadPage from './pages/UploadPage'
 import ProfilePage from './pages/ProfilePage'
+import AdminPanel from './pages/AdminPanel'
 
 const routes = [
 	{
@@ -64,7 +65,12 @@ const routes = [
 	{
 		path: "/upload",
 		element: <UploadPage />
+	},
+	{
+		path: "/admin-panel",
+		element: <AdminPanel />
 	}
+
 ]
 
 export default routes
