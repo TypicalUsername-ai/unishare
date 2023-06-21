@@ -5,7 +5,18 @@ import { useParams } from 'react-router-dom';
 
 
 
-const FileCard = ({username, fileid, picture, title}) => {
+const FileCard = ({
+    username, 
+    fileid, 
+    picture, 
+    title, 
+    price, 
+    rating, 
+    primaryTag, 
+    secondaryTag, 
+    editStamp, 
+    available
+}) => {
     const navigate = useNavigate();
     const handleClick = () => {
         navigate(`/file/${fileid}`);
@@ -21,6 +32,15 @@ const FileCard = ({username, fileid, picture, title}) => {
             <section style={{ textAlign: "left" }}>
                 <h3 style={{ marginBottom: "8px" }}>{title}</h3>
                 <h4>author : {username}</h4>
+                {available ? 
+                    <h4>price : {price}</h4>
+                    :
+                    <h4>File unavailable</h4>
+                }
+                {primaryTag || secondaryTag ? 
+                <h4>Tags: [{primaryTag}, {secondaryTag}]</h4> 
+                : null
+                }
                 <button onClick={handleClick} className='seeMore'>Details</button>
             </section>
 

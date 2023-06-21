@@ -9,6 +9,12 @@ const FileSearchResults = ({ data }) => {
                     fileid={file.id}
                     picture={null}
                     title={file.name}
+                    price={file.price}
+                    rating={file.rating}
+                    primaryTag={file.primaryTag}
+                    secondaryTag={file.secondaryTag}
+                    editStamp={file.last_edit}
+                    available={file.available}
                 />
             )}
         </div>

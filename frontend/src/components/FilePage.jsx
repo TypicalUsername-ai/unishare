@@ -1,5 +1,6 @@
 import FileReviewsBox from "./FileReviewsBox";
-import FileReviewForm from './FileReviewForm'
+import FileReviewForm from './FileReviewForm';
+import FilePurchaseBox from './FilePurchaseBox'
 
 export default function FilePage() {
 
@@ -9,6 +10,7 @@ export default function FilePage() {
             HERE WILL BE DISPLAYED THE CONTENTS OF THE FILE 
             <FileReviewsBox />
             <FileReviewForm />
+            <FilePurchaseBox />
 
         </div>
     );
