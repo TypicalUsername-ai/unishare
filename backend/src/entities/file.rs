@@ -153,6 +153,19 @@ impl File {
             Ok(vec![])
         }
     }
+    
+    /// Retrieves file data by id
+    pub async fn by_id(id: Uuid, db_conn: &mut PgConnection) -> Result <File, UnishareError> {
+        let opt_data = files_data::table
+            .filter(files_data::id.eq(id))
+            .first::<File>(db_conn)
+            .optional()?;
+        if let Some(results) = opt_data {
+            Ok(results)
+        } else {
+            Err(UnishareError::ResourceNotFound { resource: format!("File {}", id) })
+        }
+    }
 
     /// Edits the file data such as price or availability
     /// WARNING! does not allow for editing the file contents
@@ -183,6 +196,10 @@ impl File {
 
     pub fn create(data: NewFile, user_id: Uuid) -> Self {
         File::new(data.filename, user_id, data.price, data.primary_tag, data.secondary_tag)
+    }
+
+    pub async fn get_snippet(&self) -> String {
+        String::from("Lorem lorem ipsum dolor...")
     }
 }
 
