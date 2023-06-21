@@ -4,6 +4,7 @@ use diesel::{r2d2::ConnectionManager, PgConnection};
 use diesel::{prelude::*, insert_into};
 use r2d2::Pool;
 use uuid::Uuid;
+use crate::entities::file_user_view::FileUserView;
 use crate::entities::{error::UnishareError, file::{File, FileContent, NewFile}, file_review::FileReview};
 use crate::schema::{files_data, files_content};
 use super::token_middleware::validate_request;
@@ -16,6 +17,8 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .service(buy_file)
             .service(get_reviews)
             .service(add_review)
+            .service(search)
+            .service(get_file_with_transaction)
         );
 }
 
@@ -38,12 +41,12 @@ async fn add_file(auth: BearerAuth, data: web::Json::<NewFile>, pool: web::Data<
 
 #[post("/{file_id}/purchase")]
 async fn buy_file(auth: BearerAuth, pool: web::Data<ConnectionPool>, path: web::Path<Uuid>) -> Result<impl Responder, UnishareError> {
-    let buyer_id = path.into_inner();
+    let file_id = path.into_inner();
     let mut db_conn = pool.get()?;
 
     let user = validate_request(auth, &mut db_conn).await?;
-    let file = files_data::table.filter(files_data::id.eq(buyer_id)).first::<File>(&mut db_conn)?;
-    let purchase_result = file.purchase(buyer_id, &mut db_conn).await?;
+    let file = files_data::table.filter(files_data::id.eq(file_id)).first::<File>(&mut db_conn)?;
+    let purchase_result = file.purchase(user.user_id, &mut db_conn).await?;
 
     Ok(HttpResponse::Ok().json(purchase_result))
 }
@@ -64,13 +67,33 @@ async fn search(pool: web::Data<ConnectionPool>, data: web::Query<Fname>) -> Res
     Ok(HttpResponse::Ok().json(results))
 }
 
+#[get("/{file_id}")]
+async fn get_file_with_transaction(auth: BearerAuth, pool: web::Data<ConnectionPool>, path: web::Path<Uuid>) -> Result<impl Responder, UnishareError> {
+    let fileid = path.into_inner();
+    let mut db_conn = pool.get()?;
+
+    let user = validate_request(auth, &mut db_conn).await;
+    let mut uid = Uuid::new_v4();
+    match user {
+        Ok(session) => {
+            uid = session.user_id;
+        }
+        Err(_) => {}
+    }
+    Ok(HttpResponse::Ok().json(FileUserView::get(fileid, uid, &mut db_conn).await?))
+}
+
 #[get("/{file_id}/reviews")]
 async fn get_reviews(auth: BearerAuth, pool: web::Data<ConnectionPool>, path: web::Path<Uuid>) -> Result<impl Responder, UnishareError> {
     let id = path.into_inner();
     let mut db_conn = pool.get()?;
 
-    let user = validate_request(auth, &mut db_conn).await?;
-    let data = FileReview::by_uuid(id, &mut db_conn).await?;
+    let user = validate_request(auth, &mut db_conn).await;
+    let mut data = FileReview::by_uuid(id, &mut db_conn).await?;
+
+    if let Err(_) = user {
+        data.truncate(5);
+    }
 
     Ok(HttpResponse::Ok().json(data))
 }

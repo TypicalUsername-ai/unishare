@@ -13,7 +13,6 @@ function FileOverview() {
 
 	return (
 		<div style={{ textAlign: "center" }} className="GlobalContainer">
-			<div> owner : {username} file id : {fileid}</div>
 			<Header/>
 			<FilePage />
 		</div>

@@ -3,29 +3,28 @@ import React, { useState } from "react";
 import { Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import Header from '../components/Header';
+import uploadFile from '../functions/uploadFile';
 
-const UploadPage = ({onSave, file={}}) => {
+const UploadPage = ({ onSave, file = {} }) => {
 
 
     const [FileData, setFileData] = useState(file);
     const [errors, setErrors] = useState({});
-    const [open, setOpen] = React.useState(false);
     const [selectedFile, setSelectedFile] = useState(null);
-    const {title, description, price} = FileData;
+    const { filename, description, price } = FileData;
 
     const token = useSelector((state) => state.token.token);
-	const authorized = useSelector((state) => state.token.authorized);
-	const id = useSelector((state) => state.user.id);
+    const authorized = useSelector((state) => state.token.authorized);
+    const id = useSelector((state) => state.user.id);
 
     const validateData = () => {
         let errors = {};
-        if (!title){
-            errors.title = "Title is required!";
-            console.log(errors.title);
+        if (!filename) {
+            errors.filename = "Title is required!";
         }
 
-        if (!description) { 
-                errors.description = "Description is required!";
+        if (!description) {
+            errors.description = "Description is required!";
         }
 
         if (!price) {
@@ -38,57 +37,56 @@ const UploadPage = ({onSave, file={}}) => {
 
 
     const handleChange = (event) => {
-        const {name, value} = event.target;
-        setFileData((prevData) => ({...prevData, [name]: value }));
+        const { name, value } = event.target;
+        setFileData((prevData) => ({ ...prevData, [name]: value }));
     };
 
     const handleSave = async () => {
         const errors = validateData();
-        if (Object.keys(errors).length){
+        if (Object.keys(errors).length) {
             setErrors(errors);
-            
+
             return;
         }
         setErrors({});
         console.log(FileData);
-
-        setOpen(false);
-        window.clearTimeout(timerRef.current);
-        timerRef.current = window.setTimeout(() => {
-        setOpen(true);
-        }, 100);
-        onSave(FileData);
+        uploadFile(FileData, null, token).then(
+            (r) => console.log(r)
+        )
+        //onSave(FileData);
 
     }
 
-    return(
+    return (
         <div className="GlobalContainer">
-            {!authorized ? <Navigate to="/login?r=upload"/> : null }
-			<Header/>
+            {!authorized ? <Navigate to="/login?r=upload" /> : null}
+            <Header />
             <h1>Upload File</h1>
-             <Field default="Title" name="title" onChange={handleChange}/>
-                <div className="errorInformation"></div>
+            <Field default="Title" name="filename" onChange={handleChange} />
+            <div className="errorInformation">{errors.filename}</div>
             <div
-                style={{ display: 'flex', padding: '0 20px', flexWrap: 'wrap', gap: 15, alignItems: 'center'   }}
+                style={{ display: 'flex', padding: '0 20px', flexWrap: 'wrap', gap: 15, alignItems: 'center' }}
             >
-            <textarea
-                className="Input" name='description' style={{position: 'relative', left: '15px', width: '380px', height: '200px', marginBottom: '25px'}} id="TextArea" placeholder="Description" text="message" default="Jak możemy ci pomóc?" onChange={handleChange}></textarea>
-                 <div className="errorInformation"></div>
+                <textarea
+                    className="Input" name='description' style={{ position: 'relative', left: '15px', width: '380px', height: '200px', marginBottom: '25px' }} id="TextArea" placeholder="Description" text="message" default="Jak możemy ci pomóc?" onChange={handleChange}></textarea>
+                <div className="errorInformation">{errors.description}</div>
             </div>
-            <Field default="Price (PLN)" name="price" onChange={handleChange}/>
-                <div className="errorInformation"></div>
+            <Field default="Price (tokens)" name="price" type="number" onChange={(e) => setFileData((prevData) => ({ ...prevData, price: parseInt(e.target.value) }))} />
+            <div className="errorInformation">{errors.price}</div>
+            <Field default="Tag (primary)" name="primary_tag" onChange={handleChange} />
+            <Field default="Tag (Secondary)" name="secondary_tag" onChange={handleChange} />
 
-            <input type='file' value={selectedFile}   ></input>
+            <input type='file' name="content" onChange={(e) => setFileData((prevData) => ({ ...prevData, content: e.target.files[0] }))}   />
 
 
 
-                    
-                        <button className='TopPageButton' style={{width: "135px", height: "45px", backgroundColor: 'white', margin: '10px', borderRadius: '50px', textAlign: 'center'}} 
-                            onClick={handleSave}> 
-                            Send
-                        </button>
 
-</div>
+            <button className='TopPageButton' style={{ width: "135px", height: "45px", backgroundColor: 'white', margin: '10px', borderRadius: '50px', textAlign: 'center' }}
+                onClick={handleSave}>
+                Send
+            </button>
+
+        </div>
     );
 }
 
