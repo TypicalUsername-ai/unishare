@@ -4,7 +4,7 @@ use uuid::Uuid;
 use crate::schema::{users_data, transactions, files_content};
 use serde::{Serialize, Deserialize};
 use crate::schema::files_data;
-use super::{error::UnishareError, file_review::FileReview, transaction::{Transaction, TransactionType}};
+use super::{error::UnishareError, file_review::FileReview, transaction::{Transaction, TransactionType}, user_data::UserData};
 use std::convert::TryInto;
 
 #[derive(Debug, Serialize, Deserialize, Queryable, Insertable)]
@@ -39,40 +39,16 @@ pub struct FileOpt {
 impl From<File> for FileOpt {
     fn from(value: File) -> Self {
         Self { 
-            name: string_to_option(value.name), 
+            name: Some(value.name), 
             last_edit: value.last_edit, 
-            price: i32_to_option_u64(value.price), 
+            price: Some(value.price), 
             rating: value.rating, 
             primary_tag: value.primary_tag, 
             secondary_tag: value.secondary_tag, 
-            available: bool_to_option(value.available) 
+            available: Some(value.available) 
         }
     }
 }
-
-pub fn string_to_option(s: String) -> Option<String> {
-    if s.is_empty() {
-        None
-    } else {
-        Some(s)
-    }
-}
-
-pub fn bool_to_option(b: bool) -> Option<bool> {
-    if b {
-        Some(b)
-    } else {
-        None
-    }
-}
-
-pub fn i32_to_option_u64(n: i32) -> Option<u64> {
-    match n.try_into() {
-        Ok(value) => Some(value),
-        Err(_) => None,
-    }
-}
-
 
 #[derive(Debug, Serialize, Deserialize, Insertable)]
 #[diesel(table_name=files_content)]
@@ -206,6 +182,18 @@ impl File {
 impl FileContent {
     pub fn new(id: Uuid, content: Vec<u8>) -> Self {
         Self { id, content }
+    }
+
+    pub async fn by_file_id(file_id: Uuid, db_conn: &mut PgConnection) -> Result<Vec<u8>, UnishareError> {
+        let content_opt = files_content::table
+            .select(files_content::content)
+            .filter(files_content::id.eq(file_id.clone()))
+            .get_result::<Vec<u8>>(db_conn).optional()?;
+        if let Some(result) = content_opt {
+            Ok(result)
+        } else {
+            Err(UnishareError::ResourceNotFound { resource: format!("FileContent {}", file_id) })
+        }
     }
 }
 
