@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import BanButton from "../admin/banButton.jsx";
 
 
-const ReportedUser = ({name, id, report, token }) =>{
+const ReportedUser = (props) =>{
 
     const navigate = useNavigate();
     const handleClick = () => {
@@ -12,20 +12,16 @@ const ReportedUser = ({name, id, report, token }) =>{
 
     //Send email with information about actions taken against the user 
 
-
-
-
-
     return (
-        <div style={{ display: "flex", backgroundColor: "#4CA1AF", borderRadius: "45px", marginBottom: "20px" }}>
+        <div style={{ display: "flex", backgroundColor: "#4CA1AF", borderRadius: "45px", marginBottom: "20px", padding:"20px" }}>
             <section style={{ textAlign: "left" }}>
-                <h3 style={{ marginBottom: "8px" }}>{name}</h3>
-                <h3 style={{ marginBottom: "8px" }}>{report}</h3>
+                <h3 style={{ marginBottom: "8px" }}>{props.name}</h3>
+                <h3 style={{ marginBottom: "8px" }}>{props.report}</h3>
                 <button onClick={handleClick} className='seeMore'>Details</button>
                
                 <BanButton
-                id={id}
-                token={token}
+                id={props.id}
+                token={props.token}
                 ></BanButton>
             </section>
         </div>
