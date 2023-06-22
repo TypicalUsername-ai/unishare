@@ -65,6 +65,26 @@ impl User {
             Ok(vec![])
         }
     }
+
+    /// Removes user profile and data
+    pub async fn remove_user(id: Uuid, db_conn: &mut PgConnection) -> Result <(), UnishareError> {
+        let remove_data = diesel::update(users_data::table)
+            .filter(users_data::user_id.eq(id.clone()))
+            .set(users_data::tokens.eq(0)).execute(db_conn)?;
+        let remove_user = diesel::update(users::table)
+            .filter(users::id.eq(id.clone()))
+            .set((
+                users::username.eq("Deleted user"),
+                users::user_email.eq(""),
+                users::password_hash.eq(""),
+                users::confirmed.eq(false)
+            )).execute(db_conn)?;
+        if remove_data > 0 && remove_user > 0 {
+            Ok(())
+        } else {
+            Err(UnishareError::ResourceNotFound { resource: format!("User {}", id) })
+        }
+    }
     
     /// Retrieves user data by email
     /// useful for text search functionality
@@ -85,7 +105,8 @@ impl User {
     /// Retrieves `UserData` object from the database matching the provided `Uuid` of the file said
     /// user owns
     pub async fn by_file_id(file_id: Uuid, db_conn: &mut PgConnection) -> Result<Self, UnishareError> {
-        todo!()
+        let user_id = files_data::table
+            .filter(files_data::id.eq(file_id.clone()))
     }
 
     /// Returns the vector of file objects which the user owns

@@ -161,6 +161,24 @@ impl File {
         Ok(update_rating)
     }
 
+    pub async fn delete_file(id: Uuid, db_conn: &mut PgConnection) -> Result<(), UnishareError> {
+        let remove_file = diesel::update(files_data::table)
+            .filter(files_data::id.eq(id.clone()))
+            .set((
+                files_data::name.eq("Deleted file"),
+                files_data::created_time.eq(SystemTime::UNIX_EPOCH),
+                files_data::last_edit_time.eq(SystemTime::UNIX_EPOCH),
+                files_data::price.eq(0),
+                files_data::rating.eq(0f32),
+                files_data::primary_tag.eq(""),
+                files_data::secondary_tag.eq(""),
+                files_data::available.eq(false)
+            )).execute(db_conn)?;
+        let user_file_decrement = diesel::update(users_data::table)
+            .filter()
+        Ok(())
+    }
+
     /// Changes token balance of both buyer and seller after a transaction to buy access to the file
     async fn update_tokens(&self, user_id: Uuid, tokens_amount: i32, db_conn: &mut PgConnection) -> Result<(), UnishareError> {
         let update_user = diesel::update(users_data::table)
