@@ -65,6 +65,22 @@ impl User {
             Ok(vec![])
         }
     }
+    
+    /// Retrieves user data by email
+    /// useful for text search functionality
+    pub async fn by_email(name: String, db_conn: &mut PgConnection) -> Result <Vec<GuestView>, UnishareError> {
+        let opt_data = users_data::table
+            .inner_join(users::table.on(users::id.eq(users_data::user_id)))
+            .filter(users::user_email.ilike(format!("{}%", name)))
+            .load::<(UserData, UserAuth)>(db_conn)
+            .optional()?;
+        if let Some(results) = opt_data {
+            let data = results.into_iter().map(|a| User::from(a).into()).collect();
+            Ok(data)
+        } else {
+            Ok(vec![])
+        }
+    }
 
     /// Retrieves `UserData` object from the database matching the provided `Uuid` of the file said
     /// user owns
@@ -107,13 +123,14 @@ impl User {
 #[derive(Debug, Serialize)]
 pub struct GuestView {
     username: String,
-    id: Uuid,
+    pub id: Uuid,
     pub_files: i32,
+    rating: f32,
 }
 
 impl From<User> for GuestView {
     fn from(value: User) -> Self {
-        Self { username: value.username, id: value.id, pub_files: value.pub_files }
+        Self { username: value.username, id: value.id, pub_files: value.pub_files, rating: value.rating }
     }
 }
 
@@ -124,10 +141,11 @@ pub struct UserView {
     pub_files: i32,
     priv_files: i32,
     email: String,
+    rating: f32,
 }
 
 impl From<User> for UserView {
     fn from(value: User) -> Self {
-        Self { username: value.username, id: value.id, pub_files: value.pub_files, priv_files: value.priv_files, email: value.email }
+        Self { username: value.username, id: value.id, pub_files: value.pub_files, priv_files: value.priv_files, email: value.email, rating: value.rating }
     }
 }

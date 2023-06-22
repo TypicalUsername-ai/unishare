@@ -61,7 +61,7 @@ const UserLoginForm = ({ onSave, user = {} }) => {
             dispatch(setToken(access_token));
             dispatch(setUserId(user_id));
             let redirect = params.get("r");
-            navigate(redirect ? "/"+redirect : "/loggedin");
+            navigate(redirect ? "/" + redirect : "/account");
         } else {
             let errors = {}
             errors.password = "invalid password";

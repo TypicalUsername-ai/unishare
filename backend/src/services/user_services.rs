@@ -16,6 +16,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
              .service(get_reviews)
              .service(add_review)
              .service(search)
+             .service(get_files)
             );
 }
 
@@ -54,7 +55,10 @@ async fn search(pool: web::Data<ConnectionPool>, data: web::Query<Uname>) -> Res
     let mut db_conn = pool.get()?;
     let name = data.into_inner();
 
-    let results = User::by_name(name.name, &mut db_conn).await?;
+    let mut results = User::by_name(name.name.clone(), &mut db_conn).await?;
+    let mut mail_results = User::by_email(name.name, &mut db_conn).await?;
+    results.append(&mut mail_results);
+    results.dedup_by(|a, b| a.id == b.id);
 
     Ok(HttpResponse::Ok().json(results))
 }
@@ -79,10 +83,18 @@ struct Files {
 #[get("/{user_id}/files")]
 async fn get_files(bearer: BearerAuth, pool: web::Data<ConnectionPool>, path: web::Path<Uuid>) -> Result<impl Responder, UnishareError> {
     let mut db_conn = pool.get()?;
-    let auth_result = validate_request(bearer, &mut db_conn).await?;
+    let auth_result = validate_request(bearer, &mut db_conn).await;
     let user = User::by_uuid(path.to_owned(), &mut db_conn).await?;
-    let files = user.get_owned_files(&mut db_conn).await?;
-    Ok(HttpResponse::Ok().json(Files{files}))
+    let mut files = user.get_owned_files(&mut db_conn).await?;
+    match auth_result {
+        Ok(_) => {
+            Ok(HttpResponse::Ok().json(Files{files}))
+        }
+        Err(_) => {
+            files.truncate(5);
+            Ok(HttpResponse::Ok().json(Files{files}))
+        }
+    }
 }
 
 #[get("/{user_id}/reviews")]
@@ -91,9 +103,13 @@ async fn get_reviews(auth: BearerAuth, pool: web::Data<ConnectionPool>, path: we
     let id = path.into_inner();
     let mut db_conn = pool.get()?;
 
-    let user = validate_request(auth, &mut db_conn).await?;
-    let data = UserReview::by_uuid(id, &mut db_conn).await?;
+    let user = validate_request(auth, &mut db_conn).await;
+    let mut data = UserReview::by_uuid(id, &mut db_conn).await?;
     
+    if let Err(_) = user {
+        data.truncate(5);
+    }
+
     Ok(HttpResponse::Ok().json(data))
 }
 
