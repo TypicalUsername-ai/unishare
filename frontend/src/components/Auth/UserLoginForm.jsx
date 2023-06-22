@@ -12,12 +12,9 @@ const UserLoginForm = ({ onSave, user = {} }) => {
     const navigate = useNavigate();
     const [userData, setUserData] = useState(user);
     const [errors, setErrors] = useState({});
-    const [open, setOpen] = useState(false);
+    const [remember, setRemember] = useState(false);
     const [params, setParams] = useSearchParams();
     const { username, email, password } = userData;
-
-    const token = useSelector((state) => state.token);
-    const user_data = useSelector((state) => state.user);
     const dispatch = useDispatch();
 
     const validateData = () => {
@@ -46,7 +43,7 @@ const UserLoginForm = ({ onSave, user = {} }) => {
         }
         setErrors({});
         let response = await fetch(
-            "http://localhost/api/login",
+            `http://localhost/api/login?rememberMe=${remember}`,
             {
                 method: 'POST',
                 headers: { 'Authorization': `Basic ${btoa(username + ":" + password)}` }
@@ -76,6 +73,11 @@ const UserLoginForm = ({ onSave, user = {} }) => {
         navigate("/passwordreset");
     }
 
+    const toggleRemember = () => {
+        let prev = remember;
+        setRemember(!prev);
+    }
+
     return (
         <div className="formContainer">
 
@@ -84,6 +86,11 @@ const UserLoginForm = ({ onSave, user = {} }) => {
 
             <Field text="password" type="password" default="password" name="password" onChange={handleChange} />
             <div className="errorInformation">{errors.password}</div>
+
+            <div>
+                <input style={{width : "20px", height : "20px"}} onChange={toggleRemember} type="checkbox"/>
+                <label> remember me </label>
+            </div>
 
             <Toast.Provider swipeDirection="right">
                 <button
