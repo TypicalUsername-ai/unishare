@@ -12,8 +12,8 @@ use actix_multipart::Multipart;
 use futures_util::stream::StreamExt as _;
 use uuid::Uuid;
 use crate::entities::{file_user_view::FileUserView, transaction::Transaction};
-use crate::entities::{error::UnishareError, file::{File, FileContent, NewFile}, file_review::FileReview};
-use crate::schema::{files_data, files_content};
+use crate::entities::{error::UnishareError, file::{File, NewFile}, file_review::FileReview};
+use crate::schema::files_data;
 use super::token_middleware::validate_request;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
@@ -118,8 +118,8 @@ async fn get_content(auth: BearerAuth, pool: web::Data<ConnectionPool>, path: we
     let user = validate_request(auth, &mut db_conn).await?;
     let is_owner: bool = Transaction::user_owns_file(file_id, user.user_id, &mut db_conn).await?;
     if is_owner {
-        let content = FileContent::by_file_id(file_id, &mut db_conn).await?;
-        Ok(HttpResponse::Ok().json(content))
+        let content = File::get_content(file_id).await?;
+        Ok(HttpResponse::Ok().finish()) // need to send content
     } else {
         Ok(HttpResponse::NoContent().finish())
     }

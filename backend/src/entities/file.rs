@@ -1,11 +1,12 @@
 use std::time::SystemTime;
 use diesel::{PgConnection, prelude::*};
 use uuid::Uuid;
-use crate::schema::{users_data, transactions, files_content};
+use crate::{schema::{users_data, transactions}, services::file_services::get_content};
 use serde::{Serialize, Deserialize};
 use crate::schema::files_data;
 use super::{error::UnishareError, file_review::FileReview, transaction::{Transaction, TransactionType}, user_data::UserData};
 use std::convert::TryInto;
+use std::fs;
 
 #[derive(Debug, Serialize, Deserialize, Queryable, Insertable)]
 #[diesel(table_name = files_data)]
@@ -48,13 +49,6 @@ impl From<File> for FileOpt {
             available: Some(value.available) 
         }
     }
-}
-
-#[derive(Debug, Serialize, Deserialize, Insertable)]
-#[diesel(table_name=files_content)]
-pub struct FileContent {
-    id: Uuid,
-    content: Vec<u8>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -174,24 +168,20 @@ impl File {
     }
 
     pub async fn get_snippet(&self) -> String {
-        String::from("Lorem lorem ipsum dolor...")
-    }
-}
 
-impl FileContent {
-    pub fn new(id: Uuid, content: Vec<u8>) -> Self {
-        Self { id, content }
+        let mut fcontent = fs::read_to_string(format!("/files/{}", self.id))
+        .unwrap_or("No Contant available".to_owned());
+
+        fcontent.truncate(50);
+        fcontent
+
     }
 
-    pub async fn by_file_id(file_id: Uuid, db_conn: &mut PgConnection) -> Result<Vec<u8>, UnishareError> {
-        let content_opt = files_content::table
-            .select(files_content::content)
-            .filter(files_content::id.eq(file_id.clone()))
-            .get_result::<Vec<u8>>(db_conn).optional()?;
-        if let Some(result) = content_opt {
-            Ok(result)
-        } else {
-            Err(UnishareError::ResourceNotFound { resource: format!("FileContent {}", file_id) })
+    pub async fn get_content(file_id: Uuid) -> Result<fs::File, UnishareError> {
+        let file_opt = fs::File::open(format!("/files/{}", file_id));
+        match file_opt {
+            Ok(file) => Ok(file),
+            Err(e) => Err(UnishareError::ResourceNotFound { resource: format!("FileContents {}", file_id) }),
         }
     }
 }
