@@ -29,7 +29,7 @@ pub struct File {
 pub struct FileOpt {
     name: Option<String>,
     last_edit: SystemTime,
-    price: Option<u64>,
+    price: Option<i32>,
     rating: f32,
     primary_tag: Option<String>,
     secondary_tag: Option<String>,
@@ -63,7 +63,6 @@ pub struct NewFile {
     price: i32,
     primary_tag: Option<String>,
     secondary_tag: Option<String>,
-    pub content: Vec<u8>,
 }
 
 
@@ -198,7 +197,7 @@ impl FileContent {
 }
 
 impl NewFile {
-    pub fn new(filename: String, creator: Uuid, price: i32, primary_tag: Option<String>, secondary_tag: Option<String>, content: Vec<u8>) -> Self {
-        Self {filename, price, primary_tag, secondary_tag, content }
+    pub fn new(filename: String, creator: Uuid, price: i32, primary_tag: Option<String>, secondary_tag: Option<String>) -> Self {
+        Self {filename, price, primary_tag, secondary_tag }
     }
 }

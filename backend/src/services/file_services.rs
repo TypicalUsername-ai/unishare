@@ -1,8 +1,15 @@
+use actix_multipart::form::MultipartForm;
+use actix_multipart::form::tempfile::TempFile;
+use actix_multipart::form::text::Text;
 use actix_web::{web, Responder, HttpResponse, get, post};
 use actix_web_httpauth::extractors::bearer::BearerAuth;
 use diesel::{r2d2::ConnectionManager, PgConnection};
 use diesel::{prelude::*, insert_into};
+use std::fs;
+use log::error;
 use r2d2::Pool;
+use actix_multipart::Multipart;
+use futures_util::stream::StreamExt as _;
 use uuid::Uuid;
 use crate::entities::{file_user_view::FileUserView, transaction::Transaction};
 use crate::entities::{error::UnishareError, file::{File, FileContent, NewFile}, file_review::FileReview};
@@ -25,19 +32,38 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 
 type ConnectionPool = Pool<ConnectionManager<PgConnection>>;
 
+#[derive(Debug, MultipartForm)]
+struct FileUploadForm {
+    filename: Text<String>,
+    description: Text<String>,
+    price: Text<i32>,
+    primary_tag: Option<Text<String>>,
+    secondary_tag: Option<Text<String>>,
+    content: TempFile
+}
+
 #[post("/create")]
-async fn add_file(auth: BearerAuth, data: web::Json::<NewFile>, pool: web::Data<ConnectionPool>) -> Result<impl Responder, UnishareError> {
+async fn add_file(auth: BearerAuth, data: MultipartForm<FileUploadForm>, pool: web::Data<ConnectionPool>) -> Result<impl Responder, UnishareError> {
     let mut db_conn = pool.get()?;
     let user = validate_request(auth, &mut db_conn).await?;
-    let data_inner = data.into_inner();
-    let contents = data_inner.content.clone();
-    let new_data = File::create(data_inner, user.user_id);
-    // Creates file content object from content and the same id as corresponding file data record
-    let new_content = FileContent::new(new_data.id, contents);
-    let insert_data_op: File = insert_into(files_data::table).values(new_data).get_result(&mut db_conn)?;
-    let insert_content_op = insert_into(files_content::table).values(new_content).execute(&mut db_conn)?;
-    Ok(HttpResponse::Created()
-        .json(insert_data_op))
+    let file = data.into_inner();
+    let content_file = file.content.file.as_file();
+
+    let filedata = NewFile::new(
+        file.filename.into_inner(), 
+        user.user_id, 
+        file.price.into_inner(), 
+        match file.primary_tag {Some(e) => Some(e.into_inner()), None => None} , 
+        match file.secondary_tag {Some(e) => Some(e.into_inner()), None => None}
+    );
+
+    let newfile = File::create(filedata, user.user_id);
+    let fileid = newfile.id.clone();
+    insert_into(files_data::table).values(newfile).execute(&mut db_conn).unwrap();
+    fs::rename(file.content.file, format!("/files/{}", fileid));
+
+    Ok(HttpResponse::Created().json(fileid))
+
 }
 
 #[post("/{file_id}/purchase")]
@@ -90,12 +116,12 @@ async fn get_content(auth: BearerAuth, pool: web::Data<ConnectionPool>, path: we
     let mut db_conn = pool.get()?;
 
     let user = validate_request(auth, &mut db_conn).await?;
-    let is_owner: bool = Transaction::user_owns_file(file_id, user.user_id, db_conn)?;
-    if(is_owner) {
-        let content = FileContent::get_content(file_id, db_conn).await?;
+    let is_owner: bool = Transaction::user_owns_file(file_id, user.user_id, &mut db_conn).await?;
+    if is_owner {
+        let content = FileContent::by_file_id(file_id, &mut db_conn).await?;
         Ok(HttpResponse::Ok().json(content))
     } else {
-        Ok(HttpResponse::NoContent())
+        Ok(HttpResponse::NoContent().finish())
     }
 }
 

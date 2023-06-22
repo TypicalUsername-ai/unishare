@@ -28,10 +28,10 @@ impl Transaction {
         let user_file_transactions = transactions::table
             .filter(transactions::buyer_id.eq(user_id.clone())
                 .and(transactions::file_id.eq(file_id.clone())))
-            .get_result::<Vec<Transaction>>(db_conn)?;
+            .get_results::<Transaction>(db_conn)?;
         match user_file_transactions.last() {
             Some(transaction) => {
-                if transaction.transaction_type.into() == TransactionType::PURCHASE {
+                if transaction.transaction_type == TransactionType::PURCHASE.to_i32() {
                     Ok(true)
                 } else {
                     Ok(false)
