@@ -49,8 +49,12 @@ const UploadPage = ({ onSave, file = {} }) => {
             return;
         }
         setErrors({});
-        console.log(FileData);
-        uploadFile(FileData, null, token).then(
+        let reqData = new FormData();
+        Object.entries(FileData).forEach(
+            (value) => reqData.append(value[0], value[1])
+        )
+        console.log(reqData);
+        uploadFile(reqData, token).then(
             (r) => console.log(r)
         )
         //onSave(FileData);
