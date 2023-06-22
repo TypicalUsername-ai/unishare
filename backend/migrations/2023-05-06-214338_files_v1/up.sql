@@ -16,12 +16,3 @@ CREATE TABLE files_data (
         REFERENCES users(id),
     PRIMARY KEY (id)
 );
-
-CREATE TABLE files_content (
-    id uuid NOT NULL,
-    content bytea NOT NULL,
-    CONSTRAINT fk_id
-        FOREIGN KEY (id)
-        REFERENCES files_data(id),
-    PRIMARY KEY (id)
-);
