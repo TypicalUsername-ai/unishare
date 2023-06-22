@@ -1,9 +1,9 @@
 use diesel::{prelude::*, PgConnection};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
-use crate::schema::{files_data, transactions};
+use crate::schema::transactions;
 
-use super::{file::File, transaction::{Transaction, self}, error::UnishareError};
+use super::{file::File, transaction::Transaction, error::UnishareError};
 
 #[derive(Serialize, Deserialize)]
 pub struct FileUserView {

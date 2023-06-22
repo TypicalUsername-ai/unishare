@@ -5,11 +5,9 @@ use actix_web::{web, Responder, HttpResponse, get, post};
 use actix_web_httpauth::extractors::bearer::BearerAuth;
 use diesel::{r2d2::ConnectionManager, PgConnection};
 use diesel::{prelude::*, insert_into};
+use serde::{Serialize, Deserialize};
 use std::fs;
-use log::error;
 use r2d2::Pool;
-use actix_multipart::Multipart;
-use futures_util::stream::StreamExt as _;
 use uuid::Uuid;
 use crate::entities::{file_user_view::FileUserView, transaction::Transaction};
 use crate::entities::{error::UnishareError, file::{File, NewFile}, file_review::FileReview};
@@ -78,7 +76,7 @@ async fn buy_file(auth: BearerAuth, pool: web::Data<ConnectionPool>, path: web::
     Ok(HttpResponse::Ok().json(purchase_result))
 }
 
-#[derive(Debug, serde::Deserialize)]
+#[derive(Debug, Deserialize)]
 struct Fname {
     name: String,
 }
@@ -110,6 +108,11 @@ async fn get_file_with_transaction(auth: BearerAuth, pool: web::Data<ConnectionP
     Ok(HttpResponse::Ok().json(FileUserView::get(fileid, uid, &mut db_conn).await?))
 }
 
+#[derive(Serialize, Deserialize)]
+struct FileContent {
+    pub content: String,
+}
+
 #[get("/{file_id}/content")]
 async fn get_content(auth: BearerAuth, pool: web::Data<ConnectionPool>, path: web::Path<Uuid>) -> Result<impl Responder, UnishareError> {
     let file_id = path.into_inner();
@@ -118,8 +121,9 @@ async fn get_content(auth: BearerAuth, pool: web::Data<ConnectionPool>, path: we
     let user = validate_request(auth, &mut db_conn).await?;
     let is_owner: bool = Transaction::user_owns_file(file_id, user.user_id, &mut db_conn).await?;
     if is_owner {
-        let content = File::get_content(file_id).await?;
-        Ok(HttpResponse::Ok().finish()) // need to send content
+        let content = fs::read_to_string(format!("/files/{}", file_id))
+        .unwrap_or("No Content Available".to_owned());
+        Ok(HttpResponse::Ok().json(FileContent{ content })) // need to send content
     } else {
         Ok(HttpResponse::NoContent().finish())
     }
@@ -142,7 +146,7 @@ async fn get_reviews(auth: BearerAuth, pool: web::Data<ConnectionPool>, path: we
 
 
 
-#[derive(Debug, serde::Deserialize)]
+#[derive(Debug, Deserialize)]
 struct ReviewData {
     pub review: i32,
     pub comment: Option<String>

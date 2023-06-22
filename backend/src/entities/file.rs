@@ -1,11 +1,10 @@
 use std::time::SystemTime;
 use diesel::{PgConnection, prelude::*};
 use uuid::Uuid;
-use crate::{schema::{users_data, transactions}, services::file_services::get_content};
+use crate::schema::{users_data, transactions};
 use serde::{Serialize, Deserialize};
 use crate::schema::files_data;
-use super::{error::UnishareError, file_review::FileReview, transaction::{Transaction, TransactionType}, user_data::UserData};
-use std::convert::TryInto;
+use super::{error::UnishareError, file_review::FileReview, transaction::{Transaction, TransactionType}};
 use std::fs;
 
 #[derive(Debug, Serialize, Deserialize, Queryable, Insertable)]

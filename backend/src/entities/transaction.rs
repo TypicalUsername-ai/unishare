@@ -2,7 +2,7 @@ use std::time::SystemTime;
 use crate::schema::transactions;
 use serde::{Serialize, Deserialize};
 use uuid::Uuid;
-use diesel::{Insertable, Queryable, PgConnection, QueryDsl, expression::is_aggregate::No};
+use diesel::{Insertable, Queryable, PgConnection, QueryDsl};
 use super::error::UnishareError;
 use diesel::prelude::*;
 
