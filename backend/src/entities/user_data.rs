@@ -104,9 +104,19 @@ impl User {
 
     /// Retrieves `UserData` object from the database matching the provided `Uuid` of the file said
     /// user owns
-    pub async fn by_file_id(file_id: Uuid, db_conn: &mut PgConnection) -> Result<Self, UnishareError> {
+    pub async fn by_file_id(file_id: Uuid, db_conn: &mut PgConnection) -> Result<UserData, UnishareError> {
         let user_id = files_data::table
             .filter(files_data::id.eq(file_id.clone()))
+            .select(files_data::creator).first::<Uuid>(db_conn)?;
+        let user = users_data::table
+            .filter(users_data::user_id.eq(user_id.clone()))
+            .select((
+                users_data::user_id, 
+                users_data::pub_files, 
+                users_data::priv_files, 
+                users_data::tokens
+            )).first::<UserData>(db_conn)?;
+        Ok(user)
     }
 
     /// Returns the vector of file objects which the user owns

@@ -4,7 +4,7 @@ use uuid::Uuid;
 use crate::schema::{users_data, transactions, files_content};
 use serde::{Serialize, Deserialize};
 use crate::schema::files_data;
-use super::{error::UnishareError, file_review::FileReview, transaction::{Transaction, TransactionType}, user_data::UserData};
+use super::{error::UnishareError, file_review::FileReview, transaction::{Transaction, TransactionType}, user_data::{UserData, User}};
 use std::convert::TryInto;
 
 #[derive(Debug, Serialize, Deserialize, Queryable, Insertable)]
@@ -174,8 +174,11 @@ impl File {
                 files_data::secondary_tag.eq(""),
                 files_data::available.eq(false)
             )).execute(db_conn)?;
+        let user = User::by_file_id(id, db_conn).await?;
         let user_file_decrement = diesel::update(users_data::table)
-            .filter()
+            .filter(users_data::user_id.eq(user.id))
+            .set(users_data::pub_files.eq(users_data::pub_files - 1))
+            .execute(db_conn)?;
         Ok(())
     }
 
