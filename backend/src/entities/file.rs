@@ -39,40 +39,16 @@ pub struct FileOpt {
 impl From<File> for FileOpt {
     fn from(value: File) -> Self {
         Self { 
-            name: string_to_option(value.name), 
+            name: Some(value.name), 
             last_edit: value.last_edit, 
-            price: i32_to_option_u64(value.price), 
+            price: Some(value.price), 
             rating: value.rating, 
             primary_tag: value.primary_tag, 
             secondary_tag: value.secondary_tag, 
-            available: bool_to_option(value.available) 
+            available: Some(value.available) 
         }
     }
 }
-
-pub fn string_to_option(s: String) -> Option<String> {
-    if s.is_empty() {
-        None
-    } else {
-        Some(s)
-    }
-}
-
-pub fn bool_to_option(b: bool) -> Option<bool> {
-    if b {
-        Some(b)
-    } else {
-        None
-    }
-}
-
-pub fn i32_to_option_u64(n: i32) -> Option<u64> {
-    match n.try_into() {
-        Ok(value) => Some(value),
-        Err(_) => None,
-    }
-}
-
 
 #[derive(Debug, Serialize, Deserialize, Insertable)]
 #[diesel(table_name=files_content)]
