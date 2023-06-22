@@ -1,13 +1,12 @@
 import React, { useState } from "react";
 import validator from "validator";
 import "../form.css";
-
 import * as Toast from '@radix-ui/react-toast';
 import Field from "../field";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useSelector, useDispatch } from 'react-redux';
 import { setToken } from '../../reducers/tokenSlice';
-import { setUserId } from '../../reducers/userSlice'
+import { setUserId } from '../../reducers/userSlice';
 
 const UserLoginForm = ({ onSave, user = {} }) => {
     const navigate = useNavigate();
@@ -59,6 +58,9 @@ const UserLoginForm = ({ onSave, user = {} }) => {
             let access_token = data.access_token;
             let user_id = data.user;
             dispatch(setToken(access_token));
+
+            localStorage.setItem('token', access_token);
+
             dispatch(setUserId(user_id));
             let redirect = params.get("r");
             navigate(redirect ? "/" + redirect : "/account");

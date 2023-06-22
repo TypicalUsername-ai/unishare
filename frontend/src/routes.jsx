@@ -11,6 +11,7 @@ import ExplorePage from './pages/ExplorePage'
 import FileOverviewPage from './pages/FileOverviewPage'
 import UploadPage from './pages/UploadPage'
 import ProfilePage from './pages/ProfilePage'
+import LogoutPage from './pages/LogoutPage'
 
 const routes = [
 	{
@@ -64,6 +65,10 @@ const routes = [
 	{
 		path: "/upload",
 		element: <UploadPage />
+	},
+	{
+		path: "/logout",
+		element: <LogoutPage/>
 	}
 ]
 
