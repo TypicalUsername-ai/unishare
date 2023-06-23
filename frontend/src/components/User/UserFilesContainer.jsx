@@ -18,7 +18,18 @@ const UserFilesContainer = ({ userid }) => {
         <div style={{backgroundColor: "AliceBlue"}}>
             <h2>Latest files</h2>
             {files.map(
-                (entry) => <File username={userid} title={entry.name} fileid={entry.id} picture={null}/>
+                (file) => <File 
+                username={file.creator} 
+                fileid={file.id}
+                picture={null}
+                title={file.name}
+                price={file.price}
+                rating={file.rating}
+                primaryTag={file.primaryTag}
+                secondaryTag={file.secondaryTag}
+                editStamp={file.last_edit}
+                available={file.available}
+            />
             )}
             <button className="seeMore" style={{backgroundColor: "#4CA1AF", marginBottom: "20px"}}>See more</button>
         </div>
