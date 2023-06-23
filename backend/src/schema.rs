@@ -81,6 +81,7 @@ diesel::table! {
 
 diesel::joinable!(files_content -> files_data (id));
 diesel::joinable!(transactions -> users (buyer_id));
+diesel::joinable!(user_reviews -> users (reviewed_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
     file_reviews,

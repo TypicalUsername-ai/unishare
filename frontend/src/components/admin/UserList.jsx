@@ -15,8 +15,13 @@ export default function UserList () {
     function sorting ({sort}) {
         switch(sort){
             case 'number-of-reports':
-                 
+                 users.sort(sortMethods.descending);
         }
+    }
+
+    const sortMethods = {
+        none: {method: (a,b) =>},
+        descending: {method: (a,b) => (a > b ? -1 : 1)}
     }
 
 
