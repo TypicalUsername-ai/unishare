@@ -1,5 +1,6 @@
 import React from 'react';
 import * as AlertDialog from '@radix-ui/react-alert-dialog';
+import BanSuccessful from '../admin/BanSuccessful';
 
 
 const DeleteUserButton = () => (
@@ -20,7 +21,9 @@ const DeleteUserButton = () => (
               <button className="Button mauve">Cancel</button>
             </AlertDialog.Cancel>
             <AlertDialog.Action asChild>
-              <button className="Button red">Yes, delete account</button>
+              <BanSuccessful
+                type="Delete User"
+              />
             </AlertDialog.Action>
           </div>
         </AlertDialog.Content>
