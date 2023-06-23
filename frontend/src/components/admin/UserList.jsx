@@ -36,6 +36,9 @@ export default function UserList () {
                 <option value="example3">example3</option>
             </select>
             </div>
+            {users.map(
+                (entry) => <ReportedUser name={entry.name} report={entry.report} tag={entry.tag}/>
+            )}
             <ReportedUser
                 name="name"
                 report="uzytkownik wystawia obnazajace zdjecia"

@@ -13,7 +13,7 @@ const ReportedUser = (props) =>{
     //Send email with information about actions taken against the user 
 
     return (
-        <div style={{ display: "flex", backgroundColor: "#4CA1AF", borderRadius: "45px", marginBottom: "20px", padding:"20px" }}>
+        <div style={{ display: "flex", backgroundColor: "#4CA1AF", borderRadius: "45px", marginBottom: "20px", padding:"20px",  width:"300px", height: "200px" }}>
             <section style={{ textAlign: "left" }}>
                 <h3 style={{ marginBottom: "8px" }}>{props.name}</h3>
                 <h3 style={{ marginBottom: "8px" }}>{props.report}</h3>
