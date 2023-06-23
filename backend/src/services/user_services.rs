@@ -4,7 +4,7 @@ use diesel::{r2d2::ConnectionManager, PgConnection};
 use r2d2::Pool;
 use serde::{Serialize, Deserialize};
 use uuid::Uuid;
-use crate::entities::{error::UnishareError, user_data::{User, UserData}, user_review::UserReview, file::File};
+use crate::entities::{error::UnishareError, user_data::{User, UserData}, user_review::UserReview, file::File, transaction::Transaction};
 use super::token_middleware::validate_request;
 use log::warn;
 
@@ -99,6 +99,17 @@ async fn get_files(bearer: BearerAuth, pool: web::Data<ConnectionPool>, path: we
             Ok(HttpResponse::Ok().json(Files{files}))
         }
     }
+}
+
+#[get("/{user_id}/inventory/files")]
+async fn get_bought_files(auth: BearerAuth, pool: web::Data<ConnectionPool>, path: web::Path<Uuid>) -> Result<impl Responder, UnishareError> {
+    let id = path.into_inner();
+    let mut db_conn = pool.get()?;
+
+    let user = validate_request(auth, &mut db_conn).await;
+    let files = Transaction::get_user_files(id, &mut db_conn).await?;
+
+    Ok(HttpResponse::Ok().json(files))
 }
 
 #[get("/{user_id}/reviews")]

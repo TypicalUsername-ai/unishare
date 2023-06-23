@@ -29,7 +29,7 @@ pub struct File {
 pub struct FileOpt {
     name: Option<String>,
     last_edit: SystemTime,
-    price: Option<u64>,
+    price: Option<i32>,
     rating: f32,
     primary_tag: Option<String>,
     secondary_tag: Option<String>,
