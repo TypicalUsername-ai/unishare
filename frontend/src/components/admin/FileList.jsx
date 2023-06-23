@@ -14,9 +14,11 @@ export default function FileList () {
 
     return (
         <div style={{padding:"20px", background:"#ADD8E6"}}>
+            <h3>Reported Files</h3>
             <div>
+                Type of file
             <select name="sort">
-                <option value="number-of-reports">Number of reports</option>
+                <option value="example">example</option>
                 <option value="example1">example1</option>
                 <option value="example2">example2</option>
                 <option value="example3">example3</option>

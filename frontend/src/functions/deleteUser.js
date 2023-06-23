@@ -1,6 +1,7 @@
 export default async function deleteUser(id, token){
     const options = {
         method: 'DELETE',
+        body: JSON.stringify(id),
         headers: {
             Authorization: `Bearer ${token}`
         }
