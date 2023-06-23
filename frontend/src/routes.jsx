@@ -12,6 +12,8 @@ import FileOverviewPage from './pages/FileOverviewPage'
 import UploadPage from './pages/UploadPage'
 import ProfilePage from './pages/ProfilePage'
 import AdminPanel from './pages/AdminPanel'
+import LogoutPage from './pages/LogoutPage'
+
 
 const routes = [
 	{
@@ -68,7 +70,11 @@ const routes = [
 	},
 	{
 		path: "/admin-panel",
-		element: <AdminPanel />
+		element: <AdminPanel />,
+  },
+  {
+		path: "/logout",
+		element: <LogoutPage/>
 	}
 
 ]

@@ -23,6 +23,9 @@ function NavMenu() {
 				<NavigationMenu.Item className='NavigationMenuItem'>
 					<button className='NavigationMenuLink' onClick={() => nav("/upload")}> Upload </button>
 				</NavigationMenu.Item>
+				<NavigationMenu.Item className='NavigationMenuItem'>
+					<button className='NavigationMenuLink' onClick={() => nav("/logout")}> log out </button>
+				</NavigationMenu.Item>
 				</> : null }
 
 				{!authorized ? <>

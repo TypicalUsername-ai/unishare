@@ -19,6 +19,10 @@ impl Session {
         Self { session_data: SessionData::new(user_id), signature: String::from("") }.sign()
     }
 
+    pub fn new_persistent(user_id: Uuid) -> Self {
+        Self { session_data: SessionData::new(user_id), signature: String::from("") }.sign()
+    }
+
     pub fn extend(mut self, time_secs: u64) -> Self {
         self.session_data = self.session_data.extend(time_secs);
         self.sign()

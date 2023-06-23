@@ -88,11 +88,6 @@ impl User {
         todo!()
     }
 
-    /// Simple function checking whether a provided user owns the file identified by the provided `Uuid`
-    pub async fn owns_file(&self, file_id: Uuid, db_conn: &mut PgConnection) -> Result<bool, UnishareError> {
-        todo!();
-    }
-
     /// Returns the vector of file objects which the user owns
     pub async fn get_owned_files(&self, db_conn: &mut PgConnection) -> Result<Vec<File>, UnishareError> {
         let files = files_data::table
@@ -128,7 +123,7 @@ impl User {
 #[derive(Debug, Serialize)]
 pub struct GuestView {
     username: String,
-    id: Uuid,
+    pub id: Uuid,
     pub_files: i32,
     rating: f32,
 }

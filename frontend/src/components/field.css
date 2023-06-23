@@ -1,9 +1,9 @@
 @import '@radix-ui/colors/blackA.css';
 
 /* reset */
-input {
+/* input {
   all: unset;
-}
+} */
 
 .LabelRoot {
   font-size: 15px;

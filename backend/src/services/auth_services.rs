@@ -84,15 +84,22 @@ async fn create_user(data: web::Json<NewUser>, pool: web::Data<ConnectionPool>, 
     }
 }
 
+#[derive(Deserialize)]
+struct ProlongSession {
+    #[serde(rename = "rememberMe")]
+    remember_me: String,
+}
+
 /// Endpoint for providing the authorization token for the user
 /// The endpoint is authorized with `Basic` authorization
 /// The basic auth header should be of form `Basic {B64encoded(login:password)}`
 #[post("/login")]
-async fn user_login(basic_auth: BasicAuth, pool: web::Data<ConnectionPool>) -> Result<impl Responder, UnishareError> {
+async fn user_login(basic_auth: BasicAuth, pool: web::Data<ConnectionPool>, remember: web::Query<ProlongSession>) -> Result<impl Responder, UnishareError> {
     // extract data
     let uname = basic_auth.user_id();
     let plaintext = basic_auth.password().unwrap_or("").to_owned();
     let pass = UserAuth::hash_password(&plaintext);
+    let session_choice = remember.remember_me.clone();
     // find user in db
     let mut conn = pool.get()?;
     let user: Option<Uuid> = users::table
@@ -102,10 +109,12 @@ async fn user_login(basic_auth: BasicAuth, pool: web::Data<ConnectionPool>) -> R
 
     match user {
         None => Err(UnishareError::BadCredentials),
-        Some(data) => {
-            let id = data;
+        Some(id) => {
             // create a cookie
-            let jwt = Session::new(id);
+            let mut jwt = Session::new(id);
+            if session_choice == "true" {
+                jwt = jwt.extend(604_800);
+            }
             // store a cookie in db
             let cookie_result = insert_into(sessions::table)
                 .values(jwt.data())

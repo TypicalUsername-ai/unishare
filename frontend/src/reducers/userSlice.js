@@ -18,7 +18,7 @@ export const userSlice = createSlice({
       // immutable state based off those changes
       state.name = action.payload
     },
-    logOut: (state) => {
+    userLogOut: (state) => {
       state.name = "Guest"
       state.id = ""
     },
@@ -26,6 +26,6 @@ export const userSlice = createSlice({
 })
 
 // Action creators are generated for each case reducer function
-export const { setUserId, setName, logOut } = userSlice.actions
+export const { setUserId, setName, userLogOut } = userSlice.actions
 
 export default userSlice.reducer
