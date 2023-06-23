@@ -17,6 +17,10 @@ const ReportedUser = (props) =>{
             <section style={{ textAlign: "left" }}>
                 <h3 style={{ marginBottom: "8px" }}>{props.name}</h3>
                 <h3 style={{ marginBottom: "8px" }}>{props.report}</h3>
+                <section style={{display:"flex", flexDirection:"row"}}>
+                <label>Tag:</label>
+                <label>{props.tag}</label>
+                </section>
                 <button onClick={handleClick} className='seeMore'>Details</button>
                
                 <BanButton

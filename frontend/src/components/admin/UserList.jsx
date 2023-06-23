@@ -20,7 +20,7 @@ export default function UserList () {
     }
 
     const sortMethods = {
-        none: {method: (a,b) =>},
+        none: {method: (a,b) => null},
         descending: {method: (a,b) => (a > b ? -1 : 1)}
     }
 
@@ -29,7 +29,7 @@ export default function UserList () {
     return (
         <div style={{padding:"20px", background:"#ADD8E6"}}>
             <div>
-            <select name="cars" id="cars">
+            <select name="sort">
                 <option value="number-of-reports">Number of reports</option>
                 <option value="example1">example1</option>
                 <option value="example2">example2</option>
@@ -39,6 +39,7 @@ export default function UserList () {
             <ReportedUser
                 name="name"
                 report="uzytkownik wystawia obnazajace zdjecia"
+                tag="TAGexample"
             />
              <ReportedUser
                 name="name"
