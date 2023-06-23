@@ -12,6 +12,7 @@ import FileOverviewPage from './pages/FileOverviewPage'
 import UploadPage from './pages/UploadPage'
 import ProfilePage from './pages/ProfilePage'
 import LogoutPage from './pages/LogoutPage'
+import MyNotesPage from './pages/MyNotesPage'
 
 const routes = [
 	{
@@ -69,6 +70,10 @@ const routes = [
 	{
 		path: "/logout",
 		element: <LogoutPage/>
+	},
+	{
+		path: "/notes",
+		element: <MyNotesPage/>
 	}
 ]
 
