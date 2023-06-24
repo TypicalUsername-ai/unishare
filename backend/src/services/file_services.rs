@@ -90,12 +90,12 @@ async fn get_content(auth: BearerAuth, pool: web::Data<ConnectionPool>, path: we
     let mut db_conn = pool.get()?;
 
     let user = validate_request(auth, &mut db_conn).await?;
-    let is_owner: bool = Transaction::user_owns_file(file_id, user.user_id, db_conn)?;
+    let is_owner: bool = Transaction::user_owns_file(file_id, user.user_id, &mut db_conn).await?;
     if(is_owner) {
-        let content = FileContent::get_content(file_id, db_conn).await?;
+        let content = FileContent::by_file_id(file_id, &mut db_conn).await?;
         Ok(HttpResponse::Ok().json(content))
     } else {
-        Ok(HttpResponse::NoContent())
+        Ok(HttpResponse::NoContent().finish())
     }
 }
 
