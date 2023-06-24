@@ -82,7 +82,8 @@ impl Transaction {
 // more types to be added later
 pub enum TransactionType {
     PURCHASE,
-    REFUND
+    REFUND,
+    OWNERSHIP
 }
 
 impl From<i32> for TransactionType {
@@ -90,6 +91,7 @@ impl From<i32> for TransactionType {
         match value {
             1 => TransactionType::PURCHASE,
             2 => TransactionType::REFUND,
+            -1 => TransactionType::OWNERSHIP,
             _ => unimplemented!()
         }
     }
@@ -101,6 +103,7 @@ impl TransactionType {
         match self {
             TransactionType::PURCHASE => 1,
             TransactionType::REFUND => 2,
+            TransactionType::OWNERSHIP => -1,
         }
     }
 }

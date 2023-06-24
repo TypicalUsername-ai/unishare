@@ -11,7 +11,7 @@ const UploadPage = ({ onSave, file = {} }) => {
     const [FileData, setFileData] = useState(file);
     const [errors, setErrors] = useState({});
     const [selectedFile, setSelectedFile] = useState(null);
-    const { filename, description, price } = FileData;
+    const { filename, description, price, content } = FileData;
 
     const token = useSelector((state) => state.token.token);
     const authorized = useSelector((state) => state.token.authorized);
@@ -31,6 +31,15 @@ const UploadPage = ({ onSave, file = {} }) => {
             errors.price = "Price is required!";
         }
 
+        if (!content) {
+            errors.content = "File is required!";
+        } else if (content.size > 20_000){
+            errors.content = "File is too big!"
+        }
+        console.log(content.size);
+
+
+
         console.log(errors);
         return errors;
     }
@@ -49,8 +58,12 @@ const UploadPage = ({ onSave, file = {} }) => {
             return;
         }
         setErrors({});
-        console.log(FileData);
-        uploadFile(FileData, null, token).then(
+        let reqData = new FormData();
+        Object.entries(FileData).forEach(
+            (value) => reqData.append(value[0], value[1])
+        )
+        console.log(reqData);
+        uploadFile(reqData, token).then(
             (r) => console.log(r)
         )
         //onSave(FileData);
@@ -76,7 +89,11 @@ const UploadPage = ({ onSave, file = {} }) => {
             <Field default="Tag (primary)" name="primary_tag" onChange={handleChange} />
             <Field default="Tag (Secondary)" name="secondary_tag" onChange={handleChange} />
 
-            <input type='file' name="content" onChange={(e) => setFileData((prevData) => ({ ...prevData, content: e.target.files[0] }))}   />
+            <input type='file'
+                name="content" 
+                onChange={(e) => setFileData((prevData) => ({ ...prevData, content: e.target.files[0] }))}   
+                accept='.md, .tex, .txt'
+            />
 
 
 

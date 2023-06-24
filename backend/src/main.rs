@@ -4,6 +4,7 @@ use diesel::{r2d2::{ConnectionManager, Pool}, pg::PgConnection};
 use lettre::transport::smtp::{authentication::{Credentials, Mechanism}, PoolConfig};
 use lettre::SmtpTransport;
 use services::{user_services, auth_services, file_services};
+use std::fs;
 
 mod services;
 mod entities;
@@ -12,6 +13,7 @@ mod schema;
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
 
+    fs::create_dir("/files");
     env_logger::init_from_env(Env::default().default_filter_or("info"));
     
     let db_url = std::env!("DATABASE_URL");

@@ -7,6 +7,7 @@ edition = "2021"
 
 [dependencies]
 actix-files = "0.6.2"
+actix-multipart = "0.6.0"
 actix-web = { version = "4.3.1", features = ["cookies"] }
 actix-web-httpauth = "0.8.0"
 argon2 = "0.5.0"
@@ -15,6 +16,7 @@ bigdecimal = "0.3.1"
 derive_more = "0.99.17"
 diesel = { version = "2.0.3", default-features = false, features = ["postgres", "uuid", "r2d2", "numeric"] }
 env_logger = "0.10.0"
+futures-util = "0.3.28"
 lettre = "0.10.4"
 log = "0.4.17"
 r2d2 = "0.8.10"
