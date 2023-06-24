@@ -4,7 +4,7 @@ use diesel::{r2d2::ConnectionManager, PgConnection};
 use r2d2::Pool;
 use serde::{Serialize, Deserialize};
 use uuid::Uuid;
-use crate::entities::{error::UnishareError, user_data::User, user_review::UserReview, file::File};
+use crate::entities::{error::UnishareError, user_data::{User, UserData}, user_review::UserReview, file::File, transaction::Transaction};
 use super::token_middleware::validate_request;
 use log::warn;
 
@@ -17,6 +17,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
              .service(add_review)
              .service(search)
              .service(get_files)
+             .service(delete_account)
             );
 }
 
@@ -70,9 +71,12 @@ async fn update_profile() -> Result<impl Responder, UnishareError> {
 }
 
 #[delete("/{user_id}")]
-async fn delete_account() -> Result<impl Responder, UnishareError> {
-    todo!();
-    Ok(HttpResponse::InternalServerError().finish())
+async fn delete_account(auth: BearerAuth, pool: web::Data<ConnectionPool>, path: web::Path<Uuid>) -> Result<impl Responder, UnishareError> {
+    let mut db_conn = pool.get()?;
+    let user = validate_request(auth, &mut db_conn).await?;
+    
+    let delete_user = User::remove_user(user.user_id, &mut db_conn).await?;
+    Ok(HttpResponse::Ok().json(delete_user))
 }
 
 #[derive(Serialize, Deserialize)]
@@ -95,6 +99,17 @@ async fn get_files(bearer: BearerAuth, pool: web::Data<ConnectionPool>, path: we
             Ok(HttpResponse::Ok().json(Files{files}))
         }
     }
+}
+
+#[get("/{user_id}/inventory/files")]
+async fn get_bought_files(auth: BearerAuth, pool: web::Data<ConnectionPool>, path: web::Path<Uuid>) -> Result<impl Responder, UnishareError> {
+    let id = path.into_inner();
+    let mut db_conn = pool.get()?;
+
+    let user = validate_request(auth, &mut db_conn).await;
+    let files = Transaction::get_user_files(id, &mut db_conn).await?;
+
+    Ok(HttpResponse::Ok().json(files))
 }
 
 #[get("/{user_id}/reviews")]

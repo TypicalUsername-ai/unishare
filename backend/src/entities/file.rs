@@ -4,7 +4,7 @@ use uuid::Uuid;
 use crate::schema::{users_data, transactions};
 use serde::{Serialize, Deserialize};
 use crate::schema::files_data;
-use super::{error::UnishareError, file_review::FileReview, transaction::{Transaction, TransactionType}};
+use super::{error::UnishareError, file_review::FileReview, transaction::{Transaction, TransactionType}, user_data::{UserData, User}};
 use std::fs;
 
 #[derive(Debug, Serialize, Deserialize, Queryable, Insertable)]
@@ -151,6 +151,27 @@ impl File {
         .get_result(db_conn)?;
         
         Ok(update_rating)
+    }
+
+    pub async fn delete_file(id: Uuid, db_conn: &mut PgConnection) -> Result<(), UnishareError> {
+        let remove_file = diesel::update(files_data::table)
+            .filter(files_data::id.eq(id.clone()))
+            .set((
+                files_data::name.eq("Deleted file"),
+                files_data::created_time.eq(SystemTime::UNIX_EPOCH),
+                files_data::last_edit_time.eq(SystemTime::UNIX_EPOCH),
+                files_data::price.eq(0),
+                files_data::rating.eq(0f32),
+                files_data::primary_tag.eq(""),
+                files_data::secondary_tag.eq(""),
+                files_data::available.eq(false)
+            )).execute(db_conn)?;
+        let user = User::by_file_id(id, db_conn).await?;
+        let user_file_decrement = diesel::update(users_data::table)
+            .filter(users_data::user_id.eq(user.id))
+            .set(users_data::pub_files.eq(users_data::pub_files - 1))
+            .execute(db_conn)?;
+        Ok(())
     }
 
     /// Changes token balance of both buyer and seller after a transaction to buy access to the file
