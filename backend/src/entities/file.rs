@@ -12,12 +12,12 @@ use std::fs;
 pub struct File {
     name: String,
     pub id: Uuid,
-    creator: Uuid,
+    pub creator: Uuid,
     #[diesel(column_name = created_time)]
     created: SystemTime,
     #[diesel(column_name = last_edit_time)]
     last_edit: SystemTime,
-    price: i32,
+    pub price: i32,
     rating: f32,
     primary_tag: Option<String>,
     secondary_tag: Option<String>,

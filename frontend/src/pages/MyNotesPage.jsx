@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import getUserFiles from "../functions/getUserFiles";
 import FileCard from "../components/FileCard";
 import getProfile from "../functions/getProfile";
+import getPurchasedFiles from "../functions/getPurchasedFiles";
 
 const MyNotesPage = () => {
 
@@ -20,10 +21,13 @@ const MyNotesPage = () => {
     useEffect(() => {
         getProfile(user_id, token).then(
             (data) => setUser(data)
-        )
+        );
         getUserFiles(user_id, token).then(
             (data) => setOwned(data)
-        )
+        );
+        getPurchasedFiles(user_id, token).then(
+            (data) => setPurchased(data)
+        );
     }, [])
 
     return (
