@@ -1,20 +1,26 @@
 import { useSelector } from "react-redux"
 import Header from "../components/Header"
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import getUserFiles from "../functions/getUserFiles";
 import FileCard from "../components/FileCard";
+import getProfile from "../functions/getProfile";
 
 const MyNotesPage = () => {
 
     const authorized = useSelector((state) => state.token.authorized);
     const token = useSelector((state) => state.token.token);
     const user_id = useSelector((state) => state.user.id);
+    const navigate = useNavigate();
 
     const [owned, setOwned] = useState([]);
     const [purchased, setPurchased] = useState([]);
+    const [user, setUser] = useState({});
 
     useEffect(() => {
+        getProfile(user_id, token).then(
+            (data) => setUser(data)
+        )
         getUserFiles(user_id, token).then(
             (data) => setOwned(data)
         )
@@ -24,6 +30,7 @@ const MyNotesPage = () => {
         <div>
             {!authorized ? <Navigate to="/login?r=notes"/> : null }
             <Header/>
+            
             <p>Owned</p>
             {owned.map(
                 (file) => <FileCard 
@@ -39,6 +46,7 @@ const MyNotesPage = () => {
                 available={file.available}
             />
             )}
+            <button onClick={() => navigate("/upload")}>Upload more</button>
             <p>Purchased:</p>
             {purchased.map(
                 (file) => <FileCard 
