@@ -15,6 +15,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .service(add_report)
             .service(get_reports)
             .service(accept_report)
+            .service(reject_report)
         );
 }
 
