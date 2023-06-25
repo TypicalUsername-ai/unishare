@@ -28,6 +28,7 @@ export default function UserList () {
 
     return (
         <div style={{padding:"20px", background:"#ADD8E6"}}>
+            <h3>Reported Users</h3>
             <div>
             <select name="sort">
                 <option value="number-of-reports">Number of reports</option>

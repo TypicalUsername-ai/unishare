@@ -2,6 +2,7 @@ import * as Popover from '@radix-ui/react-popover';
 import { MixerHorizontalIcon, Cross2Icon } from '@radix-ui/react-icons';
 
 import banUser from '../../functions/banUser';
+import DeleteUserButton from '../User/DeleteUserButton';
 
 
 
@@ -26,7 +27,7 @@ const banButton = (props) => (
             <textarea></textarea>
           </fieldset>
           <fieldset>
-            <button className="seeMore" onClick={banUser(props.id, props.token)}>Ban User</button>
+            <DeleteUserButton/>
           </fieldset>
         </div>
         <Popover.Close className="PopoverClose" aria-label="Close">
