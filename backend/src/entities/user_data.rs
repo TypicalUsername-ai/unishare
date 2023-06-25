@@ -1,7 +1,7 @@
 use diesel::{PgConnection, Queryable, prelude::*};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
-use super::{error::UnishareError, file::File, user_auth::UserAuth};
+use super::{error::UnishareError, file::File, user_auth::UserAuth, transaction::{Transaction, TransactionType}};
 use crate::schema::{users_data, users, files_data};
 
 #[derive(Debug, Serialize, Deserialize, Queryable)]

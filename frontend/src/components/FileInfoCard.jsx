@@ -15,7 +15,7 @@ const FileInfoCard = ({data, snippet}) => {
 
     return (
         <div>
-            <h1>Name: {data.name}</h1>
+            <h1>"{data.name}"</h1>
             <h2>Author: {profile}</h2>
             <h2>Price: {data.price}</h2>
             <h2>Rating: {data.rating}/5</h2>

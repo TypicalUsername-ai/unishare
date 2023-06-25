@@ -12,7 +12,7 @@ const UserLoginForm = ({ onSave, user = {} }) => {
     const navigate = useNavigate();
     const [userData, setUserData] = useState(user);
     const [errors, setErrors] = useState({});
-    const [remember, setRemember] = useState(false);
+    const [remember, setRemember] = useState("false");
     const [params, setParams] = useSearchParams();
     const { username, email, password } = userData;
     const dispatch = useDispatch();

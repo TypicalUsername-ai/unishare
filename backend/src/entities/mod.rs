@@ -7,3 +7,4 @@ pub mod file;
 pub mod file_review;
 pub mod transaction;
 pub mod file_user_view;
+pub mod report;

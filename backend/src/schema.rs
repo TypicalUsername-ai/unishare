@@ -32,6 +32,19 @@ diesel::table! {
 }
 
 diesel::table! {
+    reports (id) {
+        id -> Uuid,
+        reporter_id -> Uuid,
+        object_id -> Uuid,
+        object_type -> Int4,
+        reason -> Text,
+        state -> Int4,
+        created_time -> Timestamp,
+        reviewed_time -> Nullable<Timestamp>,
+    }
+}
+
+diesel::table! {
     sessions (session_id) {
         session_id -> Uuid,
         user_id -> Uuid,
@@ -80,6 +93,7 @@ diesel::table! {
 }
 
 diesel::joinable!(files_content -> files_data (id));
+diesel::joinable!(reports -> users (reporter_id));
 diesel::joinable!(transactions -> users (buyer_id));
 diesel::joinable!(user_reviews -> users (reviewed_id));
 
@@ -87,6 +101,7 @@ diesel::allow_tables_to_appear_in_same_query!(
     file_reviews,
     files_content,
     files_data,
+    reports,
     sessions,
     transactions,
     user_reviews,
