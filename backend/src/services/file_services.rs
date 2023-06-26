@@ -1,7 +1,7 @@
 use actix_multipart::form::MultipartForm;
 use actix_multipart::form::tempfile::TempFile;
 use actix_multipart::form::text::Text;
-use actix_web::{web, Responder, HttpResponse, get, post};
+use actix_web::{web, Responder, HttpResponse, get, post, delete};
 use actix_web_httpauth::extractors::bearer::BearerAuth;
 use diesel::{r2d2::ConnectionManager, PgConnection};
 use diesel::{prelude::*, insert_into};
@@ -10,7 +10,7 @@ use std::fs;
 use r2d2::Pool;
 use uuid::Uuid;
 use crate::entities::{file_user_view::FileUserView, transaction::Transaction};
-use crate::entities::{error::UnishareError, file::{File, NewFile}, file_review::FileReview};
+use crate::entities::{error::UnishareError, file::{File, NewFile}, file_review::FileReview, user_data::User};
 use crate::schema::files_data;
 use super::token_middleware::validate_request;
 
@@ -25,6 +25,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .service(search)
             .service(get_file_with_transaction)
             .service(get_content)
+            .service(delete_file)
         );
 }
 
@@ -108,6 +109,16 @@ async fn get_file_with_transaction(auth: BearerAuth, pool: web::Data<ConnectionP
     Ok(HttpResponse::Ok().json(FileUserView::get(fileid, uid, &mut db_conn).await?))
 }
 
+#[delete("/{file_id}")]
+async fn delete_file(auth: BearerAuth, pool: web::Data<ConnectionPool>, path: web::Path<Uuid>) -> Result<impl Responder, UnishareError> {
+    let fileid = path.into_inner();
+    let mut db_conn = pool.get()?;
+
+    let user = validate_request(auth, &mut db_conn).await;
+    let delete_file = File::delete_file(fileid, &mut db_conn).await?;
+    Ok(HttpResponse::Ok())
+}
+
 #[derive(Serialize, Deserialize)]
 struct FileContent {
     pub content: String,
@@ -158,9 +169,11 @@ async fn add_review(auth: BearerAuth, pool: web::Data<ConnectionPool>, data: web
     let review_data = data.into_inner();
     let mut db_conn = pool.get()?;
     let target_id = path.into_inner();
-    let reviewer = validate_request(auth, &mut db_conn).await?;
-    let review = FileReview { reviewer_id: reviewer.user_id, file_id: target_id, review: review_data.review, comment: review_data.comment };
+    let reviewer_session = validate_request(auth, &mut db_conn).await?;
+    let review = FileReview { reviewer_id: reviewer_session.user_id, file_id: target_id, review: review_data.review, comment: review_data.comment };
     let data = FileReview::add_review(review, &mut db_conn).await?;
+    let reviewer = User::by_uuid(reviewer_session.user_id, &mut db_conn).await?;
+    reviewer.update_tokens(5, &mut db_conn).await?;
 
     Ok(HttpResponse::Ok().json(data))
 }
