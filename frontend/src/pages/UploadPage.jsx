@@ -30,10 +30,13 @@ const UploadPage = ({ onSave, file = {} }) => {
         if (!price) {
             errors.price = "Price is required!";
         }
+        if (price > 99999 || price < 10) {
+            errors.price = "Price should be between 10 and 99999, your currect price: " + price
+        }
 
         if (!content) {
             errors.content = "File is required!";
-        } else if (content.size > 20_000){
+        } else if (content.size > 20_000) {
             errors.content = "File is too big!"
         }
         console.log(content.size);
@@ -84,14 +87,24 @@ const UploadPage = ({ onSave, file = {} }) => {
                     className="Input" name='description' style={{ position: 'relative', left: '15px', width: '380px', height: '200px', marginBottom: '25px' }} id="TextArea" placeholder="Description" text="message" default="Jak możemy ci pomóc?" onChange={handleChange}></textarea>
                 <div className="errorInformation">{errors.description}</div>
             </div>
-            <Field default="Price (tokens)" name="price" type="number" onChange={(e) => setFileData((prevData) => ({ ...prevData, price: parseInt(e.target.value) }))} />
+            <Field
+                default="Price (tokens)"
+                name="price"
+                type="number"
+                onChange={(e) => {
+                    const enteredValue = parseInt(e.target.value);
+                    let clampedValue = Math.min(enteredValue, 99999);
+                    clampedValue = Math.max(clampedValue, 10);
+                    setFileData((prevData) => ({ ...prevData, price: clampedValue }));
+                }}
+            />
             <div className="errorInformation">{errors.price}</div>
             <Field default="Tag (primary)" name="primary_tag" onChange={handleChange} />
             <Field default="Tag (Secondary)" name="secondary_tag" onChange={handleChange} />
 
             <input type='file'
-                name="content" 
-                onChange={(e) => setFileData((prevData) => ({ ...prevData, content: e.target.files[0] }))}   
+                name="content"
+                onChange={(e) => setFileData((prevData) => ({ ...prevData, content: e.target.files[0] }))}
                 accept='.md, .tex, .txt'
             />
 
