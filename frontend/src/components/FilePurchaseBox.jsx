@@ -29,6 +29,7 @@ const FilePurchaseBox = ({ price, transaction }) => {
             );
 
             if (response.ok) {
+                alert("Price have been updated!")
                 console.log("Price changed");
             } else {
                 console.error("Error changing the price: " + response);

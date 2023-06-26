@@ -46,7 +46,7 @@ const UserReviewForm = () => {
         });
 
         if (response.ok) {
-            console.log('Review added');
+            alert("Your review was submited!");
         } else {
             console.error('Error adding review' + response);
         }
@@ -56,7 +56,6 @@ const UserReviewForm = () => {
         setReviewText('');
         setRating(0);
         setPopupOpen(false);
-        alert("Your review was submited!");
     };
 
     const handleInputChange = (event) => {
