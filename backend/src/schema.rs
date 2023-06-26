@@ -10,13 +10,6 @@ diesel::table! {
 }
 
 diesel::table! {
-    files_content (id) {
-        id -> Uuid,
-        content -> Bytea,
-    }
-}
-
-diesel::table! {
     files_data (id) {
         name -> Text,
         id -> Uuid,
@@ -92,13 +85,11 @@ diesel::table! {
     }
 }
 
-diesel::joinable!(files_content -> files_data (id));
 diesel::joinable!(reports -> users (reporter_id));
 diesel::joinable!(transactions -> users (buyer_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
     file_reviews,
-    files_content,
     files_data,
     reports,
     sessions,

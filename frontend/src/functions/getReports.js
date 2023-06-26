@@ -1,4 +1,4 @@
-async function getReportedUsers(id, token) {
+async function getReports(token) {
     const options = {
         method: 'GET',
         headers: {
@@ -6,9 +6,10 @@ async function getReportedUsers(id, token) {
         }
     };
 
-    let response = await fetch(`http://localhost/api/users/`, options)
+    let response = await fetch(`http://localhost/api/reports/panel`, options)
+    console.log(response)
     if (!response.ok) {throw new Error("GetReportedUsers : " + response.status)}
     return await response.json()
 }
 
-export default getReportedUsers;
+export default getReports;

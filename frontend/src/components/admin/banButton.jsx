@@ -27,7 +27,10 @@ const banButton = (props) => (
             <textarea></textarea>
           </fieldset>
           <fieldset>
-            <DeleteUserButton/>
+            <DeleteUserButton
+            id = {props.id}
+            token = {props.token}
+            />
           </fieldset>
         </div>
         <Popover.Close className="PopoverClose" aria-label="Close">

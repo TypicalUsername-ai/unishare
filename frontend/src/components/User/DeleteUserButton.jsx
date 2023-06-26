@@ -1,12 +1,13 @@
 import React from 'react';
 import * as AlertDialog from '@radix-ui/react-alert-dialog';
 import BanSuccessful from '../admin/BanSuccessful';
+import acceptReport from '../../functions/acceptReport';
 
 
-const DeleteUserButton = () => (
+const DeleteUserButton = (props) => (
     <AlertDialog.Root>
       <AlertDialog.Trigger asChild>
-        <button>Ban User</button>
+        <button onClick={acceptReport(props.id, props.token)}>Ban User</button>
       </AlertDialog.Trigger>
       <AlertDialog.Portal>
         <AlertDialog.Overlay/>

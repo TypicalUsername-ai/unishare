@@ -1,14 +1,16 @@
 import ReportedFile from "./ReportedFile";
 import { useState, useEffect } from "react";
-import getAllFiles from "../../functions/getAllFiles";
+import getReports from "../../functions/getReports";
+import { useSelector } from "react-redux";
 
 export default function FileList () {
 
-    const [files, setFiles] = useState([]);
+    const [reports, setReports] = useState([]);
+    const token = useSelector((state) => state.token.token);
 
     useEffect(() => {
-        getAllFiles().then(
-            (data) => setFiles(data)
+        getReports(token).then(
+            (data) => setReports(data)
         );
     }, [])
 
@@ -24,12 +26,9 @@ export default function FileList () {
                 <option value="example3">example3</option>
             </select>
             </div>
-            {files.map(
-                (entry) => <ReportedFile username={entry.userid} title={entry.name} fileid={entry.id} picture={null}/>
-            )}
 
-            <ReportedFile username="userID" title="Name" fileid="fieldID" report="report" tag="tag" picture={null}/>
-            <ReportedFile username="userID" title="Name" fileid="fieldID" report="report" tag="tag" picture={null}/>
+            <ReportedFile username="userID" title="Name" fileid="fieldID" report="report" tag="tag" />
+            <ReportedFile username="userID" title="Name" fileid="fieldID" report="report" tag="tag" />
         </div>
     );
 }

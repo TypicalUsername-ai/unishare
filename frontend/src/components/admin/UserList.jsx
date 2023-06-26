@@ -1,16 +1,23 @@
 import { useState, useEffect } from "react";
-import getReportedUsers from "../../functions/getReportedUsers";
+import getReports from "../../functions/getReports";
 import ReportedUser from "../User/ReportedUser";
+import { useSelector } from "react-redux";
 
 export default function UserList () {
 
-    const [users, setUsers] = useState([]);
+    const [reports, setReports] = useState([]);
+    const auth = useSelector((state) => state.token);
     
     useEffect(() => {
-        getReportedUsers().then(
-            (data) => setUsers(data)
+        getReports(auth.token).then(
+            (data) => {console.log(data); setReports(data);}
         );
-    }, [])
+        
+        console.log("token:");
+        console.log(auth.token);
+        console.log("JSON: " + reports);
+        console.log(reports.user_reports);
+        }, [])
 
     function sorting ({sort}) {
         switch(sort){
@@ -37,17 +44,19 @@ export default function UserList () {
                 <option value="example3">example3</option>
             </select>
             </div>
-            {users.map(
-                (entry) => <ReportedUser name={entry.name} report={entry.report} tag={entry.tag}/>
-            )}
+            
             <ReportedUser
                 name="name"
                 report="uzytkownik wystawia obnazajace zdjecia"
                 tag="TAGexample"
+                id=""
+                token=""
             />
              <ReportedUser
                 name="name"
                 report="uzytkownik wystawia obnazajace zdjecia"
+                id=""
+                token=""
             />
         </div>
     );
