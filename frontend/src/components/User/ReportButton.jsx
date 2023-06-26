@@ -1,6 +1,6 @@
 import * as Popover from '@radix-ui/react-popover';
 import { MixerHorizontalIcon, Cross2Icon } from '@radix-ui/react-icons';
-import ReportUser from '../../functions/reportUser';
+import Report from '../../functions/repor';
 
 
 
@@ -34,7 +34,7 @@ const ReportButton = (props) => (
                 </select>
           </fieldset>
           <fieldset>
-            <button onClick={ReportUser(props.id, props.token)}>Report User</button>
+            <button onClick={Report(props.id, props.token)}>Report User</button>
           </fieldset>
         </div>
         <Popover.Close className="PopoverClose" aria-label="Close">
