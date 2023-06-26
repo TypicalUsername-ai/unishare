@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
+import buyFile from '../functions/buyFile';
 
 const FilePurchaseBox = ({ price, transaction }) => {
     const { fileid } = useParams();
@@ -8,6 +9,10 @@ const FilePurchaseBox = ({ price, transaction }) => {
     const [newPrice, setNewPrice] = useState("");
 
     const authToken = useSelector((state) => state.token.token);
+    const authorization = useSelector((state) => state.token.authorized);
+
+    const userId = useSelector((state) => state.user.id);
+
 
     const handleChangePrice = async (e) => {
         e.preventDefault();
@@ -38,7 +43,16 @@ const FilePurchaseBox = ({ price, transaction }) => {
             console.error("Invalid price");
         }
     };
-
+    const handleBuy = async (e) => {
+        console.log("Handling the buy");
+        if (!authorization) {
+            alert("You must be logged in to buy a file!")
+            return;
+        }
+        buyFile(userId, fileid, authToken).then(
+            (r) => console.log(r)
+        )
+    }
     return (
         <div>
             {transaction !== null ? (
@@ -63,7 +77,7 @@ const FilePurchaseBox = ({ price, transaction }) => {
                         )}
                 </>
             ) : (
-                    <button>Buy this file ({price} tokens)</button>
+                    <button onClick={handleBuy}>Buy this file ({price} tokens)</button>
                 )}
         </div>
     );
