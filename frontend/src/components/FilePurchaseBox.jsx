@@ -12,6 +12,7 @@ const FilePurchaseBox = ({ price, transaction }) => {
     const handleChangePrice = async (e) => {
         e.preventDefault();
         if (newPrice >= 10 && newPrice <= 99999) {
+            const currentTime = Date.now();
             const response = await fetch(
                 `http://localhost/api/files/${fileid}/pricechange`,
                 {
@@ -22,6 +23,7 @@ const FilePurchaseBox = ({ price, transaction }) => {
                     },
                     body: JSON.stringify({
                         price: newPrice,
+                        timestamp: currentTime,
                     }),
                 }
             );
