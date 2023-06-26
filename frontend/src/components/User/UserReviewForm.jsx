@@ -11,7 +11,7 @@ const UserReviewForm = () => {
     const { params } = useParams();
     const authToken = useSelector((state) => state.token.token);
     const authorized = useSelector((state) => state.token.authorized);
-    const authorizedd = useSelector((state) => state.token);
+    const userId = useSelector((state) => state.user.id);
 
 
 
@@ -20,7 +20,6 @@ const UserReviewForm = () => {
     };
 
     const handleSubmit = async (event) => {
-        console.log(authorizedd);
         if (rating === 0) {
             alert("You must choose rating before submiting your review");
             return;
@@ -33,7 +32,7 @@ const UserReviewForm = () => {
         /// api to give and recive tokens, dunno what params are here so...
         event.preventDefault();
 
-        const response = await fetch(`http://localhost/api/users/${params}/reviews`, {
+        const response = await fetch(`http://localhost/api/users/${userId}/reviews`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

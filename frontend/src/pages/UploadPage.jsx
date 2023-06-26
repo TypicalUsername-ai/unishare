@@ -19,6 +19,7 @@ const UploadPage = ({ onSave, file = {} }) => {
 
     const validateData = () => {
         let errors = {};
+        console.log(FileData);
         if (!filename) {
             errors.filename = "Title is required!";
         }
@@ -30,7 +31,7 @@ const UploadPage = ({ onSave, file = {} }) => {
         if (!price) {
             errors.price = "Price is required!";
         }
-        if (price > 99999 || price < 10) {
+        if (FileData.price > 99999 || FileData.price < 10) {
             errors.price = "Price should be between 10 and 99999, your currect price: " + price
         }
 
@@ -69,6 +70,7 @@ const UploadPage = ({ onSave, file = {} }) => {
         uploadFile(reqData, token).then(
             (r) => console.log(r)
         )
+        alert("File uploaded successfuly!");
         //onSave(FileData);
 
     }
@@ -93,9 +95,7 @@ const UploadPage = ({ onSave, file = {} }) => {
                 type="number"
                 onChange={(e) => {
                     const enteredValue = parseInt(e.target.value);
-                    let clampedValue = Math.min(enteredValue, 99999);
-                    clampedValue = Math.max(clampedValue, 10);
-                    setFileData((prevData) => ({ ...prevData, price: clampedValue }));
+                    setFileData((prevData) => ({ ...prevData, price: enteredValue }));
                 }}
             />
             <div className="errorInformation">{errors.price}</div>
