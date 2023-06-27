@@ -42,12 +42,6 @@ const UserList = ({ data }) => {
             {data.map(
                 (entry) => <ReportedUser />
             )}
-            <ReportedUser
-                name="name"
-                report="uzytkownik wystawia obnazajace zdjecia"
-                id=""
-                token=""
-            />
         </div>
     );
 }
