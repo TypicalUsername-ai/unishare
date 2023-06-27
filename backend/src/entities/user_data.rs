@@ -128,6 +128,15 @@ impl User {
         Ok(files.unwrap())
     }
 
+    /// Changes token balance of both buyer and seller after a transaction to buy access to the file
+    pub async fn update_tokens(&self, tokens_amount: i32, db_conn: &mut PgConnection) -> Result<(), UnishareError> {
+        let update_user = diesel::update(users_data::table)
+            .filter(users_data::user_id.eq(self.id.clone()))
+            .set(users_data::tokens.eq(users_data::tokens + tokens_amount))
+            .execute(db_conn)?;
+        Ok(())
+    }
+
     /// Adds a new reting to the user and updates the cumulative rating
     pub async fn add_rating(&mut self, rating: f32, comment: Option<String>, reviewer_id: Uuid, db_conn: &mut PgConnection) 
         -> Result<Self, UnishareError> {
