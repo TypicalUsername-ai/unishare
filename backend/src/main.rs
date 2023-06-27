@@ -47,6 +47,7 @@ async fn main() -> std::io::Result<()> {
                 .configure(user_services::config)
                 .configure(file_services::config)
                 .configure(report_services::config)
+                .configure(report_services::config)
             )
     })
     .bind(("0.0.0.0", 8080))?
