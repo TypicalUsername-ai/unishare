@@ -1,6 +1,8 @@
-import { useState } from "react";
+import React, { useState } from 'react';
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
+import postFileReview from '../functions/postFileReview';
+
 
 const FileReviewForm = () => {
     const [isPopupOpen, setPopupOpen] = useState(false);
@@ -8,30 +10,43 @@ const FileReviewForm = () => {
     const [rating, setRating] = useState(0);
     const { fileid } = useParams();
     const authorized = useSelector((state) => state.token.authorized);
+    const authToken = useSelector((state) => state.token.token);
+
     const navigate = useNavigate();
 
     const handleButtonClick = () => {
-        if(!authorized) {
+        if (!authorized) {
             navigate(`/login?r=/file/${fileid}`);
         }
         setPopupOpen(true);
     };
 
+
     const handleSubmit = async (event) => {
+        console.log(authToken);
+        if (rating === 0) {
+            alert("You must choose rating before submiting your review");
+            return;
+        }
+
+
+        /// api to give and recive tokens, dunno what params are here so...
         event.preventDefault();
-        // const options = {
-        //     method: 'POST',
-        //     headers: { 'content-type': 'application/json' },
-        //     body: '{"user_id":"' + userId + '","review":"' + reviewText + "reviewerId" + userId + '"}'
-        // };
+
+        postFileReview(rating, reviewText, fileid, authToken).then(
+            (ok_res) => {
+                alert("Review submitted succesfully");
+                setReviewText('');
+                setRating(0);
+                setPopupOpen(false);
+            },
+            (err) => {
+                alert("Error submitting review")
+            }
+        )
 
         // let response = await fetch('http://localhost/api/add_review', options)
 
-        console.log('Review:', reviewText); // reviewtext is holding the text for the review
-        console.log('Rating:', rating); // rating is just star rating 0-5
-        setReviewText('');
-        setRating(0);
-        setPopupOpen(false);
     };
 
     const handleInputChange = (event) => {

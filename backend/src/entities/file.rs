@@ -79,12 +79,18 @@ impl File {
     /// Attempts to purchase the provided file by the user with the provided id
     pub async fn purchase(&self, buyer_id: Uuid, db_conn: &mut PgConnection) -> Result<(), UnishareError> {
         if self.available == true {
-            let transaction = Transaction::new(TransactionType::PURCHASE, buyer_id, self.creator, self.id, self.price);
-            let update_owner = self.update_tokens(self.creator, self.price, db_conn).await?;
-            let update_buyer = self.update_tokens(buyer_id, -self.price, db_conn).await?;
-            let create_transaction = diesel::insert_into(transactions::table)
-            .values(transaction).execute(db_conn)?;
-            Ok(())
+            let buyer = User::by_uuid(buyer_id, db_conn).await?;
+            let creator = User::by_uuid(self.creator, db_conn).await?;
+            if buyer.tokens >= self.price {
+                let transaction = Transaction::new(TransactionType::PURCHASE, buyer_id, self.creator, self.id, self.price);
+                let update_owner = creator.update_tokens((self.price as f32 * 0.8) as i32, db_conn).await?;
+                let update_buyer = buyer.update_tokens( -self.price, db_conn).await?;
+                let create_transaction = diesel::insert_into(transactions::table)
+                .values(transaction).execute(db_conn)?;
+                Ok(())
+            } else {
+                Err(UnishareError::ResourceNotFound { resource: format!("Insufficient tokens {} required: {}", buyer.tokens, self.price) })
+            }
         }
         else {
             Err(UnishareError::ResourceNotFound { resource: self.name.to_owned() })
@@ -170,15 +176,6 @@ impl File {
         let user_file_decrement = diesel::update(users_data::table)
             .filter(users_data::user_id.eq(user.id))
             .set(users_data::pub_files.eq(users_data::pub_files - 1))
-            .execute(db_conn)?;
-        Ok(())
-    }
-
-    /// Changes token balance of both buyer and seller after a transaction to buy access to the file
-    async fn update_tokens(&self, user_id: Uuid, tokens_amount: i32, db_conn: &mut PgConnection) -> Result<(), UnishareError> {
-        let update_user = diesel::update(users_data::table)
-            .filter(users_data::user_id.eq(user_id.clone()))
-            .set(users_data::tokens.eq(users_data::tokens + tokens_amount))
             .execute(db_conn)?;
         Ok(())
     }

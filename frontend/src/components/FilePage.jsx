@@ -23,7 +23,7 @@ export default function FilePage() {
         <div className="GlobalContainer">
             {file ?
                 <>
-                    <FileInfoCard data={file.file} snippet={file.snippet}/>
+                    <FileInfoCard data={file.file} snippet={file.snippet} transaction={file.transaction}/>
                     <FileReviewsBox />
                     <FileReviewForm />
                     <FilePurchaseBox price={file.file.price} transaction={file.transaction}/>

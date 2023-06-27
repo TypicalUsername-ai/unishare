@@ -11,7 +11,8 @@ const ExploreSearch = ({ onSave, user = {}, searchType }) => {
     const [userData, setUserData] = useState(user);
     const [errors, setErrors] = useState({});
     const [results, setResults] = useState([]);
-    const { search } = userData;
+    const { search, category } = userData;
+    const [showCategory, setShowCategory] = useState(false);
 
     const validateData = () => {
         let errors = {};
@@ -19,7 +20,7 @@ const ExploreSearch = ({ onSave, user = {}, searchType }) => {
             errors.search = "You need to search for something!";
         }
         return errors;
-    }
+    };
 
     const handleChange = (event) => {
         const { name, value } = event.target;
@@ -28,54 +29,68 @@ const ExploreSearch = ({ onSave, user = {}, searchType }) => {
 
     const handleSave = async () => {
         const errors = validateData();
-        if (Object.keys(errors).length != 0) {
+        if (Object.keys(errors).length !== 0) {
             setErrors(errors);
             return;
         }
         setErrors({});
-
+        console.log(category); //category contains the insides of the category 
         const response = await fetch(
             `http://localhost/api/${searchType}/search?name=${search}`,
         );
-
 
         if (response.ok) {
             setResults(await response.json());
         } else {
             let error = {};
-            error.search = "Provided query returned no matches"; //Will need to be later change, so far I'm implementing simple logic -> look for exact user, if dne then give error, later on we probably need some sort of algorithym to look for files and users at the same time and also that doesnt look at exact string imput but looks for similarities like search: Ernst powinno nadal wyszukac Ernesta lub jakies pliki o nazwie Ernest
+            error.search = "Provided query returned no matches";
             setErrors(error);
             return;
         }
-    }
+    };
 
     useEffect(() => {
         setResults([]);
-    }, [searchType])
+    }, [searchType]);
+
+    useEffect(() => {
+        setShowCategory(searchType === "files");
+        setUserData((prevData) => ({ ...prevData, category: "" }));
+    }, [searchType]);
 
     return (
         <div className="formContainer">
-
             <Field text="search" default="search" name="search" onChange={handleChange} />
             <div className="errorInformation">{errors.search}</div>
 
+            {showCategory && (
+                <>
+                    <Field
+                        text="category"
+                        default="category"
+                        name="category"
+                        onChange={handleChange}
+                    />
+                    <div className="errorInformation">{errors.category}</div>
+                </>
+            )}
+
             <Toast.Provider swipeDirection="right">
-                <button
-                    className="formButton"
-                    onClick={handleSave}>
+                <button className="formButton" onClick={handleSave}>
                     Search
-                </button>
-                <p> Showing {results.length} results for {searchType} </p>
-                {searchType === "users" ? 
-                    <UserSearchResults data={results}/>
-                    :
-                    <FileSearchResults data={results}/>
-                }
+        </button>
+                <p>
+                    Showing {results.length} results for {searchType}
+                </p>
+                {searchType === "users" ? (
+                    <UserSearchResults data={results} />
+                ) : (
+                        <FileSearchResults data={results} />
+                    )}
                 <Toast.Viewport className="ToastViewport" />
             </Toast.Provider>
-
         </div>
     );
-}
+};
 
 export default ExploreSearch;
