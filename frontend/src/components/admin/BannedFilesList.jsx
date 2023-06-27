@@ -1,6 +1,6 @@
 import BannedFile from "./BannedFile.jsx"
 
-export default function BannedFilesList () {
+const BannedFilesList = ({ data }) => {
     return (
         <div style={{padding:"20px", background:"#ADD8E6"}}>
             <h3>History of banned files</h3>
@@ -13,16 +13,14 @@ export default function BannedFilesList () {
                 <option value="example3">example3</option>
             </select>
             </div>
-            <BannedFile
-            name="ernest"
-            reason="Nie wiem co napisac"
-            tag="informatyka"
-            />
-            <BannedFile
-            name="ernest"
-            reason="Nie wiem co napisac"
-            tag="informatyka"
-            />
+            {data.map(
+                (entry) => <BannedFile
+                    id={entry.object_id}
+                    reason={entry.reason}
+                />
+            )}
         </div>
     );
 }
+
+export default BannedFilesList;

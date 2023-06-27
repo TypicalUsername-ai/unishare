@@ -1,18 +1,6 @@
 import ReportedFile from "./ReportedFile";
-import { useState, useEffect } from "react";
-import getReports from "../../functions/getReports";
-import { useSelector } from "react-redux";
 
-export default function FileList () {
-
-    const [reports, setReports] = useState([]);
-    const token = useSelector((state) => state.token.token);
-
-    useEffect(() => {
-        getReports(token).then(
-            (data) => setReports(data)
-        );
-    }, [])
+const FileList = ({ data }) => {
 
     function sorting ({sort}) {
         switch(sort){
@@ -43,9 +31,16 @@ export default function FileList () {
                 <option value="type3">example3</option>
             </select>
             </div>
-
-            <ReportedFile username="userID" title="Name" fileid="fieldID" report="report" tag="tag" />
-            <ReportedFile username="userID" title="Name" fileid="fieldID" report="report" tag="tag" />
-        </div>
+            {data.map(
+                (entry) => <ReportedFile 
+                    fileid={entry.object_id}
+                    reporter_id={entry.reporter_id}
+                    report_id={entry.id}
+                    reason={entry.reason}
+                />
+            )}
+            </div>
     );
 }
+
+export default FileList;

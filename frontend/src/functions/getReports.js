@@ -7,7 +7,6 @@ async function getReports(token) {
     };
 
     let response = await fetch(`http://localhost/api/reports/panel`, options)
-    console.log(response)
     if (!response.ok) {throw new Error("GetReportedUsers : " + response.status)}
     return await response.json()
 }
