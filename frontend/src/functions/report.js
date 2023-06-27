@@ -1,6 +1,6 @@
 export default async function report (data = {object_id, object_type, reason} , token){
     const options = {
-        method: 'UPDATE',
+        method: 'POST',
         body: JSON.stringify(data),
         headers: {
             Authorization: `Bearer ${token}`
