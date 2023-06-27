@@ -6,3 +6,5 @@ export default function banUser (id, token){
     acceptReport(id,token);
     deleteUser(id, token);
 }
+
+// not needed we delete users on ban
