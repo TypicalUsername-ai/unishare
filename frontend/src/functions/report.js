@@ -1,13 +1,14 @@
-export default async function report (id, token){
+export default async function report (data = {object_id, object_type, reason} , token){
     const options = {
         method: 'UPDATE',
-        body: JSON.stringify({id}),
+        body: JSON.stringify(data),
         headers: {
             Authorization: `Bearer ${token}`
         }
     };
 
-    let response = await fetch(`http://localhost/api/create`, options)
-    if (!response.ok) {throw new Error("DeleteFile : " + response.status)}
-
+    let response = await fetch(`http://localhost/api/reports/create`, options)
+    if (!response.ok) {throw new Error("createReport : " + response.status)}
+    return await response.json()
+    
 }
