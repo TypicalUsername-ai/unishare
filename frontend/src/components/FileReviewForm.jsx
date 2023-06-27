@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
+import postFileReview from '../functions/postFileReview';
 
 
 const FileReviewForm = () => {
@@ -32,29 +33,20 @@ const FileReviewForm = () => {
         /// api to give and recive tokens, dunno what params are here so...
         event.preventDefault();
 
-        const response = await fetch(`http://localhost/api/files/${fileid}/reviews`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${authToken}`
+        postFileReview(rating, reviewText, fileid, authToken).then(
+            (ok_res) => {
+                alert("Review submitted succesfully");
+                setReviewText('');
+                setRating(0);
+                setPopupOpen(false);
             },
-            body: JSON.stringify({
-                review: rating,
-                comment: reviewText
-            })
-        });
-
-        if (response.ok) {
-            alert("Your review was submited!");
-        } else {
-            console.error('Error adding review' + response);
-        }
+            (err) => {
+                alert("Error submitting review")
+            }
+        )
 
         // let response = await fetch('http://localhost/api/add_review', options)
 
-        setReviewText('');
-        setRating(0);
-        setPopupOpen(false);
     };
 
     const handleInputChange = (event) => {
