@@ -169,12 +169,13 @@ async fn add_review(auth: BearerAuth, pool: web::Data<ConnectionPool>, data: web
     let review_data = data.into_inner();
     let mut db_conn = pool.get()?;
     let target_id = path.into_inner();
+    let file = File::by_id(target_id, &mut db_conn).await?;
     let reviewer_session = validate_request(auth, &mut db_conn).await?;
     let review = FileReview { reviewer_id: reviewer_session.user_id, file_id: target_id, review: review_data.review, comment: review_data.comment };
     let data = FileReview::add_review(review, &mut db_conn).await?;
     let reviewer = User::by_uuid(reviewer_session.user_id, &mut db_conn).await?;
+    let updated_file = file.update_rating(&mut db_conn).await?;
     reviewer.update_tokens(5, &mut db_conn).await?;
-
     Ok(HttpResponse::Ok().json(data))
 }
 
