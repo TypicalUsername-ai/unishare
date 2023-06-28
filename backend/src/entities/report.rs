@@ -103,12 +103,16 @@ impl Report {
     }
 
     pub async fn can_report(user_id: Uuid, db_conn: &mut PgConnection) -> Result<bool, UnishareError> {
-        let reports_num: BigInt = reports::table
+        let reports_num: i64 = reports::table
             .filter(reports::reporter_id.eq(user_id.clone())
                 .and(reports::created_time.gt(SystemTime::now().sub(Duration::from_secs(24 * 60 * 60)))))
             .select(count(reports::id))
             .first(db_conn)?;
-        Ok(true)
+        if reports_num < 5 {
+            Ok(true)
+        } else {
+            Ok(false)
+        }
     }
 }
 
