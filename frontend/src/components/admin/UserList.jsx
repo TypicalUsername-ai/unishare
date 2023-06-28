@@ -32,10 +32,10 @@ const UserList = ({ data }) => {
             <h3>Reported Users</h3>
             <div>
                 <select name="sort">
-                    <option value="number-of-reports">Number of reports</option>
-                    <option value="example1">example1</option>
-                    <option value="example2">example2</option>
-                    <option value="example3">example3</option>
+                    <option value="type1">type1</option>
+                    <option value="type2">type2</option>
+                    <option value="type3">type3</option>
+                    <option value="type4">type4</option>
                 </select>
             </div>
 

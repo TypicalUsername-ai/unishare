@@ -24,7 +24,7 @@ const banButton = (props) => (
             <label htmlFor="width" style={{position:"relative", bottom:"40%", padding:"10px"}}>
               Message
             </label>
-            <textarea></textarea>
+            <textarea value="ban-reason"></textarea>
           </fieldset>
           <fieldset>
             <DeleteUserButton

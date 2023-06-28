@@ -12,6 +12,10 @@ const  BannedFile = ({ id, reason, tag, }) => {
                 <h3>Tag:</h3>
                 <p style={{marginTop: "20px", marginLeft: "20px"}}>{tag}</p>
                 </section>
+                <h3>Name of admin</h3>
+                <p style={{marginTop: "20px", marginLeft: "20px"}}>{adminName}</p>
+                <h3>Date and Time of ban</h3>
+                <p style={{marginTop: "20px", marginLeft: "20px"}}>{dateTime}</p>
                 <button className='seeMore'>Details</button>
                
     
