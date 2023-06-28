@@ -28,10 +28,9 @@ function UserInformation(props) {
     }, [id, auth]);
 
     const handleDeleteProfile = () => {
-        console.log(userId);
 
-        delUser(user.id, auth.token).then((err) => {
-            console.log(err);
+        delUser(user.id, auth.token).then((data) => {
+            console.log(data);
         });
     };
 
@@ -40,8 +39,8 @@ function UserInformation(props) {
     };
 
     const handleSubmit = () => {
-        reportUser(userId, auth.token, reason).then((err) => {
-            console.log(err);
+        reportUser(user.id, auth.token, reason).then((data) => {
+            console.log(data);
         });
 
         setReason('');
