@@ -24,8 +24,10 @@ const FileList = ({ data }) => {
 
     const handleFilter = () => {
         let newData = data.filter(
-            
+            (entry) => entry.category == input
         )
+
+        setFilteredData(newData)
     }
 
     return (
