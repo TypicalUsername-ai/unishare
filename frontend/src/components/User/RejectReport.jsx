@@ -7,7 +7,7 @@ import rejectReport from '../../functions/rejectReport';
 const RejectReport = (props) => (
     <AlertDialog.Root>
       <AlertDialog.Trigger asChild>
-        <button onClick={rejectReport(props.id, props.token)}>Reject Report</button>
+        <button onClick={() => rejectReport(props.id, props.token)}>Reject Report</button>
       </AlertDialog.Trigger>
       <AlertDialog.Portal>
         <AlertDialog.Overlay/>

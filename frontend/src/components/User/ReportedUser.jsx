@@ -44,8 +44,8 @@ const ReportedUser = (props) =>{
                 </section>
                 <button onClick={handleClick} className='seeMore'>Details</button>
                
-                <button onClick={acceptReport(props.id, token)} className='seeMore' >Accept</button>
-                <button onClick={rejectReport(props.id, token)} className='seeMore' >Decline</button>
+                <button onClick={() => acceptReport(props.id, token)} className='seeMore' >Accept</button>
+                <button onClick={() => rejectReport(props.id, token)} className='seeMore' >Decline</button>
             </section>
         </div>
     );
