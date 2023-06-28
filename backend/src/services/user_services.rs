@@ -19,6 +19,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
              .service(get_files)
              .service(delete_account)
              .service(get_bought_files)
+             .service(delete_review)
             );
 }
 
