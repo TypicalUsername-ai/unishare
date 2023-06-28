@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import buyFile from '../functions/buyFile';
+import updateFilePrice from "../functions/updateFilePrice";
 
 const FilePurchaseBox = ({ price, transaction }) => {
     const { fileid } = useParams();
@@ -17,28 +18,9 @@ const FilePurchaseBox = ({ price, transaction }) => {
     const handleChangePrice = async (e) => {
         e.preventDefault();
         if (newPrice >= 10 && newPrice <= 99999) {
-            const currentTime = Date.now();
-            const response = await fetch(
-                `http://localhost/api/files/${fileid}/pricechange`,
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${authToken}`,
-                    },
-                    body: JSON.stringify({
-                        price: newPrice,
-                        timestamp: currentTime,
-                    }),
-                }
-            );
-
-            if (response.ok) {
-                alert("Price have been updated!")
-                console.log("Price changed");
-            } else {
-                console.error("Error changing the price: " + response);
-            }
+            updateFilePrice(fileid, newPrice, authToken).then(
+                (data) => alert("price updated succesfully")
+            )
         } else {
             console.error("Invalid price");
         }
@@ -49,7 +31,7 @@ const FilePurchaseBox = ({ price, transaction }) => {
             alert("You must be logged in to buy a file!")
             return;
         }
-        buyFile(userId, fileid, authToken).then(
+        buyFile(fileid, authToken).then(
             (r) => console.log(r)
         )
     }
