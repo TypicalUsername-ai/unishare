@@ -51,4 +51,12 @@ impl UserReview {
         Ok(())
     }
 
+    pub async fn by_author(user_id: Uuid, db_conn: &mut PgConnection) -> Result<Vec<UserReview>, UnishareError> {
+        let data = user_reviews::table
+            .filter(user_reviews::reviewer_id.eq(user_id))
+            .get_results::<UserReview>(db_conn)?;
+
+        Ok(data)
+    }
+
 }

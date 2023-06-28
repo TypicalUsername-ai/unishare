@@ -47,6 +47,14 @@ impl FileReview {
         Ok(inserted_opt)
     }
 
+    pub async fn by_author(user_id: Uuid, db_conn: &mut PgConnection) -> Result<Vec<FileReview>, UnishareError> {
+        let data = file_reviews::table
+            .filter(file_reviews::reviewer_id.eq(user_id))
+            .get_results::<FileReview>(db_conn)?;
+
+        Ok(data)
+    }
+
     // Get average rating if the file
     pub async fn get_average(file_id: Uuid, db_conn: &mut PgConnection) -> Result<f32, UnishareError> {
         let average: Option<BigDecimal> = file_reviews::table

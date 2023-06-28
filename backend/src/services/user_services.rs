@@ -4,7 +4,7 @@ use diesel::{r2d2::ConnectionManager, PgConnection, IntoSql};
 use r2d2::Pool;
 use serde::{Serialize, Deserialize};
 use uuid::Uuid;
-use crate::entities::{error::UnishareError, user_data::{User, UserData}, user_review::UserReview, file::File, transaction::Transaction};
+use crate::entities::{error::UnishareError, user_data::{User, UserData}, user_review::UserReview, file::File, transaction::Transaction, file_review::FileReview};
 use super::token_middleware::validate_request;
 use log::warn;
 
@@ -20,6 +20,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
              .service(delete_account)
              .service(get_bought_files)
              .service(delete_review)
+             .service(my_reviews)
             );
 }
 
@@ -175,4 +176,19 @@ async fn delete_review(auth: BearerAuth, pool: web::Data<ConnectionPool>, path: 
     } else {
         Ok(HttpResponse::MethodNotAllowed().finish())
     }
+}
+
+#[derive(Serialize)]
+struct MyReviews {
+    pub files: Vec<FileReview>,
+    pub users: Vec<UserReview>
+}
+
+#[get("/myreviews")]
+async fn my_reviews(auth: BearerAuth, pool: web::Data<ConnectionPool>) -> Result<impl Responder, UnishareError> {
+    let mut db_conn = pool.get()?;
+    let user = validate_request(auth, &mut db_conn).await?;
+    let files = FileReview::by_author(user.user_id, &mut db_conn).await?;
+    let users = UserReview::by_author(user.user_id, &mut db_conn).await?;
+    Ok(HttpResponse::Ok().json(MyReviews{ files, users}))
 }
