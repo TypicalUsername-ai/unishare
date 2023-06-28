@@ -13,6 +13,7 @@ use crate::entities::{file_user_view::FileUserView, transaction::Transaction};
 use crate::entities::{error::UnishareError, file::{File, NewFile}, file_review::FileReview, user_data::User};
 use crate::schema::files_data;
 use super::token_middleware::validate_request;
+use sha256::try_digest;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg
@@ -49,20 +50,30 @@ async fn add_file(auth: BearerAuth, data: MultipartForm<FileUploadForm>, pool: w
     let file = data.into_inner();
     let content_file = file.content.file.as_file();
 
-    let filedata = NewFile::new(
-        file.filename.into_inner(), 
-        user.user_id, 
-        file.price.into_inner(), 
-        match file.primary_tag {Some(e) => Some(e.into_inner()), None => None} , 
-        match file.secondary_tag {Some(e) => Some(e.into_inner()), None => None}
-    );
+    let file_checksum = try_digest(file.content.file.path()).expect("Failed to perform fie checksum").to_owned();
+    let matching_files = files_data::table
+        .filter(files_data::checksum.eq(&file_checksum))
+        .first::<File>(&mut db_conn).optional()?;
 
-    let newfile = File::create(filedata, user.user_id);
-    let fileid = newfile.id.clone();
-    insert_into(files_data::table).values(newfile).execute(&mut db_conn).unwrap();
-    fs::rename(file.content.file, format!("/files/{}", fileid));
+    if let Some(file) = matching_files {
+        Err(UnishareError::InvalidAction { action: "Found a matching checksum".to_owned() })
+    } else {
+        let filedata = NewFile::new(
+            file.filename.into_inner(), 
+            user.user_id, 
+            file.price.into_inner(), 
+            match file.primary_tag {Some(e) => Some(e.into_inner()), None => None} , 
+            match file.secondary_tag {Some(e) => Some(e.into_inner()), None => None}
+        );
+    
+        let newfile = File::create(filedata, user.user_id, file_checksum);
+        let fileid = newfile.id.clone();
+        insert_into(files_data::table).values(newfile).execute(&mut db_conn).unwrap();
+        fs::rename(file.content.file, format!("/files/{}", fileid));
+    
+        Ok(HttpResponse::Created().json(fileid))
+    }
 
-    Ok(HttpResponse::Created().json(fileid))
 
 }
 
@@ -138,7 +149,8 @@ async fn get_content(auth: BearerAuth, pool: web::Data<ConnectionPool>, path: we
 
     let user = validate_request(auth, &mut db_conn).await?;
     let is_owner: bool = Transaction::user_owns_file(file_id, user.user_id, &mut db_conn).await?;
-    if is_owner {
+    let file = File::by_id(file_id, &mut db_conn).await?;
+    if is_owner || file.creator == user.user_id {
         let content = fs::read_to_string(format!("/files/{}", file_id))
         .unwrap_or("No Content Available".to_owned());
         Ok(HttpResponse::Ok().json(FileContent{ content })) // need to send content

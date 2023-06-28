@@ -35,7 +35,7 @@ const ExploreSearch = ({ onSave, user = {}, searchType }) => {
         }
         setErrors({});
         console.log(tag); //category contains the insides of the category 
-        const response = searchType === "files" ?
+        const response = tag !== null ?
             await fetch(`http://localhost/api/${searchType}/search?name=${search}&tag=${tag}`) :
             await fetch(`http://localhost/api/${searchType}/search?name=${search}`);
 

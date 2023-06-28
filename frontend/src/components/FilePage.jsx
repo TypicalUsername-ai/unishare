@@ -2,7 +2,7 @@ import FileReviewsBox from "./FileReviewsBox";
 import FileReviewForm from './FileReviewForm';
 import FilePurchaseBox from './FilePurchaseBox';
 import FileInfoCard from "./FileInfoCard";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import getFile from '../functions/getFile';
@@ -12,10 +12,15 @@ export default function FilePage() {
     const { fileid } = useParams();
     const token = useSelector((state) => state.token.token);
     let [file, setFile] = useState(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         getFile(fileid, token).then(
-            (data) => setFile(data)
+            (data) => setFile(data),
+            (err) => {
+                alert(err);
+                navigate("/home");
+            }
         )
     }, [])
 

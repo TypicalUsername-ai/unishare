@@ -69,6 +69,8 @@ async fn accept_report(auth: BearerAuth, path: web::Path<Uuid>, pool: web::Data<
     } else if accepted.object_type == ObjectType::FILE.to_i32() {
         let file = File::by_id(accepted.object_id.clone(), &mut db_conn).await?;
         email_body = format!("Your file with name {} was banned for the reason:\n{}",file.name.clone(),accepted.reason.clone()).to_owned();
+    } else {
+        panic!();
     }
     let email = Message::builder()
         .from(Mailbox::new(None, std::env!("APP_MAIL").parse::<Address>().expect("error parsing user email")))

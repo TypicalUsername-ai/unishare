@@ -41,7 +41,7 @@ const UserReviewForm = () => {
                 setPopupOpen(false);
             },
             (err) => {
-                alert("Error submitting review")
+                alert("Error submitting review"+err)
             }
         )
 
