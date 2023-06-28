@@ -1,5 +1,5 @@
 
-const  BannedFile = ({ id, reason, tag, adminName }) => {
+const  BannedFile = ({ id, reason, type, reporter, timestamp }) => {
 
     return (
         <div>
@@ -8,9 +8,10 @@ const  BannedFile = ({ id, reason, tag, adminName }) => {
                 <h3 style={{ marginBottom: "8px" }}>{id}</h3>
                 <h3>Reason for ban</h3>
                 <p style={{ marginBottom: "8px" }}>{reason}</p>
+                <h3>type: {type === 2 ? "File" : "User"}</h3>
                 <section style={{display:"flex", flexDirection:"row"}}>
                 </section>
-                <h3>Date and Time of ban</h3>
+                <h3>Date and Time of ban : {JSON.stringify(timestamp)}</h3>
                 <p style={{marginTop: "20px", marginLeft: "20px"}}></p>
             </section>
         </div>

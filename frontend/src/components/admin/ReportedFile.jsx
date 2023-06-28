@@ -53,11 +53,11 @@ const ReportedFile = ({ fileid, reporter_id, reason, report_id}) => {
                 <h3 style={{ marginBottom: "8px" }}>{reason}</h3>
                 <button onClick={handleClick} className='seeMore'>Details</button>
                 <DeleteUserButton
-                     id = {fileid}
+                     id = {report_id}
                      token = {token}
                 />
                 <RejectReport
-                    id = {fileid}
+                    id = {report_id}
                     token = {token}
                 />
                 

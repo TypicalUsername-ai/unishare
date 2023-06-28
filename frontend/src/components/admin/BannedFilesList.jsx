@@ -7,8 +7,10 @@ const BannedFilesList = ({ data }) => {
             {data.map(
                 (entry) => <BannedFile
                     id={entry.object_id}
+                    type={entry.object_type}
                     reporter={entry.reporter_id}
                     reason={entry.reason}
+                    timestamp={entry.reviewed_time}
                 />
             )}
         </div>
