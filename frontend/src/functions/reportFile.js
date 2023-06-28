@@ -1,4 +1,4 @@
-async function reportFile(userId, fileId, authToken, reason) {
+async function reportFile(fileId, authToken, reason) {
     const response = await fetch(`http://localhost/api/reports/create`, {
         method: 'post',
         headers: {
@@ -6,7 +6,6 @@ async function reportFile(userId, fileId, authToken, reason) {
             'Authorization': `Bearer ${authToken}`
         },
         body: JSON.stringify({
-            user: userId,
             object_id: fileId,
             object_type: "FILE",
             reason: reason

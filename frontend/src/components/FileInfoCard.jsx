@@ -23,7 +23,7 @@ const FileInfoCard = ({ data, snippet, transaction }) => {
     };
 
     const handleSubmitReport = () => {
-        reportFile(userId, auth.token, reason).then((err) => {
+        reportFile(data.id, auth.token, reason).then((err) => {
             console.log(err);
         });
         setReason('');

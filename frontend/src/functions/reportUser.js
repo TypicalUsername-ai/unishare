@@ -6,7 +6,6 @@ async function reportUser(userId, authToken, reason) {
             'Authorization': `Bearer ${authToken}`
         },
         body: JSON.stringify({
-            user: userId,
             object_id: userId,
             object_type: "USER",
             reason: reason

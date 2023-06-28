@@ -11,7 +11,6 @@ function UserInformation(props) {
     const navigate = useNavigate();
     const id = props.id;
     const auth = useSelector((state) => state.token);
-    const userId = useSelector((state) => state.user.id);
 
     const [user, setUser] = useState(null);
     const [reason, setReason] = useState('');
@@ -31,7 +30,7 @@ function UserInformation(props) {
     const handleDeleteProfile = () => {
         console.log(userId);
 
-        delUser(userId, auth.token).then((err) => {
+        delUser(user.id, auth.token).then((err) => {
             console.log(err);
         });
     };
