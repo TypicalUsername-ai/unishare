@@ -9,6 +9,7 @@ use log::warn;
 use r2d2::Pool;
 use uuid::Uuid;
 use diesel::{prelude::*, insert_into};
+use crate::entities::file::File;
 use crate::entities::user_data::User;
 use crate::schema::reports;
 use crate::entities::{error::UnishareError, report::{Report, NewReport, AdminPanelData, ObjectType, State}};
@@ -61,11 +62,19 @@ async fn accept_report(auth: BearerAuth, path: web::Path<Uuid>, pool: web::Data<
     let report_id = path.into_inner();
     let accepted = Report::accept(report_id, &mut db_conn).await?;
     let reporter = User::by_uuid(accepted.reporter_id.clone(), &mut db_conn).await?;
+
+    let email_body;
+    if accepted.object_type == ObjectType::USER.to_i32() {
+        email_body = format!("You were banned in the Unishare app for the reason:\n{}",accepted.reason.clone()).to_owned();
+    } else if accepted.object_type == ObjectType::FILE.to_i32() {
+        let file = File::by_id(accepted.object_id.clone(), &mut db_conn).await?;
+        email_body = format!("Your file with name {} was banned for the reason:\n{}",file.name.clone(),accepted.reason.clone()).to_owned();
+    }
     let email = Message::builder()
         .from(Mailbox::new(None, std::env!("APP_MAIL").parse::<Address>().expect("error parsing user email")))
         .to(Mailbox::new(None, reporter.email.clone().parse::<Address>().expect("error parsing user email")))
         .subject("Unishare ban")
-        .body(format!("You were banned in the Unishare app dor the reason:\n{}",accepted.reason).to_owned())
+        .body(email_body)
         .expect("error creating email");
     let result = mailer.send(&email);
     warn!("{}", std::env!("APP_MAIL"));
