@@ -54,6 +54,7 @@ const UserList = ({ data }) => {
                     id={entry.id}
                     reporter_id={entry.reporter_id}
                     reason={entry.reason}
+                    name = {entry.object_id}
                 />
             )}
         </div>

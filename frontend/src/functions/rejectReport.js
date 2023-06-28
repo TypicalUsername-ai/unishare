@@ -6,6 +6,6 @@ export default async function acceptReport (id, token){
         }
     };
 
-    let response = await fetch(`http://localhost/api/${id}/reject`, options)
+    let response = await fetch(`http://localhost/api/reports/${id}/reject`, options)
     if (!response.ok) {throw new Error("Reject Report : " + response.status)}
 }

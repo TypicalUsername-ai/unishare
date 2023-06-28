@@ -7,11 +7,11 @@ import acceptReport from '../../functions/acceptReport';
 import getProfile from '../../functions/getProfile';
 
 
-const ReportedUser = ({ id, reporter_id, reason }) =>{
+const ReportedUser = (props) =>{
 
     const navigate = useNavigate();
     const handleClick = () => {
-        navigate(`/user/${id}`);
+        navigate(`/user/${props.id}`);
     };
 
     const token = useSelector((state) => state.token.token);
@@ -19,14 +19,14 @@ const ReportedUser = ({ id, reporter_id, reason }) =>{
     const [reporter, setReporter] = useState("");
 
     useEffect(() => {
-        getProfile(id, token).then(
+        getProfile(props.id, token).then(
             (data) => setName(data.username)
         )
-        getProfile(reporter_id, token).then(
+        getProfile(props.reporter_id, token).then(
             (data) => setReporter(data.username)
         )
-        console.log(id)
-        console.log(token)
+        console.log("ID Reported User" + props.id)
+        console.log("Token Reported User" + token)
     }, [])
 
     //Send email with information about actions taken against the user 
@@ -34,16 +34,16 @@ const ReportedUser = ({ id, reporter_id, reason }) =>{
     return (
         <div style={{ display: "flex", backgroundColor: "#4CA1AF", borderRadius: "45px", marginBottom: "20px", padding:"20px",  width:"300px", height: "300px" }}>
             <section style={{ textAlign: "left" }}>
-                <h3 style={{ marginBottom: "8px" }}>{name}</h3>
-                <h3 style={{ marginBottom: "8px" }}>{reporter}</h3>
+                <h3 style={{ marginBottom: "8px" }}>{props.name}</h3>
+                <h3 style={{ marginBottom: "8px" }}>{props._reporter}</h3>
                 <section style={{display:"flex", flexDirection:"row"}}>
                 <h3>Reason:</h3>
-                <p style={{marginTop: "20px", marginLeft: "20px"}}>{reason}</p>
+                <p style={{marginTop: "20px", marginLeft: "20px"}}>{props.reason}</p>
                 </section>
                 <button onClick={handleClick} className='seeMore'>Details</button>
                
-                <button onClick={acceptReport(id, token)} className='seeMore' >Accept</button>
-                <button onClick={rejectReport(id, token)} className='seeMore' >Decline</button>
+                <button onClick={acceptReport(props.id, token)} className='seeMore' >Accept</button>
+                <button onClick={rejectReport(props.id, token)} className='seeMore' >Decline</button>
             </section>
         </div>
     );
