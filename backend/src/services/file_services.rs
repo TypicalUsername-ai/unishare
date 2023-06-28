@@ -80,15 +80,21 @@ async fn buy_file(auth: BearerAuth, pool: web::Data<ConnectionPool>, path: web::
 #[derive(Debug, Deserialize)]
 struct Fname {
     name: String,
+    tag: Option<String>,
 }
 
 #[get("/search")]
 async fn search(pool: web::Data<ConnectionPool>, data: web::Query<Fname>) -> Result<impl Responder, UnishareError> {
 
     let mut db_conn = pool.get()?;
-    let name = data.into_inner();
+    let query = data.into_inner();
+    let results;
 
-    let results = File::by_name(name.name, &mut db_conn).await?;
+    if let Some(tag) = query.tag {
+        results = File::by_tag(tag, &mut db_conn).await?;
+    } else {
+        results = File::by_name(query.name, &mut db_conn).await?;
+    }
 
     Ok(HttpResponse::Ok().json(results))
 }

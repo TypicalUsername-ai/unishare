@@ -1,4 +1,4 @@
-use std::time::SystemTime;
+use std::{time::SystemTime, fmt::format};
 use diesel::{PgConnection, prelude::*};
 use uuid::Uuid;
 use crate::schema::{users_data, transactions};
@@ -121,6 +121,18 @@ impl File {
             .filter(files_data::name.ilike(format!("{}%", name)))
             .load::<File>(db_conn)
             .optional()?;
+        if let Some(results) = opt_data {
+            Ok(results)
+        } else {
+            Ok(vec![])
+        }
+    }
+
+    pub async fn by_tag(tag: String, db_conn: &mut PgConnection) -> Result<Vec<File>, UnishareError> {
+        let opt_data = files_data::table
+            .filter(files_data::primary_tag.ilike(format!("{}%", tag))
+                .or(files_data::secondary_tag.ilike(format!("{}%", tag))))
+            .load::<File>(db_conn).optional()?;
         if let Some(results) = opt_data {
             Ok(results)
         } else {
