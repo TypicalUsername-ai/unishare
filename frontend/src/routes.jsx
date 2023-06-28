@@ -13,6 +13,7 @@ import UploadPage from './pages/UploadPage'
 import ProfilePage from './pages/ProfilePage'
 import LogoutPage from './pages/LogoutPage'
 import MyNotesPage from './pages/MyNotesPage'
+import FileContentPage from './pages/FileContentPage'
 
 const routes = [
 	{
@@ -62,6 +63,10 @@ const routes = [
 	{
 		path: "/file/:fileid",
 		element: <FileOverviewPage /> //This will need to be changed to be dynamic by file ids, similar to how users will need to be changed
+	},
+	{
+		path: "/file/:fileid/content",
+		element: <FileContentPage /> //This will need to be changed to be dynamic by file ids, similar to how users will need to be changed
 	},
 	{
 		path: "/upload",

@@ -149,7 +149,8 @@ async fn get_content(auth: BearerAuth, pool: web::Data<ConnectionPool>, path: we
 
     let user = validate_request(auth, &mut db_conn).await?;
     let is_owner: bool = Transaction::user_owns_file(file_id, user.user_id, &mut db_conn).await?;
-    if is_owner {
+    let file = File::by_id(file_id, &mut db_conn).await?;
+    if is_owner || file.creator == user.user_id {
         let content = fs::read_to_string(format!("/files/{}", file_id))
         .unwrap_or("No Content Available".to_owned());
         Ok(HttpResponse::Ok().json(FileContent{ content })) // need to send content

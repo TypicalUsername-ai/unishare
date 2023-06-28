@@ -62,7 +62,7 @@ const FilePurchaseBox = ({ price, transaction }) => {
         <div>
             {transaction !== null ? (
                 <>
-                    <p>You own this file</p>
+                    <button onClick={() => navigate(`content`)}> view file </button>
 
                     {canChangePrice ? (
                         <form onSubmit={handleChangePrice}>
