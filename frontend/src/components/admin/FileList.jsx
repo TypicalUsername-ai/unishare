@@ -1,3 +1,4 @@
+import { useState } from "react";
 import ReportedFile from "./ReportedFile";
 
 const FileList = ({ data }) => {
@@ -19,16 +20,23 @@ const FileList = ({ data }) => {
 
     }
 
+    const [filteredData, setFilteredData] = useState(data);
+
+    const handleFilter = () => {
+        let newData = data.filter(
+            
+        )
+    }
+
     return (
         <div style={{padding:"20px", background:"#ADD8E6"}}>
             <h3>Reported Files</h3>
             <div>
                 Type of file
+            <input></input>
             <select name="sort">
-                <option value="number-of-reports">example</option>
-                <option value="type1">example1</option>
-                <option value="type2">example2</option>
-                <option value="type3">example3</option>
+                <option value="filename">File name</option>
+                <option value="tag">File tag</option>
             </select>
             </div>
             {data.map(
