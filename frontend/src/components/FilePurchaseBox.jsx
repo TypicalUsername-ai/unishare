@@ -49,7 +49,7 @@ const FilePurchaseBox = ({ price, transaction }) => {
             alert("You must be logged in to buy a file!")
             return;
         }
-        buyFile(userId, fileid, authToken).then(
+        buyFile(fileid, authToken).then(
             (r) => console.log(r)
         )
     }

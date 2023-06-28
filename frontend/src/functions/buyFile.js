@@ -1,6 +1,6 @@
-async function buyFile(userId, fileId, authToken) {
+async function buyFile(fileId, authToken) {
 
-    const response = await fetch(`http://localhost/api/files/${fileId}/buy`, {
+    const response = await fetch(`http://localhost/api/files/${fileId}/purchase`, {
         method: 'POST',
         headers: {
             'Authorization': `Bearer ${authToken}`
