@@ -161,10 +161,12 @@ async fn delete_review(auth: BearerAuth, pool: web::Data<ConnectionPool>, path: 
     let (reviewed_id, reviewer_id) = path.into_inner();
     let mut db_conn = pool.get()?;
     let session = validate_request(auth, &mut db_conn).await?;
+    let reviewed = User::by_uuid(reviewed_id, &mut db_conn).await?;
     if reviewed_id != session.user_id {
         let review_opt = UserReview::by_reviewer_reviewed(reviewer_id, reviewed_id, &mut db_conn).await?;
         if let Some(review) = review_opt {
             review.delete_review(&mut db_conn).await?;
+            reviewed.update_rating(&mut db_conn).await?;
             Ok(HttpResponse::Ok().finish())
         } else {
             Ok(HttpResponse::NotFound().finish())
