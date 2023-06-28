@@ -1,4 +1,5 @@
 use std::time::SystemTime;
+use actix_web::cookie::time::Duration;
 use diesel::{PgConnection, prelude::*};
 use uuid::Uuid;
 use crate::schema::{users_data, transactions};
@@ -89,7 +90,7 @@ impl File {
                 .values(transaction).execute(db_conn)?;
                 Ok(())
             } else {
-                Err(UnishareError::ResourceNotFound { resource: format!("Insufficient tokens {} required: {}", buyer.tokens, self.price) })
+                Err(UnishareError::InvalidAction { action: format!("Insufficient tokens {} required: {}", buyer.tokens, self.price) })
             }
         }
         else {
@@ -147,6 +148,24 @@ impl File {
         todo!();
     }
 
+    pub async fn edit_price(self, new_price: i32, db_conn: &mut PgConnection) -> Result<Self, UnishareError> {
+        if SystemTime::now().duration_since(self.last_edit.clone()).unwrap().as_secs_f32() >= (24 * 60 * 60) as f32 {
+            let edit_price = diesel::update(files_data::table)
+            .filter(files_data::id.eq(self.id))
+            .set((
+                files_data::price.eq(new_price),
+                files_data::last_edit_time.eq(SystemTime::now())
+            )).get_result(db_conn).optional()?;
+            if let Some(file) = edit_price {
+                Ok(file)
+            } else {
+                Err(UnishareError::ResourceNotFound { resource: format!("File {}", self.id) })
+            }
+        } else {
+            Err(UnishareError::InvalidAction { action: "Updating price more than one time a day".to_owned() })
+        }
+    }
+
     /// Adds a new rating to the file and retireves an updated object
     /// Updates rating of the file and retireves an updated object
     pub async fn update_rating(self, db_conn: &mut PgConnection) -> Result<Self, UnishareError> {
@@ -187,7 +206,7 @@ impl File {
     pub async fn get_snippet(&self) -> String {
 
         let mut fcontent = fs::read_to_string(format!("/files/{}", self.id))
-        .unwrap_or("No Contant available".to_owned());
+        .unwrap_or("No Content available".to_owned());
 
         fcontent.truncate(50);
         fcontent

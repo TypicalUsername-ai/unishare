@@ -91,7 +91,10 @@ impl Report {
     pub async fn set_state(report_id: Uuid, state: State, db_conn: &mut PgConnection) -> Result<Report, UnishareError> {
         let update_report: Report = diesel::update(reports::table)
             .filter(reports::id.eq(report_id.clone()))
-            .set(reports::state.eq(state.to_i32()))
+            .set((
+                reports::state.eq(state.to_i32()),
+                reports::reviewed_time.eq(SystemTime::now())
+            ))
             .get_result(db_conn)?;
         Ok(update_report)
     }
