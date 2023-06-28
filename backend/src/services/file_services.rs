@@ -216,3 +216,24 @@ async fn change_file_price(auth: BearerAuth, pool: web::Data<ConnectionPool>, da
 
     Ok(HttpResponse::Ok().json(updated_file))
 }
+
+#[delete("/{file_id}/{reviewer_id}")]
+async fn delete_review(auth: BearerAuth, pool: web::Data<ConnectionPool>, path: web::Path<(Uuid, Uuid)>) -> Result<impl Responder, UnishareError> {
+    let (file_id, reviewer_id) = path.into_inner();
+    let mut db_conn = pool.get()?;
+    let user = validate_request(auth, &mut db_conn).await?;
+    let file = File::by_id(file_id.clone(), &mut db_conn).await?;
+
+    if user.user_id == reviewer_id {
+        let review_opt = FileReview::by_user_file(user.user_id.clone(), file_id.clone(), &mut db_conn).await?;
+        if let Some(review) = review_opt {
+            review.delete_review(&mut db_conn).await?;
+            file.update_rating(&mut db_conn).await?;
+            Ok(HttpResponse::Ok().finish())
+        } else {
+            Ok(HttpResponse::NotFound().finish())
+        }
+    } else {
+        Ok(HttpResponse::MethodNotAllowed().finish())
+    }
+}
