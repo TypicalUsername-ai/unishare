@@ -11,12 +11,12 @@ const ExploreSearch = ({ onSave, user = {}, searchType }) => {
     const [userData, setUserData] = useState(user);
     const [errors, setErrors] = useState({});
     const [results, setResults] = useState([]);
-    const { search, category } = userData;
+    const { search, tag } = userData;
     const [showCategory, setShowCategory] = useState(false);
 
     const validateData = () => {
         let errors = {};
-        if (!search) {
+        if (!search && !tag) {
             errors.search = "You need to search for something!";
         }
         return errors;
@@ -34,10 +34,11 @@ const ExploreSearch = ({ onSave, user = {}, searchType }) => {
             return;
         }
         setErrors({});
-        console.log(category); //category contains the insides of the category 
-        const response = await fetch(
-            `http://localhost/api/${searchType}/search?name=${search}`,
-        );
+        console.log(tag); //category contains the insides of the category 
+        const response = searchType === "files" ?
+            await fetch(`http://localhost/api/${searchType}/search?name=${search}&tag=${tag}`) :
+            await fetch(`http://localhost/api/${searchType}/search?name=${search}`);
+
 
         if (response.ok) {
             setResults(await response.json());
@@ -51,11 +52,8 @@ const ExploreSearch = ({ onSave, user = {}, searchType }) => {
 
     useEffect(() => {
         setResults([]);
-    }, [searchType]);
-
-    useEffect(() => {
         setShowCategory(searchType === "files");
-        setUserData((prevData) => ({ ...prevData, category: "" }));
+        setUserData((prevData) => ({ ...prevData, tag: null }));
     }, [searchType]);
 
     return (
@@ -66,9 +64,9 @@ const ExploreSearch = ({ onSave, user = {}, searchType }) => {
             {showCategory && (
                 <>
                     <Field
-                        text="category"
-                        default="category"
-                        name="category"
+                        text="tag"
+                        default="tag"
+                        name="tag"
                         onChange={handleChange}
                     />
                     <div className="errorInformation">{errors.category}</div>
@@ -78,15 +76,15 @@ const ExploreSearch = ({ onSave, user = {}, searchType }) => {
             <Toast.Provider swipeDirection="right">
                 <button className="formButton" onClick={handleSave}>
                     Search
-        </button>
+                </button>
                 <p>
                     Showing {results.length} results for {searchType}
                 </p>
                 {searchType === "users" ? (
                     <UserSearchResults data={results} />
                 ) : (
-                        <FileSearchResults data={results} />
-                    )}
+                    <FileSearchResults data={results} />
+                )}
                 <Toast.Viewport className="ToastViewport" />
             </Toast.Provider>
         </div>
