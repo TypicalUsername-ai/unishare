@@ -1,8 +1,9 @@
-use diesel::{PgConnection, Queryable, prelude::*};
+use bigdecimal::{BigDecimal, ToPrimitive};
+use diesel::{PgConnection, Queryable, prelude::*, dsl::avg};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
-use super::{error::UnishareError, file::File, user_auth::UserAuth, transaction::{Transaction, TransactionType}, file_review::FileReview};
-use crate::schema::{users_data, users, files_data, file_reviews};
+use super::{error::UnishareError, file::File, user_auth::UserAuth, transaction::{Transaction, TransactionType}, file_review::FileReview, user_review::UserReview};
+use crate::schema::{users_data, users, files_data, file_reviews, user_reviews::{self, reviewed_id}};
 
 #[derive(Debug, Serialize, Deserialize, Queryable)]
 #[diesel(table_name = users_data)]
@@ -128,7 +129,7 @@ impl User {
         Ok(files.unwrap())
     }
 
-    /// Check if user can add a review
+    /// Check if user can review a file
     pub async fn can_review_file(&self, file_id: Uuid, db_conn: &mut PgConnection) -> Result<bool, UnishareError> {
         let is_owner = Transaction::user_owns_file(file_id.clone(), self.id.clone(), db_conn).await?;
         if is_owner {
@@ -143,6 +144,16 @@ impl User {
         }
     }
 
+    /// Check if user can review another user
+    pub async fn can_review_user(&self, user_id: Uuid, db_conn: &mut PgConnection) -> Result<bool, UnishareError> {
+        let user_user_review_opt = UserReview::by_reviewer_reviewed(self.id.clone(), user_id.clone(), db_conn).await?;
+        if let Some(review) = user_user_review_opt {
+            Ok(false)
+        } else {
+            Ok(true)
+        }
+    }
+
     /// Changes token balance of both buyer and seller after a transaction to buy access to the file
     pub async fn update_tokens(&self, tokens_amount: i32, db_conn: &mut PgConnection) -> Result<(), UnishareError> {
         let update_user = diesel::update(users_data::table)
@@ -150,6 +161,17 @@ impl User {
             .set(users_data::tokens.eq(users_data::tokens + tokens_amount))
             .execute(db_conn)?;
         Ok(())
+    }
+
+    pub async fn update_rating(&self, db_conn: &mut PgConnection) -> Result<f32, UnishareError> {
+        let average: Option<BigDecimal> = user_reviews::table
+            .filter(user_reviews::reviewed_id.eq(self.id.clone()))
+            .select(avg(user_reviews::review))
+            .first(db_conn)?;
+        match average {
+            Some(avg) => Ok(avg.to_f32().unwrap_or(0.0)),
+            None => Err(UnishareError::ResourceNotFound { resource: format!("UserReview reviewed: {}", self.id) })
+        }
     }
 
     /// Adds a new reting to the user and updates the cumulative rating
