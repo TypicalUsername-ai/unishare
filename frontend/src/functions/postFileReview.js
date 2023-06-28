@@ -11,7 +11,7 @@ async function postFileReview(rating, reviewText, file_id, token) {
         })
     });
 
-    if (!response.ok) { throw new Error("postFileReview : " + response.status) }
+    if (!response.ok) { throw new Error(await response.text()) }
     return await response.json()
 }
 
