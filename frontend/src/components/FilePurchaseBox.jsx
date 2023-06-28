@@ -19,7 +19,6 @@ const FilePurchaseBox = ({ price, transaction }) => {
     const handleChangePrice = async (e) => {
         e.preventDefault();
         if (newPrice >= 10 && newPrice <= 99999) {
-            const currentTime = Date.now();
             const response = await fetch(
                 `http://localhost/api/files/${fileid}/pricechange`,
                 {
@@ -29,18 +28,19 @@ const FilePurchaseBox = ({ price, transaction }) => {
                         Authorization: `Bearer ${authToken}`,
                     },
                     body: JSON.stringify({
-                        price: newPrice,
-                        timestamp: currentTime,
+                        price: newPrice
                     }),
                 }
             );
 
             if (response.ok) {
                 alert("Price have been updated!")
-                console.log("Price changed");
             } else {
-                console.error("Error changing the price: " + response);
+                response.text().then(
+                    (data) => alert("Error changing the price: " + data)
+                )
             }
+            setCanChangePrice(false)
         } else {
             console.error("Invalid price");
         }
@@ -69,7 +69,7 @@ const FilePurchaseBox = ({ price, transaction }) => {
                             <input
                                 type="number"
                                 value={newPrice}
-                                onChange={(e) => setNewPrice(e.target.value)}
+                                onChange={(e) => setNewPrice(e.target.valueAsNumber)}
                                 min={10}
                                 max={99999}
                             />
