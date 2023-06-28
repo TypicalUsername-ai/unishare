@@ -117,12 +117,12 @@ struct FilePrice {
 #[post("/{file_id}/pricechange")]
 async fn change_file_price(auth: BearerAuth, pool: web::Data<ConnectionPool>, data: web::Json<FilePrice>, path: web::Path<Uuid>) -> Result<impl Responder, UnishareError> {
     let file_id = path.into_inner();
-    let new_price = path.into_inner();
+    let new_price = data.into_inner();
     let mut db_conn = pool.get()?;
 
     let user = validate_request(auth, &mut db_conn).await?;
     let file = File::by_id(file_id, &mut db_conn).await?;
-    let updated_file = file.edit_price(new_price, &mut db_conn).await?;
+    let updated_file = file.edit_price(new_price.price, &mut db_conn).await?;
 
     Ok(HttpResponse::Ok().json(updated_file))
 }
