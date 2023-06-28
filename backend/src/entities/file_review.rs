@@ -1,3 +1,5 @@
+use std::io::SeekFrom;
+
 use diesel::{Insertable, Queryable, PgConnection, QueryDsl, insert_into};
 use serde::{Serialize, Deserialize};
 use uuid::Uuid;
@@ -24,8 +26,18 @@ impl FileReview {
         if let Some(v) = reviews_opt {
             Ok(v)
         } else {
-            Err(UnishareError::ResourceNotFound { resource: format!("File {}", id) })
+            Err(UnishareError::ResourceNotFound { resource: format!("FileReview {}", id) })
         }
+    }
+
+    // Get review by file and user
+    pub async fn by_user_file(user_id: Uuid, file_id: Uuid, db_conn: &mut PgConnection) -> Result<Option<FileReview>, UnishareError> {
+        let review_opt: Option<FileReview> = file_reviews::table
+            .filter(file_reviews::reviewer_id.eq(user_id.clone())
+                .and(file_reviews::file_id.eq(file_id.clone())))
+            .limit(1)
+            .get_result(db_conn).optional()?;
+        Ok(review_opt)
     }
 
     // Add a review for a file
