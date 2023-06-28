@@ -32,10 +32,6 @@ export default function AdminPanel(){
                     <FileList data={reports.file_reports}/>
                     <UserList data={reports.user_reports}/>
                     <BannedFilesList data={reports.report_log}/>
-                    <ReportButton
-                    headline="ReportUser"
-                    headline2="ReportUser"
-                    />
                     
                 </section>
                 
