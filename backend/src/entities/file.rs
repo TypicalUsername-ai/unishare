@@ -11,7 +11,7 @@ use std::fs;
 #[derive(Debug, Serialize, Deserialize, Queryable, Insertable)]
 #[diesel(table_name = files_data)]
 pub struct File {
-    name: String,
+    pub name: String,
     pub id: Uuid,
     pub creator: Uuid,
     #[diesel(column_name = created_time)]
