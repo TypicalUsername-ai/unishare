@@ -1,4 +1,4 @@
-async function getFileReviews(id, token) {
+export default async function getFileContent(fileid, token) {
     const options = {
         method: 'GET',
         headers: {
@@ -6,9 +6,7 @@ async function getFileReviews(id, token) {
         }
     };
 
-    let response = await fetch(`http://localhost/api/files/${id}/reviews`, options)
+    let response = await fetch(`http://localhost/api/files/${fileid}/content`, options)
     if (!response.ok) {throw new Error(await response.text())}
     return await response.json()
 }
-
-export default getFileReviews

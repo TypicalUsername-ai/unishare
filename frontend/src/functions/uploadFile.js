@@ -10,7 +10,7 @@ async function uploadFile(filedata, token) {
     };
 
     let response = await fetch(`http://localhost/api/files/create`, options)
-    if (!response.ok) {throw new Error("UploadFile : " + response.status)}
+    if (!response.ok) {throw new Error(await response.text())}
     return await response.json()
 }
 

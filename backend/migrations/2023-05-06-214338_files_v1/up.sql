@@ -11,6 +11,7 @@ CREATE TABLE files_data (
     primary_tag text DEFAULT NULL,
     secondary_tag text DEFAULT NULL,
     available boolean NOT NULL DEFAULT TRUE,
+    checksum varchar(64) NOT NULL UNIQUE,
     CONSTRAINT fk_creator
         FOREIGN KEY (creator)
         REFERENCES users(id),

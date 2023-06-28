@@ -11,7 +11,7 @@ async function postUserReview(rating, reviewText, user_id, token) {
         })
     });
 
-    if (!response.ok) { throw new Error("postUserReview : " + response.status) }
+    if (!response.ok) { throw new Error(await response.text()) }
     return await response.json()
 }
 
