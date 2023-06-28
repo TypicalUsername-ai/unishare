@@ -1,6 +1,6 @@
 use actix_web::{web, Responder, HttpResponse, get, post, delete};
 use actix_web_httpauth::extractors::bearer::BearerAuth;
-use diesel::{r2d2::ConnectionManager, PgConnection};
+use diesel::{r2d2::ConnectionManager, PgConnection, IntoSql};
 use r2d2::Pool;
 use serde::{Serialize, Deserialize};
 use uuid::Uuid;
@@ -19,6 +19,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
              .service(get_files)
              .service(delete_account)
              .service(get_bought_files)
+             .service(delete_review)
             );
 }
 
@@ -142,10 +143,36 @@ async fn add_review(auth: BearerAuth, pool: web::Data<ConnectionPool>, data: web
     let mut db_conn = pool.get()?;
     let target_id = path.into_inner();
     let session = validate_request(auth, &mut db_conn).await?;
-    let review = UserReview { reviewer_id: session.user_id, reviewed_id: target_id, review: review_data.rating, comment: review_data.comment };
-    let data = UserReview::add_review(review, &mut db_conn).await?;
     let user = User::by_uuid(session.user_id, &mut db_conn).await?;
-    user.update_tokens(5, &mut db_conn).await?;
-    
-    Ok(HttpResponse::Ok().json(data))
+
+    if user.can_review_user(target_id, &mut db_conn).await? {
+        let review = UserReview { reviewer_id: user.id, reviewed_id: target_id, review: review_data.rating, comment: review_data.comment };
+        let data = UserReview::add_review(review, &mut db_conn).await?;
+        user.update_rating(&mut db_conn).await?;
+        user.update_tokens(5, &mut db_conn).await?;
+        
+        Ok(HttpResponse::Ok().json(data))
+    } else {
+        Ok(HttpResponse::AlreadyReported().finish())
+    }
+}
+
+#[delete("/{user_id}/{reviewer_id}")]
+async fn delete_review(auth: BearerAuth, pool: web::Data<ConnectionPool>, path: web::Path<(Uuid, Uuid)>) -> Result<impl Responder, UnishareError> {
+    let (reviewed_id, reviewer_id) = path.into_inner();
+    let mut db_conn = pool.get()?;
+    let session = validate_request(auth, &mut db_conn).await?;
+    let reviewed = User::by_uuid(reviewed_id, &mut db_conn).await?;
+    if reviewer_id == session.user_id {
+        let review_opt = UserReview::by_reviewer_reviewed(reviewer_id, reviewed_id, &mut db_conn).await?;
+        if let Some(review) = review_opt {
+            review.delete_review(&mut db_conn).await?;
+            reviewed.update_rating(&mut db_conn).await?;
+            Ok(HttpResponse::Ok().finish())
+        } else {
+            Ok(HttpResponse::NotFound().finish())
+        }
+    } else {
+        Ok(HttpResponse::MethodNotAllowed().finish())
+    }
 }

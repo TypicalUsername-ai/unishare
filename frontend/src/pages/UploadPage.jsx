@@ -1,9 +1,10 @@
 import Field from '../components/field';
 import React, { useState } from "react";
-import { Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import Header from '../components/Header';
 import uploadFile from '../functions/uploadFile';
+import ProgressBar from '../components/ProgressBar';
+import { useNavigate, Navigate } from 'react-router-dom';
 
 const UploadPage = ({ onSave, file = {} }) => {
 
@@ -16,6 +17,9 @@ const UploadPage = ({ onSave, file = {} }) => {
     const token = useSelector((state) => state.token.token);
     const authorized = useSelector((state) => state.token.authorized);
     const id = useSelector((state) => state.user.id);
+    const navigate = useNavigate();
+
+    let [progress, setProgress] = useState(0);
 
     const validateData = () => {
         let errors = {};
@@ -54,6 +58,16 @@ const UploadPage = ({ onSave, file = {} }) => {
         setFileData((prevData) => ({ ...prevData, [name]: value }));
     };
 
+    const moveProgressTo = (val) => {
+        console.log("called moveProgress")
+        while (progress < val) {
+            if (progress >= 100) break;
+            setTimeout(() => {
+                setProgress(progress+1)
+            }, "10")
+        }
+    }
+
     const handleSave = async () => {
         const errors = validateData();
         if (Object.keys(errors).length) {
@@ -67,10 +81,18 @@ const UploadPage = ({ onSave, file = {} }) => {
             (value) => reqData.append(value[0], value[1])
         )
         console.log(reqData);
+        setProgress(80)
         uploadFile(reqData, token).then(
-            (r) => console.log(r)
+            (r) => {
+                setProgress(100)
+                setTimeout(
+                    () => {
+                        alert("File uploaded successfuly!")
+                        navigate("/notes")
+                    }, "2500")
+            },
+            (err) => alert(err)
         )
-        alert("File uploaded successfuly!");
         //onSave(FileData);
 
     }
@@ -104,17 +126,24 @@ const UploadPage = ({ onSave, file = {} }) => {
 
             <input type='file'
                 name="content"
-                onChange={(e) => setFileData((prevData) => ({ ...prevData, content: e.target.files[0] }))}
+                onChange={(e) => {
+                    setFileData((prevData) => ({ ...prevData, content: e.target.files[0] }));
+                    setProgress(25);
+                }}
                 accept='.md, .tex, .txt'
             />
 
 
-
+            <div>
+                <p> upload progress </p>
+                <ProgressBar completed={progress} bgcolor="black"/>
+            </div>
 
             <button className='TopPageButton' style={{ width: "135px", height: "45px", backgroundColor: 'white', margin: '10px', borderRadius: '50px', textAlign: 'center' }}
                 onClick={handleSave}>
                 Send
             </button>
+
 
         </div>
     );

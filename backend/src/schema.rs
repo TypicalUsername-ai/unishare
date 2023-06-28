@@ -21,6 +21,7 @@ diesel::table! {
         primary_tag -> Nullable<Text>,
         secondary_tag -> Nullable<Text>,
         available -> Bool,
+        checksum -> Varchar,
     }
 }
 

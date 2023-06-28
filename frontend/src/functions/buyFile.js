@@ -7,7 +7,7 @@ async function buyFile(fileId, authToken) {
         },
     });
 
-    if (!response.ok) {throw new Error("purchaseFile : "+response.status)}
+    if (!response.ok) {throw new Error(await response.text())}
     return await response.json()
 }
 

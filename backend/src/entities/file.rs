@@ -1,4 +1,5 @@
-use std::time::SystemTime;
+use std::{time::SystemTime, fmt::format};
+use actix_web::cookie::time::Duration;
 use diesel::{PgConnection, prelude::*};
 use uuid::Uuid;
 use crate::schema::{users_data, transactions};
@@ -10,7 +11,7 @@ use std::fs;
 #[derive(Debug, Serialize, Deserialize, Queryable, Insertable)]
 #[diesel(table_name = files_data)]
 pub struct File {
-    name: String,
+    pub name: String,
     pub id: Uuid,
     pub creator: Uuid,
     #[diesel(column_name = created_time)]
@@ -22,6 +23,7 @@ pub struct File {
     primary_tag: Option<String>,
     secondary_tag: Option<String>,
     available: bool,
+    checksum: String,
 }
 
 /// WARNING! rating to be made as Option<f32>
@@ -61,7 +63,7 @@ pub struct NewFile {
 
 impl File {
 
-    pub fn new(filename: String, creator: Uuid, price: i32, primary_tag: Option<String>, secondary_tag: Option<String>) -> Self {
+    pub fn new(filename: String, creator: Uuid, price: i32, primary_tag: Option<String>, secondary_tag: Option<String>, checksum: String) -> Self {
         Self { 
             name: filename, 
             id: Uuid::new_v4(), 
@@ -72,7 +74,8 @@ impl File {
             rating: 0.0, 
             primary_tag: primary_tag, 
             secondary_tag: secondary_tag, 
-            available: true 
+            available: true,
+            checksum,
         }
     }
 
@@ -89,7 +92,7 @@ impl File {
                 .values(transaction).execute(db_conn)?;
                 Ok(())
             } else {
-                Err(UnishareError::ResourceNotFound { resource: format!("Insufficient tokens {} required: {}", buyer.tokens, self.price) })
+                Err(UnishareError::InvalidAction { action: format!("Insufficient tokens {} required: {}", buyer.tokens, self.price) })
             }
         }
         else {
@@ -127,6 +130,18 @@ impl File {
             Ok(vec![])
         }
     }
+
+    pub async fn by_tag(tag: String, db_conn: &mut PgConnection) -> Result<Vec<File>, UnishareError> {
+        let opt_data = files_data::table
+            .filter(files_data::primary_tag.ilike(format!("{}%", tag))
+                .or(files_data::secondary_tag.ilike(format!("{}%", tag))))
+            .load::<File>(db_conn).optional()?;
+        if let Some(results) = opt_data {
+            Ok(results)
+        } else {
+            Ok(vec![])
+        }
+    }
     
     /// Retrieves file data by id
     pub async fn by_id(id: Uuid, db_conn: &mut PgConnection) -> Result <File, UnishareError> {
@@ -145,6 +160,24 @@ impl File {
     /// WARNING! does not allow for editing the file contents
     pub async fn edit(&mut self, edits: FileOpt, db_conn: &mut PgConnection) -> Result<Self, UnishareError> {
         todo!();
+    }
+
+    pub async fn edit_price(self, new_price: i32, db_conn: &mut PgConnection) -> Result<Self, UnishareError> {
+        if SystemTime::now().duration_since(self.last_edit.clone()).unwrap().as_secs_f32() >= (24 * 60 * 60) as f32 {
+            let edit_price = diesel::update(files_data::table)
+            .filter(files_data::id.eq(self.id))
+            .set((
+                files_data::price.eq(new_price),
+                files_data::last_edit_time.eq(SystemTime::now())
+            )).get_result(db_conn).optional()?;
+            if let Some(file) = edit_price {
+                Ok(file)
+            } else {
+                Err(UnishareError::ResourceNotFound { resource: format!("File {}", self.id) })
+            }
+        } else {
+            Err(UnishareError::InvalidAction { action: "Updating price more than one time a day".to_owned() })
+        }
     }
 
     /// Adds a new rating to the file and retireves an updated object
@@ -180,14 +213,14 @@ impl File {
         Ok(())
     }
 
-    pub fn create(data: NewFile, user_id: Uuid) -> Self {
-        File::new(data.filename, user_id, data.price, data.primary_tag, data.secondary_tag)
+    pub fn create(data: NewFile, user_id: Uuid, checksum: String) -> Self {
+        File::new(data.filename, user_id, data.price, data.primary_tag, data.secondary_tag, checksum)
     }
 
     pub async fn get_snippet(&self) -> String {
 
         let mut fcontent = fs::read_to_string(format!("/files/{}", self.id))
-        .unwrap_or("No Contant available".to_owned());
+        .unwrap_or("No Content available".to_owned());
 
         fcontent.truncate(50);
         fcontent

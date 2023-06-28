@@ -13,6 +13,7 @@ use crate::entities::{file_user_view::FileUserView, transaction::Transaction};
 use crate::entities::{error::UnishareError, file::{File, NewFile}, file_review::FileReview, user_data::User};
 use crate::schema::files_data;
 use super::token_middleware::validate_request;
+use sha256::try_digest;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg
@@ -26,6 +27,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .service(get_file_with_transaction)
             .service(get_content)
             .service(delete_file)
+            .service(change_file_price)
         );
 }
 
@@ -48,20 +50,30 @@ async fn add_file(auth: BearerAuth, data: MultipartForm<FileUploadForm>, pool: w
     let file = data.into_inner();
     let content_file = file.content.file.as_file();
 
-    let filedata = NewFile::new(
-        file.filename.into_inner(), 
-        user.user_id, 
-        file.price.into_inner(), 
-        match file.primary_tag {Some(e) => Some(e.into_inner()), None => None} , 
-        match file.secondary_tag {Some(e) => Some(e.into_inner()), None => None}
-    );
+    let file_checksum = try_digest(file.content.file.path()).expect("Failed to perform fie checksum").to_owned();
+    let matching_files = files_data::table
+        .filter(files_data::checksum.eq(&file_checksum))
+        .first::<File>(&mut db_conn).optional()?;
 
-    let newfile = File::create(filedata, user.user_id);
-    let fileid = newfile.id.clone();
-    insert_into(files_data::table).values(newfile).execute(&mut db_conn).unwrap();
-    fs::rename(file.content.file, format!("/files/{}", fileid));
+    if let Some(file) = matching_files {
+        Err(UnishareError::InvalidAction { action: "Found a matching checksum".to_owned() })
+    } else {
+        let filedata = NewFile::new(
+            file.filename.into_inner(), 
+            user.user_id, 
+            file.price.into_inner(), 
+            match file.primary_tag {Some(e) => Some(e.into_inner()), None => None} , 
+            match file.secondary_tag {Some(e) => Some(e.into_inner()), None => None}
+        );
+    
+        let newfile = File::create(filedata, user.user_id, file_checksum);
+        let fileid = newfile.id.clone();
+        insert_into(files_data::table).values(newfile).execute(&mut db_conn).unwrap();
+        fs::rename(file.content.file, format!("/files/{}", fileid));
+    
+        Ok(HttpResponse::Created().json(fileid))
+    }
 
-    Ok(HttpResponse::Created().json(fileid))
 
 }
 
@@ -80,15 +92,21 @@ async fn buy_file(auth: BearerAuth, pool: web::Data<ConnectionPool>, path: web::
 #[derive(Debug, Deserialize)]
 struct Fname {
     name: String,
+    tag: Option<String>,
 }
 
 #[get("/search")]
 async fn search(pool: web::Data<ConnectionPool>, data: web::Query<Fname>) -> Result<impl Responder, UnishareError> {
 
     let mut db_conn = pool.get()?;
-    let name = data.into_inner();
+    let query = data.into_inner();
+    let results;
 
-    let results = File::by_name(name.name, &mut db_conn).await?;
+    if let Some(tag) = query.tag {
+        results = File::by_tag(tag, &mut db_conn).await?;
+    } else {
+        results = File::by_name(query.name, &mut db_conn).await?;
+    }
 
     Ok(HttpResponse::Ok().json(results))
 }
@@ -131,7 +149,8 @@ async fn get_content(auth: BearerAuth, pool: web::Data<ConnectionPool>, path: we
 
     let user = validate_request(auth, &mut db_conn).await?;
     let is_owner: bool = Transaction::user_owns_file(file_id, user.user_id, &mut db_conn).await?;
-    if is_owner {
+    let file = File::by_id(file_id, &mut db_conn).await?;
+    if is_owner || file.creator == user.user_id {
         let content = fs::read_to_string(format!("/files/{}", file_id))
         .unwrap_or("No Content Available".to_owned());
         Ok(HttpResponse::Ok().json(FileContent{ content })) // need to send content
@@ -169,12 +188,64 @@ async fn add_review(auth: BearerAuth, pool: web::Data<ConnectionPool>, data: web
     let review_data = data.into_inner();
     let mut db_conn = pool.get()?;
     let target_id = path.into_inner();
+    let file = File::by_id(target_id, &mut db_conn).await?;
     let reviewer_session = validate_request(auth, &mut db_conn).await?;
-    let review = FileReview { reviewer_id: reviewer_session.user_id, file_id: target_id, review: review_data.review, comment: review_data.comment };
-    let data = FileReview::add_review(review, &mut db_conn).await?;
     let reviewer = User::by_uuid(reviewer_session.user_id, &mut db_conn).await?;
-    reviewer.update_tokens(5, &mut db_conn).await?;
 
-    Ok(HttpResponse::Ok().json(data))
+    if reviewer.can_review_file(file.id.clone(), &mut db_conn).await? {
+        let review = FileReview { reviewer_id: reviewer_session.user_id, file_id: target_id, review: review_data.review, comment: review_data.comment };
+        let data = FileReview::add_review(review, &mut db_conn).await?;
+        let updated_file = file.update_rating(&mut db_conn).await?;
+        reviewer.update_tokens(5, &mut db_conn).await?;
+    
+        let creator = User::by_uuid(updated_file.creator, &mut db_conn).await?;
+        if review_data.review == 4 {
+            creator.update_tokens(5, &mut db_conn).await?;
+        } else if review_data.review == 5 {
+            creator.update_tokens(10, &mut db_conn).await?;
+        }
+        
+        Ok(HttpResponse::Ok().json(data))
+    } else {
+        Ok(HttpResponse::AlreadyReported().finish())
+    }
 }
 
+#[derive(Debug, Deserialize)]
+struct FilePrice {
+    pub price: i32
+}
+
+#[post("/{file_id}/pricechange")]
+async fn change_file_price(auth: BearerAuth, pool: web::Data<ConnectionPool>, data: web::Json<FilePrice>, path: web::Path<Uuid>) -> Result<impl Responder, UnishareError> {
+    let file_id = path.into_inner();
+    let new_price = data.into_inner();
+    let mut db_conn = pool.get()?;
+
+    let user = validate_request(auth, &mut db_conn).await?;
+    let file = File::by_id(file_id, &mut db_conn).await?;
+    let updated_file = file.edit_price(new_price.price, &mut db_conn).await?;
+
+    Ok(HttpResponse::Ok().json(updated_file))
+}
+
+#[delete("/{file_id}/{reviewer_id}")]
+async fn delete_review(auth: BearerAuth, pool: web::Data<ConnectionPool>, path: web::Path<(Uuid, Uuid)>) -> Result<impl Responder, UnishareError> {
+    let (file_id, reviewer_id) = path.into_inner();
+    let mut db_conn = pool.get()?;
+    let user = validate_request(auth, &mut db_conn).await?;
+    let file = File::by_id(file_id.clone(), &mut db_conn).await?;
+
+    if user.user_id == reviewer_id {
+        let review_opt = FileReview::by_user_file(user.user_id.clone(), file_id.clone(), &mut db_conn).await?;
+        if let Some(review) = review_opt {
+            review.delete_review(&mut db_conn).await?;
+            file.update_rating(&mut db_conn).await?;
+            Ok(HttpResponse::Ok().finish())
+        } else {
+            Ok(HttpResponse::NotFound().finish())
+        }
+    } else {
+        Ok(HttpResponse::MethodNotAllowed().finish())
+    }
+}

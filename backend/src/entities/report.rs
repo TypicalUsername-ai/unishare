@@ -1,11 +1,14 @@
 use crate::schema::reports;
+use diesel::sql_types::BigInt;
+use diesel::dsl::count;
 use uuid::Uuid;
 use serde::{Serialize, Deserialize};
 use diesel::{Insertable, Queryable, PgConnection};
 use diesel::prelude::*;
 use super::error::UnishareError;
 use super::user_data::User;
-use std::time::SystemTime;
+use std::ops::Sub;
+use std::time::{SystemTime, Duration};
 use crate::entities::file::File;
 
 #[derive(Debug, Insertable, Queryable, Serialize, Deserialize)]
@@ -91,9 +94,25 @@ impl Report {
     pub async fn set_state(report_id: Uuid, state: State, db_conn: &mut PgConnection) -> Result<Report, UnishareError> {
         let update_report: Report = diesel::update(reports::table)
             .filter(reports::id.eq(report_id.clone()))
-            .set(reports::state.eq(state.to_i32()))
+            .set((
+                reports::state.eq(state.to_i32()),
+                reports::reviewed_time.eq(SystemTime::now())
+            ))
             .get_result(db_conn)?;
         Ok(update_report)
+    }
+
+    pub async fn can_report(user_id: Uuid, db_conn: &mut PgConnection) -> Result<bool, UnishareError> {
+        let reports_num: i64 = reports::table
+            .filter(reports::reporter_id.eq(user_id.clone())
+                .and(reports::created_time.gt(SystemTime::now().sub(Duration::from_secs(24 * 60 * 60)))))
+            .select(count(reports::id))
+            .first(db_conn)?;
+        if reports_num < 5 {
+            Ok(true)
+        } else {
+            Ok(false)
+        }
     }
 }
 
