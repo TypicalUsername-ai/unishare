@@ -23,6 +23,7 @@ pub struct File {
     primary_tag: Option<String>,
     secondary_tag: Option<String>,
     available: bool,
+    checksum: String,
 }
 
 /// WARNING! rating to be made as Option<f32>
@@ -62,7 +63,7 @@ pub struct NewFile {
 
 impl File {
 
-    pub fn new(filename: String, creator: Uuid, price: i32, primary_tag: Option<String>, secondary_tag: Option<String>) -> Self {
+    pub fn new(filename: String, creator: Uuid, price: i32, primary_tag: Option<String>, secondary_tag: Option<String>, checksum: String) -> Self {
         Self { 
             name: filename, 
             id: Uuid::new_v4(), 
@@ -73,7 +74,8 @@ impl File {
             rating: 0.0, 
             primary_tag: primary_tag, 
             secondary_tag: secondary_tag, 
-            available: true 
+            available: true,
+            checksum,
         }
     }
 
@@ -211,8 +213,8 @@ impl File {
         Ok(())
     }
 
-    pub fn create(data: NewFile, user_id: Uuid) -> Self {
-        File::new(data.filename, user_id, data.price, data.primary_tag, data.secondary_tag)
+    pub fn create(data: NewFile, user_id: Uuid, checksum: String) -> Self {
+        File::new(data.filename, user_id, data.price, data.primary_tag, data.secondary_tag, checksum)
     }
 
     pub async fn get_snippet(&self) -> String {
