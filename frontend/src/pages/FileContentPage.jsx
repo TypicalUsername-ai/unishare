@@ -11,9 +11,6 @@ const FileContentPage = () => {
     const [content, setContent] = useState("");
     const navigate = useNavigate();
 
-    if (!auth.authorized) {
-        navigate(`/login?r=/file/${fileid}/content`);
-    }
 
     useEffect(() => {
         getFileContent(fileid, auth.token).then(
