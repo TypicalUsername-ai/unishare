@@ -4,6 +4,7 @@ import { Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import Header from '../components/Header';
 import uploadFile from '../functions/uploadFile';
+import ProgressBar from '../components/ProgressBar';
 
 const UploadPage = ({ onSave, file = {} }) => {
 
@@ -16,6 +17,8 @@ const UploadPage = ({ onSave, file = {} }) => {
     const token = useSelector((state) => state.token.token);
     const authorized = useSelector((state) => state.token.authorized);
     const id = useSelector((state) => state.user.id);
+
+    let [progress, setProgress] = useState(0);
 
     const validateData = () => {
         let errors = {};
@@ -53,6 +56,16 @@ const UploadPage = ({ onSave, file = {} }) => {
         const { name, value } = event.target;
         setFileData((prevData) => ({ ...prevData, [name]: value }));
     };
+
+    const moveProgressTo = (val) => {
+        console.log("called moveProgress")
+        while (progress < val) {
+            if (progress >= 100) break;
+            setTimeout(() => {
+                setProgress(progress+1)
+            }, "10")
+        }
+    }
 
     const handleSave = async () => {
         const errors = validateData();
@@ -104,17 +117,24 @@ const UploadPage = ({ onSave, file = {} }) => {
 
             <input type='file'
                 name="content"
-                onChange={(e) => setFileData((prevData) => ({ ...prevData, content: e.target.files[0] }))}
+                onChange={(e) => {
+                    setFileData((prevData) => ({ ...prevData, content: e.target.files[0] }));
+                    setProgress(25);
+                }}
                 accept='.md, .tex, .txt'
             />
 
 
-
+            <div>
+                <p> upload progress </p>
+                <ProgressBar completed={progress} bgcolor="black"/>
+            </div>
 
             <button className='TopPageButton' style={{ width: "135px", height: "45px", backgroundColor: 'white', margin: '10px', borderRadius: '50px', textAlign: 'center' }}
                 onClick={handleSave}>
                 Send
             </button>
+
 
         </div>
     );
