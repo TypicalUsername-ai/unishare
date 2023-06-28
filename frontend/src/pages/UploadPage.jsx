@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import Header from '../components/Header';
 import uploadFile from '../functions/uploadFile';
 import ProgressBar from '../components/ProgressBar';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
 
 const UploadPage = ({ onSave, file = {} }) => {
 
@@ -81,12 +81,15 @@ const UploadPage = ({ onSave, file = {} }) => {
             (value) => reqData.append(value[0], value[1])
         )
         console.log(reqData);
+        setProgress(80)
         uploadFile(reqData, token).then(
             (r) => {
-                alert("File uploaded successfuly!")
+                setProgress(100)
                 setTimeout(
-                    () => navigate("/notes")
-                )
+                    () => {
+                        alert("File uploaded successfuly!")
+                        navigate("/notes")
+                    }, "2500")
             },
             (err) => alert(err)
         )
