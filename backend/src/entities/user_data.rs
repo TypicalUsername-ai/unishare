@@ -1,8 +1,8 @@
 use diesel::{PgConnection, Queryable, prelude::*};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
-use super::{error::UnishareError, file::File, user_auth::UserAuth, transaction::{Transaction, TransactionType}};
-use crate::schema::{users_data, users, files_data};
+use super::{error::UnishareError, file::File, user_auth::UserAuth, transaction::{Transaction, TransactionType}, file_review::FileReview};
+use crate::schema::{users_data, users, files_data, file_reviews};
 
 #[derive(Debug, Serialize, Deserialize, Queryable)]
 #[diesel(table_name = users_data)]
@@ -126,6 +126,21 @@ impl User {
         .load::<File>(db_conn)
         .optional()?;
         Ok(files.unwrap())
+    }
+
+    /// Check if user can add a review
+    pub async fn can_review_file(&self, file_id: Uuid, db_conn: &mut PgConnection) -> Result<bool, UnishareError> {
+        let is_owner = Transaction::user_owns_file(file_id.clone(), self.id.clone(), db_conn).await?;
+        if is_owner {
+            Ok(false)
+        } else {
+            let user_file_review_opt = FileReview::by_user_file(self.id.clone(), file_id.clone(), db_conn).await?;
+            if let Some(review) = user_file_review_opt {
+                Ok(false)
+            } else {
+                Ok(true)
+            }
+        }
     }
 
     /// Changes token balance of both buyer and seller after a transaction to buy access to the file
