@@ -63,7 +63,7 @@ async fn accept_report(auth: BearerAuth, path: web::Path<Uuid>, pool: web::Data<
     let accepted = Report::accept(report_id, &mut db_conn).await?;
     let reporter = User::by_uuid(accepted.reporter_id.clone(), &mut db_conn).await?;
 
-    let email_body;
+    let mut email_body = "".to_owned();
     if accepted.object_type == ObjectType::USER.to_i32() {
         email_body = format!("You were banned in the Unishare app for the reason:\n{}",accepted.reason.clone()).to_owned();
     } else if accepted.object_type == ObjectType::FILE.to_i32() {

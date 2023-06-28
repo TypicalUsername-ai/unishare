@@ -21,7 +21,7 @@ services:
     environment:
       - DATABASE_URL=postgres://unishare_root:ss2023_unishare@unishare_db:5432/unishare
       - HASH_SALT=VW5Jc0hhUmU
-      - APP_MAIL=unishareapp@hotmail.com
+      - APP_MAIL=unishare_app@hotmail.com
       - MAIL_PASSWORD=ss2023_unishare
       - HOSTNAME=http://localhost
     expose: 
