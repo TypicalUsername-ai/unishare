@@ -1,3 +1,4 @@
+use base64::display;
 use serde::{Serialize, Deserialize};
 use derive_more::{Display, Error};
 use actix_web::{error, HttpResponse, http::StatusCode};
@@ -15,7 +16,9 @@ pub enum UnishareError {
     #[display(fmt = "Internal Database Error ({})", reason)]
     DatabaseError{ reason: String },
     #[display(fmt = "Requested resource doesn't exist ({})", resource)]
-    ResourceNotFound{ resource: String }
+    ResourceNotFound{ resource: String },
+    #[display(fmt = "Invalid action ({})", action)]
+    InvalidAction{ action: String }
 }
 
 impl error::ResponseError for UnishareError {
@@ -31,6 +34,7 @@ impl error::ResponseError for UnishareError {
             UnishareError::BadCredentials => StatusCode::UNAUTHORIZED,
             UnishareError::DatabaseError{reason} => StatusCode::INTERNAL_SERVER_ERROR,
             UnishareError::ResourceNotFound { resource } => StatusCode::NOT_FOUND,
+            UnishareError::InvalidAction { action } => StatusCode::BAD_REQUEST,
         }
     }
 }
