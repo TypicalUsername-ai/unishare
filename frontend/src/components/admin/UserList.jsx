@@ -1,42 +1,51 @@
+import { useState } from "react";
 import ReportedUser from "../User/ReportedUser";
 
 const UserList = ({ data }) => {
 
+    const [filteredData, setFilteredData] = useState(data);
+    const [search, setSearch] = useState(""); 
+    const [option, setOption] = useState("");
 
-    function sorting({ sort }) {
-        switch (sort) {
-            case 'number-of-reports':
-                users.sort(sortMethods.descending);
-                break;
-            case "type1":
-                const UsersType1 = reports.filter((users) => users.tag === "type1");
-                setReports(UsersType1);
-                break;
-            case "type2":
-                    const UsersType2 = reports.filter((users) => users.tag === "type2");
-                    setReports(UsersType2);
-                    break;
-        }
+    const handleFilter = () => {
+        let newData = data.filter(
+            (entry) => entry.category == option
+        )
+        setFilteredData(newData)
 
+        let searchData = newData.filter(
+                (entry) => entry.name == search 
+        )
+        
+        if (search != ""){
+            setFilteredData(searchData);
+        } 
+        console.log(newData); 
+        console.log(searchData); 
+    }
+    
+    const handleInput = (event) => {
+        setSearch(event.value);
     }
 
-    const sortMethods = {
-        none: { method: (a, b) => null },
-        descending: { method: (a, b) => (a > b ? -1 : 1) }
-    }
-
+    const handleOption = (event) => {
+        setOption(event.value);
+    } 
 
 
     return (
         <div style={{ padding: "20px", background: "#ADD8E6" }}>
             <h3>Reported Users</h3>
             <div>
-                <select name="sort">
-                    <option value="type1">type1</option>
-                    <option value="type2">type2</option>
-                    <option value="type3">type3</option>
-                    <option value="type4">type4</option>
+                <input type="text" onClick={handleInput}></input>
+                <select name="sort" onClick={handleOption}>
+                    <option value="file-id">Inapropriate Language</option>
+                    <option value="bullying">Bullying</option>
+                    <option value="photos">Inapropriate Photos</option>
+                    <option value="other">Other</option>
+
                 </select>
+                <button onClick={handleFilter}>Search</button>
             </div>
 
             {data.map(

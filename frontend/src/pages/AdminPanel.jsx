@@ -25,7 +25,7 @@ export default function AdminPanel(){
 
     return(
         <div style={{width:"100%"}}>
-                {!auth.authorized ? <Navigate to="/login?r=admin-panel" /> : null}
+                 {!auth.authorized ? <Navigate to="/login?r=admin-panel" /> : null}
                 <Header/>
                 <h1>Welcome Admin</h1>
                 <section style={{display:"flex", width:"100%"}}>

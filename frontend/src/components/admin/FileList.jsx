@@ -3,33 +3,6 @@ import ReportedFile from "./ReportedFile";
 
 const FileList = ({ data }) => {
 
-    function sorting ({sort}) {
-        switch(sort){
-            case 'number-of-reports':
-                users.sort(sortMethods.descending);
-                break;
-            case "type1":
-                const UsersType1 = reports.filter((users) => users.tag === "type1");
-                setReports(UsersType1);
-                break;
-            case "type2":
-                    const UsersType2 = reports.filter((users) => users.tag === "type2");
-                    setReports(UsersType2);
-                    break;
-        }
-
-    }
-
-    const [filteredData, setFilteredData] = useState(data);
-
-    const handleFilter = () => {
-        let newData = data.filter(
-            (entry) => entry.category == input
-        )
-
-        setFilteredData(newData)
-    }
-
     return (
         <div style={{padding:"20px", background:"#ADD8E6"}}>
             <h3>Reported Files</h3>
@@ -37,8 +10,10 @@ const FileList = ({ data }) => {
                 Type of file
             <input></input>
             <select name="sort">
-                <option value="filename">File name</option>
-                <option value="tag">File tag</option>
+                    <option value="file-id">Inapropriate Language</option>
+                    <option value="bullying">Bullying</option>
+                    <option value="photos">Inapropriate Photos</option>
+                    <option value="other">Other</option>
             </select>
             </div>
             {data.map(

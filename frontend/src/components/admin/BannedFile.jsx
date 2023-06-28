@@ -1,5 +1,5 @@
 
-const  BannedFile = ({ id, reason, tag, }) => {
+const  BannedFile = ({ id, reason, tag, adminName }) => {
 
     return (
         <div>
@@ -15,7 +15,7 @@ const  BannedFile = ({ id, reason, tag, }) => {
                 <h3>Name of admin</h3>
                 <p style={{marginTop: "20px", marginLeft: "20px"}}>{adminName}</p>
                 <h3>Date and Time of ban</h3>
-                <p style={{marginTop: "20px", marginLeft: "20px"}}>{dateTime}</p>
+                <p style={{marginTop: "20px", marginLeft: "20px"}}></p>
                 <button className='seeMore'>Details</button>
                
     

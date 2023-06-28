@@ -1,9 +1,9 @@
-import deleteUser from "../../functions/deleteUser";
 import { useNavigate } from 'react-router-dom';
-import BanButton from "../admin/banButton.jsx";
+import DeleteUserButton from "./DeleteUserButton";
 import { useEffect, useState } from "react";
 import { useSelector } from 'react-redux'
 import getProfile from '../../functions/getProfile'
+import RejectReport from "./RejectReport";
 
 
 const ReportedUser = ({ id, reporter_id, reason }) =>{
@@ -39,10 +39,14 @@ const ReportedUser = ({ id, reporter_id, reason }) =>{
                 </section>
                 <button onClick={handleClick} className='seeMore'>Details</button>
                
-                <BanButton
-                id={id}
-                token={token}
-                ></BanButton>
+                <DeleteUserButton
+                     id = {id}
+                     token = {token}
+                />
+                <RejectReport
+                    id = {id}
+                    token = {token}
+                />
             </section>
         </div>
     );

@@ -4,6 +4,8 @@ import BanButton from "../admin/banButton.jsx";
 import { useSelector } from 'react-redux'
 import getFile from '../../functions/getFile.js'
 import getProfile from '../../functions/getProfile.js'
+import DeleteUserButton from '../User/DeleteUserButton.jsx';
+import RejectReport from '../User/RejectReport.jsx';
 
 const ReportedFile = ({ fileid, reporter_id, reason, report_id}) => {
     const navigate = useNavigate();
@@ -50,10 +52,15 @@ const ReportedFile = ({ fileid, reporter_id, reason, report_id}) => {
                 </section>
                 <h3 style={{ marginBottom: "8px" }}>{reason}</h3>
                 <button onClick={handleClick} className='seeMore'>Details</button>
-                <BanButton
-                id={report_id}
-                token={token}
-                ></BanButton>
+                <DeleteUserButton
+                     id = {fileid}
+                     token = {token}
+                />
+                <RejectReport
+                    id = {fileid}
+                    token = {token}
+                />
+                
             </section>
         </div>
     );

@@ -1,11 +1,17 @@
 import * as Popover from '@radix-ui/react-popover';
 import { MixerHorizontalIcon, Cross2Icon } from '@radix-ui/react-icons';
 import report from '../../functions/report';
+import { useState } from 'react';
 
+function ReportButton (id, token) { 
 
+  const [option, setOption] = useState("");
+ 
+  const handleOption = (event) => {
+    setOption(event.target.value);
+    } 
 
-
-const ReportButton = (props) => (
+  return( 
   <Popover.Root>
     <Popover.Trigger asChild>
       <button className='seeMore' aria-label="Update dimensions">
@@ -26,15 +32,16 @@ const ReportButton = (props) => (
           </fieldset>
           <fieldset>
             <label>Tag</label>
-            <select name="report">
-                    <option value="example">example</option>
-                    <option value="example1">example1</option>
-                    <option value="example2">example2</option>
-                    <option value="example3">example3</option>
+            <select name="report" onClick={handleOption}>
+                    <option value="file-id">Inapropriate Language</option>
+                    <option value="bullying">Bullying</option>
+                    <option value="photos">Inapropriate Photos</option>
+                    <option value="other">Other</option>
+                    
                 </select>
           </fieldset>
           <fieldset>
-            <button onClick={() => report(props.id, props.token)}>Report User</button>
+            <button onClick={() => report({id, object_type, option}, token)}>Report User</button>
           </fieldset>
         </div>
         <Popover.Close className="PopoverClose" aria-label="Close">
@@ -44,6 +51,7 @@ const ReportButton = (props) => (
       </Popover.Content>
     </Popover.Portal>
   </Popover.Root>
-);
+  );
+};
 
 export default ReportButton;

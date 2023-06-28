@@ -1,6 +1,6 @@
 import * as Popover from '@radix-ui/react-popover';
 import { MixerHorizontalIcon, Cross2Icon } from '@radix-ui/react-icons';
-
+import { useState } from 'react';
 import banUser from '../../functions/banUser';
 import DeleteUserButton from '../User/DeleteUserButton';
 
