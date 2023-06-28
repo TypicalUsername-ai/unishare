@@ -24,6 +24,9 @@ function NavMenu() {
 					<button className='NavigationMenuLink' onClick={() => nav("/notes")}> My Notes </button>
 				</NavigationMenu.Item>
 				<NavigationMenu.Item className='NavigationMenuItem'>
+					<button className='NavigationMenuLink' onClick={() => nav("/ratings")}> My Ratings </button>
+				</NavigationMenu.Item>
+				<NavigationMenu.Item className='NavigationMenuItem'>
 					<button className='NavigationMenuLink' onClick={() => nav("/upload")}> Upload </button>
 				</NavigationMenu.Item>
 				<NavigationMenu.Item className='NavigationMenuItem'>
