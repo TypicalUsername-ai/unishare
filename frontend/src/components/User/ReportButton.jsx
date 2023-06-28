@@ -15,14 +15,14 @@ function ReportButton (id, token) {
   <Popover.Root>
     <Popover.Trigger asChild>
       <button className='seeMore' aria-label="Update dimensions">
-        {props.headline}
+    
       </button>
     </Popover.Trigger>
     <Popover.Portal>
       <Popover.Content sideOffset={5}>
         <div style={{ display: 'flex', backgroundColor:"white", flexDirection: 'column', gap: 10 }}>
           <p style={{ marginBottom: 10 }}>
-            {props.headline2}
+        
           </p>
           <fieldset >
             <label htmlFor="width" style={{position:"relative", bottom:"40%", padding:"10px"}}>

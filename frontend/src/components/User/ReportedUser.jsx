@@ -2,8 +2,9 @@ import { useNavigate } from 'react-router-dom';
 import DeleteUserButton from "./DeleteUserButton";
 import { useEffect, useState } from "react";
 import { useSelector } from 'react-redux'
-import getProfile from '../../functions/getProfile'
-import RejectReport from "./RejectReport";
+import rejectReport from '../../functions/rejectReport';
+import acceptReport from '../../functions/acceptReport';
+import getProfile from '../../functions/getProfile';
 
 
 const ReportedUser = ({ id, reporter_id, reason }) =>{
@@ -24,6 +25,8 @@ const ReportedUser = ({ id, reporter_id, reason }) =>{
         getProfile(reporter_id, token).then(
             (data) => setReporter(data.username)
         )
+        console.log(id)
+        console.log(token)
     }, [])
 
     //Send email with information about actions taken against the user 
@@ -39,14 +42,8 @@ const ReportedUser = ({ id, reporter_id, reason }) =>{
                 </section>
                 <button onClick={handleClick} className='seeMore'>Details</button>
                
-                <DeleteUserButton
-                     id = {id}
-                     token = {token}
-                />
-                <RejectReport
-                    id = {id}
-                    token = {token}
-                />
+                <button onClick={acceptReport(id, token)} className='seeMore' >Accept</button>
+                <button onClick={rejectReport(id, token)} className='seeMore' >Decline</button>
             </section>
         </div>
     );

@@ -9,17 +9,18 @@ const UserList = ({ data }) => {
 
     const handleFilter = () => {
         let newData = data.filter(
-            (entry) => entry.category == option
+            (entry) => entry.reason == option
         )
         setFilteredData(newData)
-
+        
         let searchData = newData.filter(
-                (entry) => entry.name == search 
+                (entry) => entry.id == search 
         )
         
         if (search != ""){
             setFilteredData(searchData);
         } 
+        
         console.log(newData); 
         console.log(searchData); 
     }
@@ -39,7 +40,7 @@ const UserList = ({ data }) => {
             <div>
                 <input type="text" onClick={handleInput}></input>
                 <select name="sort" onClick={handleOption}>
-                    <option value="file-id">Inapropriate Language</option>
+                    <option value="language">Inapropriate Language</option>
                     <option value="bullying">Bullying</option>
                     <option value="photos">Inapropriate Photos</option>
                     <option value="other">Other</option>
