@@ -1,10 +1,10 @@
 import Field from '../components/field';
 import React, { useState } from "react";
-import { Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import Header from '../components/Header';
 import uploadFile from '../functions/uploadFile';
 import ProgressBar from '../components/ProgressBar';
+import { useNavigate } from 'react-router-dom';
 
 const UploadPage = ({ onSave, file = {} }) => {
 
@@ -17,6 +17,7 @@ const UploadPage = ({ onSave, file = {} }) => {
     const token = useSelector((state) => state.token.token);
     const authorized = useSelector((state) => state.token.authorized);
     const id = useSelector((state) => state.user.id);
+    const navigate = useNavigate();
 
     let [progress, setProgress] = useState(0);
 
@@ -81,9 +82,14 @@ const UploadPage = ({ onSave, file = {} }) => {
         )
         console.log(reqData);
         uploadFile(reqData, token).then(
-            (r) => console.log(r)
+            (r) => {
+                alert("File uploaded successfuly!")
+                setTimeout(
+                    () => navigate("/notes")
+                )
+            },
+            (err) => alert(err)
         )
-        alert("File uploaded successfuly!");
         //onSave(FileData);
 
     }
