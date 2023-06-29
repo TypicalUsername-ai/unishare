@@ -1,19 +1,25 @@
 import { useState } from "react";
 import ReportedFile from "./ReportedFile";
 
-const FileList = ({ data }) => {
+const FileList = ({ data = [] }) => {
 
     return (
         <div style={{padding:"20px", background:"#ADD8E6"}}>
             <h3>Reported Files</h3>
             <div>
-                Type of file
-            <input></input>
-            <select name="sort">
-                    <option value="file-id">Inapropriate Language</option>
-                    <option value="bullying">Bullying</option>
-                    <option value="photos">Inapropriate Photos</option>
-                    <option value="other">Other</option>
+                <p> File Id </p>
+            <select name="reporter" selected="none">
+                <option value="none"> None </option>
+                {data.map((entry) => {
+                    <option value={entry.reporter_id}>{entry.reporter_id}</option>
+                })}
+            </select>
+                <p> Reason </p>
+            <select name="reason">
+                <option> None </option>
+                {data.map((entry) => {
+                    <option value={entry.reason}>{entry.reason}</option>
+                })}
             </select>
             </div>
             {data.map(

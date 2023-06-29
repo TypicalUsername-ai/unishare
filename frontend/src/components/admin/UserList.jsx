@@ -1,7 +1,7 @@
 import { useState } from "react";
 import ReportedUser from "../User/ReportedUser";
 
-const UserList = ({ data }) => {
+const UserList = ({ data = []}) => {
 
     const [filteredData, setFilteredData] = useState(data);
     const [search, setSearch] = useState(""); 
@@ -38,15 +38,20 @@ const UserList = ({ data }) => {
         <div style={{ padding: "20px", background: "#ADD8E6" }}>
             <h3>Reported Users</h3>
             <div>
-                <input type="text" onClick={handleInput}></input>
-                <select name="sort" onClick={handleOption}>
-                    <option value="language">Inapropriate Language</option>
-                    <option value="bullying">Bullying</option>
-                    <option value="photos">Inapropriate Photos</option>
-                    <option value="other">Other</option>
-
-                </select>
-                <button onClick={handleFilter}>Search</button>
+                <p> User Id </p>
+            <select name="userid">
+                <option> None </option>
+                {filteredData.map((entry) => {
+                    <option value={entry.object_id}>{entry.object_id}</option>
+                })}
+            </select>
+                <p> Reason </p>
+            <select name="reason">
+                <option> None </option>
+                {filteredData.map((entry) => {
+                    <option value={entry.reason}>{entry.reason}</option>
+                })}
+            </select>
             </div>
 
             {data.map(
