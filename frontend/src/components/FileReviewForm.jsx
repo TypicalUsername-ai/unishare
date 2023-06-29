@@ -41,7 +41,10 @@ const FileReviewForm = () => {
                 setPopupOpen(false);
             },
             (err) => {
-                alert("Error submitting review" + err)
+                alert("Error submitting review" + err);
+                setReviewText('');
+                setRating(0);
+                setPopupOpen(false);
             }
         )
 

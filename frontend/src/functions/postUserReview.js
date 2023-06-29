@@ -3,15 +3,16 @@ async function postUserReview(rating, reviewText, user_id, token) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${authToken}`
+            'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
-            review: rating,
+            rating: rating,
             comment: reviewText
         })
     });
 
     if (!response.ok) { throw new Error(await response.text()) }
+    if (response.status === 208) { throw new Error("You already submitted review for that!")}
     return await response.json()
 }
 

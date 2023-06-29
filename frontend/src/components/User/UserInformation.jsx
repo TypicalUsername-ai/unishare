@@ -7,9 +7,8 @@ import getProfile from '../../functions/getProfile';
 import delUser from '../../functions/delUser';
 import reportUser from '../../functions/reportUser';
 
-function UserInformation(props) {
+function UserInformation({ id }) {
     const navigate = useNavigate();
-    const id = props.id;
     const auth = useSelector((state) => state.token);
 
     const [user, setUser] = useState(null);

@@ -5,14 +5,12 @@ import { useLocation } from 'react-router-dom';
 import postUserReview from '../../functions/postUserReview';
 
 
-const UserReviewForm = () => {
+const UserReviewForm = ({ id }) => {
     const [isPopupOpen, setPopupOpen] = useState(false);
     const [reviewText, setReviewText] = useState('');
     const [rating, setRating] = useState(0);
-    const { params } = useParams();
     const authToken = useSelector((state) => state.token.token);
     const authorized = useSelector((state) => state.token.authorized);
-    const userId = useSelector((state) => state.user.id);
 
 
 
@@ -33,7 +31,7 @@ const UserReviewForm = () => {
         /// api to give and recive tokens, dunno what params are here so...
         event.preventDefault();
 
-        postUserReview(rating, reviewText, userId, authToken).then(
+        postUserReview(rating, reviewText, id, authToken).then(
             (ok_res) => {
                 alert("Review submitted succesfully");
                 setReviewText('');
@@ -41,7 +39,10 @@ const UserReviewForm = () => {
                 setPopupOpen(false);
             },
             (err) => {
-                alert("Error submitting review"+err)
+                alert("Error submitting review"+err);
+                setReviewText('');
+                setRating(0);
+                setPopupOpen(false);
             }
         )
 
