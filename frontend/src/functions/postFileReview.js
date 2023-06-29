@@ -6,7 +6,7 @@ async function postFileReview(rating, reviewText, file_id, token) {
             'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
-            rating: rating,
+            review: rating,
             comment: reviewText
         })
     });

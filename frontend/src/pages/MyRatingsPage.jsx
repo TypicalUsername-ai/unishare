@@ -4,6 +4,7 @@ import getMyReviews from '../functions/getMyReviews';
 import Header from '../components/Header'
 import { Navigate } from "react-router-dom";
 import ReviewCard from "../components/ReviewCard";
+import deleteReview from '../functions/deleteReview'
 
 const MyRatingsPage = () => {
 
@@ -17,6 +18,14 @@ const MyRatingsPage = () => {
             (data) => setData(data)
         )
     }, [user_id])
+
+    const handleDelete = (reviewed_id, type) => {
+        console.log({reviewed_id, type, user_id})
+        deleteReview(reviewed_id, type, user_id, auth.token).then(
+            (ok) => alert("delete succesful"),
+            (err) => alert("error deleting review " + err)
+        )
+    }
 
     return (
         <div>
@@ -32,18 +41,20 @@ const MyRatingsPage = () => {
                         rating={entry.review}
                         text={entry.comment}
                         />
+                        <button onClick={() => handleDelete(entry.reviewed_id, "files")}> delete review </button>
                     </div>
             )}
             <h3>Users:</h3>
             {data.users.map(
                 (entry) => 
-                    <div>
+                <div>
                         <ReviewCard
                         picture={null}
                         name={entry.reviewed_id}
                         rating={entry.review}
                         text={entry.comment}
                         />
+                        <button onClick={() => handleDelete(entry.reviewed_id, "users")}> delete review </button>
                     </div>
             )}
         </div>
