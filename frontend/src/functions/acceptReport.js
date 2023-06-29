@@ -10,7 +10,7 @@ export default async function acceptReport (id, token){
         console.log("Token accept Report" + token)
 
 
-    let text = "Are you sure you want to delete this account?";
+    let text = "Are you sure you want to delete this account? The data will be deleted and unrecoverable.";
     if (confirm(text) == true) {
         let response = await fetch(`http://localhost/api/reports/${id}/accept`, options)
         if (!response.ok) {throw new Error("Accept Report : " + response.status)}
