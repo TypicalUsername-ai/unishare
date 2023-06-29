@@ -11,9 +11,11 @@ import ExplorePage from './pages/ExplorePage'
 import FileOverviewPage from './pages/FileOverviewPage'
 import UploadPage from './pages/UploadPage'
 import ProfilePage from './pages/ProfilePage'
+import AdminPanel from './pages/AdminPanel'
 import LogoutPage from './pages/LogoutPage'
 import MyNotesPage from './pages/MyNotesPage'
 import FileContentPage from './pages/FileContentPage'
+
 
 const routes = [
 	{
@@ -73,6 +75,10 @@ const routes = [
 		element: <UploadPage />
 	},
 	{
+		path: "/admin-panel",
+		element: <AdminPanel />,
+  },
+  {
 		path: "/logout",
 		element: <LogoutPage/>
 	},
@@ -80,6 +86,7 @@ const routes = [
 		path: "/notes",
 		element: <MyNotesPage/>
 	}
+
 ]
 
 export default routes
