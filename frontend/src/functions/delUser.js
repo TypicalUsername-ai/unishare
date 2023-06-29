@@ -10,7 +10,7 @@ async function delUser(userId, authToken) {
         })
     });
 
-    let text = "Are you sure you want to delete this account?";
+    let text = "Are you sure you want to delete this account? The data will be deleted and unrecoverable.";
 
 
     if (confirm(text) == true){ 

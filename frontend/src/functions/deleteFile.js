@@ -6,7 +6,7 @@ export default async function deleteFile (id, token){
         }
     };
 
-    let text = "Are you sure you want to delete this file?";
+    let text = "Are you sure you want to delete this file? The data will be deleted and unrecoverable.";
 
     if (confirm(text) == true){ 
     let response = await fetch(`http://localhost/api/`, options)
