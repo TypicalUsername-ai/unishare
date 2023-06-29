@@ -15,6 +15,7 @@ import AdminPanel from './pages/AdminPanel'
 import LogoutPage from './pages/LogoutPage'
 import MyNotesPage from './pages/MyNotesPage'
 import FileContentPage from './pages/FileContentPage'
+import MyRatingsPage from './pages/MyRatingsPage'
 
 
 const routes = [
@@ -29,6 +30,10 @@ const routes = [
 	{
 		path: "/account",
 		element: <AccountPage />
+	},
+	{
+		path: "/ratings",
+		element: <MyRatingsPage />
 	},
 	{
 		path: "/register",

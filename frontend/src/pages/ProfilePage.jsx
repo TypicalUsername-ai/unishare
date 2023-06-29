@@ -7,6 +7,10 @@ import getUserReviews from '../functions/getUserReviews';
 import ReviewCard from '../components/ReviewCard'
 import Header from "../components/Header";
 import File from '../components/FileCard';
+import UserInformation from "../components/User/UserInformation";
+import UserFilesContainer from "../components/User/UserFilesContainer";
+import UserComments from "../components/User/UserComments";
+import UserReviewForm from "../components/User/UserReviewForm";
 
 const ProfilePage = () => {
     const { username } = useParams();
@@ -41,30 +45,10 @@ const ProfilePage = () => {
     return (
         <div>
             <Header/>
-            {JSON.stringify(userData)}
-            <button onClick={handleRatingAction}> Rate user </button>
-            {userReviews.map(
-                (review) => <ReviewCard
-                    picture={null}
-                    name={review.reviewer_id}
-                    text={review.comment}
-                    rating={review.review}
-                />
-            )}
-            {userFiles.map(
-                (file) => <File 
-                    username={file.creator} 
-                    fileid={file.id}
-                    picture={null}
-                    title={file.name}
-                    price={file.price}
-                    rating={file.rating}
-                    primaryTag={file.primaryTag}
-                    secondaryTag={file.secondaryTag}
-                    editStamp={file.last_edit}
-                    available={file.available}
-                />
-            )}
+			<UserInformation id={username}/>
+			<UserFilesContainer userid={username}/>
+			<UserComments id={username}/>
+			<UserReviewForm id={username}/>
         </div>
     )
 }

@@ -24,7 +24,7 @@ function AccountPage() {
 			<UserInformation id={id}/>
 			<UserFilesContainer userid={id}/>
 			<UserComments id={id}/>
-			<UserReviewForm />
+			<UserReviewForm id={id}/>
 
 		</div>
 	)

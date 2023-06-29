@@ -3,7 +3,7 @@ async function postFileReview(rating, reviewText, file_id, token) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${authToken}`
+            'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
             review: rating,
@@ -12,6 +12,7 @@ async function postFileReview(rating, reviewText, file_id, token) {
     });
 
     if (!response.ok) { throw new Error(await response.text()) }
+    if (response.status === 208) { throw new Error("You already submitted review for that!")}
     return await response.json()
 }
 

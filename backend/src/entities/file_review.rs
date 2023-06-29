@@ -12,8 +12,8 @@ use bigdecimal::{BigDecimal, ToPrimitive};
 #[derive(Debug, Serialize, Deserialize, Insertable, Queryable)]
 #[diesel(table_name = file_reviews)]
 pub struct FileReview {
-    pub reviewer_id: Uuid,
     pub file_id: Uuid,
+    pub reviewer_id: Uuid,
     pub review: i32,
     pub comment: Option<String>
 }
@@ -45,6 +45,14 @@ impl FileReview {
         let inserted_opt = insert_into(file_reviews::table).values(review).get_result::<FileReview>(db_conn)?;
 
         Ok(inserted_opt)
+    }
+
+    pub async fn by_author(user_id: Uuid, db_conn: &mut PgConnection) -> Result<Vec<FileReview>, UnishareError> {
+        let data = file_reviews::table
+            .filter(file_reviews::reviewer_id.eq(user_id))
+            .get_results::<FileReview>(db_conn)?;
+
+        Ok(data)
     }
 
     // Get average rating if the file

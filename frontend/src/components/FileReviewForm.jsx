@@ -41,7 +41,10 @@ const FileReviewForm = () => {
                 setPopupOpen(false);
             },
             (err) => {
-                alert("Error submitting review" + err)
+                alert("Error submitting review" + err);
+                setReviewText('');
+                setRating(0);
+                setPopupOpen(false);
             }
         )
 
@@ -60,7 +63,8 @@ const FileReviewForm = () => {
             <button onClick={handleButtonClick}>Add Review</button>
             {isPopupOpen && (
                 <div className="popup-container">
-                    <button onClick={() => setPopupOpen(false)}>close</button>
+                    <button style={{color : "black"}} onClick={() => setPopupOpen(false)}>close</button>
+                    <p style={{color : 'black'}}>Remember to be respectrful and follow Terms of Service</p>
                     <form onSubmit={handleSubmit} className="popup-form">
                         <textarea
                             value={reviewText}

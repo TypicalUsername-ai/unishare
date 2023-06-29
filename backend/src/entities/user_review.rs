@@ -9,8 +9,8 @@ use super::error::UnishareError;
 #[derive(Debug, Serialize, Deserialize, Insertable, Queryable)]
 #[diesel(table_name = user_reviews)]
 pub struct UserReview {
-    pub reviewer_id: Uuid,
     pub reviewed_id: Uuid,
+    pub reviewer_id: Uuid,
     pub review: i32,
     pub comment: Option<String>
 }
@@ -49,6 +49,14 @@ impl UserReview {
                 .and(user_reviews::comment.eq(self.comment.clone()))
             ).execute(db_conn)?;
         Ok(())
+    }
+
+    pub async fn by_author(user_id: Uuid, db_conn: &mut PgConnection) -> Result<Vec<UserReview>, UnishareError> {
+        let data = user_reviews::table
+            .filter(user_reviews::reviewer_id.eq(user_id))
+            .get_results::<UserReview>(db_conn)?;
+
+        Ok(data)
     }
 
 }
