@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import getProfile from '../functions/getProfile';
 import { useSelector } from 'react-redux';
+import reportUser from '../functions/reportUser'
 
 const ReviewCard = ({picture, name, text, rating}) => {
 
@@ -15,6 +16,13 @@ const ReviewCard = ({picture, name, text, rating}) => {
             (data) => setUser(data.username)
         )
     }, name)
+
+    const handleReport = () => {
+        reportUser(name, token, "comment: "+text).then(
+            (ok) => alert("user reported"),
+            (err) => alert("error submitting report " + err)
+        )
+    }
 
     return (
         <div style={{backgroundColor: "aliceblue", borderRadius: "50px", display: "inline-block", marginBottom: "20px"}}>
@@ -30,6 +38,7 @@ const ReviewCard = ({picture, name, text, rating}) => {
                     <p> rating {rating} stars</p>
                     <p style={{textAlign: "left"}}>{text}</p>
                 </div>
+                <button onClick={handleReport}> report </button>
                 
         </div>
     );

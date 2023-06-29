@@ -60,6 +60,8 @@ const UserReviewForm = ({ id }) => {
             <button onClick={handleButtonClick}>Add Review</button>
             {isPopupOpen && (
                 <div className="popup-container">
+                    <button style={{color : 'black'}} onClick={() => setPopupOpen(false)}>close</button>
+                    <p style={{color : 'black'}}>Remember to be respectrful and follow Terms of Service</p>
                     <form onSubmit={handleSubmit} className="popup-form">
                         <textarea
                             value={reviewText}
