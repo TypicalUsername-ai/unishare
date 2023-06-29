@@ -12,8 +12,8 @@ use bigdecimal::{BigDecimal, ToPrimitive};
 #[derive(Debug, Serialize, Deserialize, Insertable, Queryable)]
 #[diesel(table_name = file_reviews)]
 pub struct FileReview {
-    pub reviewer_id: Uuid,
     pub file_id: Uuid,
+    pub reviewer_id: Uuid,
     pub review: i32,
     pub comment: Option<String>
 }

@@ -31,26 +31,28 @@ const MyRatingsPage = () => {
         <div>
             {!auth.authorized ? <Navigate to="/login?r=/ratings"/> : null}
             <Header/>
-            <h3>Files:</h3>
+            <h4>Files:</h4>
             {data.files.map(
                 (entry) => 
                     <div>
+                        <h2> File : {entry.file_id}</h2>
                         <ReviewCard
                         picture={null}
-                        name={entry.reviewed_id}
+                        name={entry.reviewer_id}
                         rating={entry.review}
                         text={entry.comment}
                         />
                         <button onClick={() => handleDelete(entry.reviewed_id, "files")}> delete review </button>
                     </div>
             )}
-            <h3>Users:</h3>
+            <h4>Users:</h4>
             {data.users.map(
                 (entry) => 
                 <div>
+                        <h2> User : {entry.reviewed_id}</h2>
                         <ReviewCard
                         picture={null}
-                        name={entry.reviewed_id}
+                        name={entry.reviewer_id}
                         rating={entry.review}
                         text={entry.comment}
                         />
