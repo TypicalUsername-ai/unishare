@@ -10,8 +10,13 @@ async function delUser(userId, authToken) {
         })
     });
 
+    let text = "Are you sure you want to delete this account?";
+
+
+    if (confirm(text) == true){ 
     if (!response.ok) { throw new Error(await response.text()) }
     return await response.json()
+    }
 }
 
 export default delUser;
