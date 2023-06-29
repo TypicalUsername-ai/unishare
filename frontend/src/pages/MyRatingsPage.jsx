@@ -42,7 +42,7 @@ const MyRatingsPage = () => {
                         rating={entry.review}
                         text={entry.comment}
                         />
-                        <button onClick={() => handleDelete(entry.reviewed_id, "files")}> delete review </button>
+                        <button onClick={() => handleDelete(entry.file_id, "files")}> delete review </button>
                     </div>
             )}
             <h4>Users:</h4>
