@@ -145,10 +145,17 @@ struct Email {
 /// requires an `Email` structure of `{email : $email}` inthe json request body
 /// replies with http 202 on success
 #[post("/passwordreset")]
-async fn password_reset(payload: web::Json<Email>, pool: web::Data<ConnectionPool>) -> Result<impl Responder, UnishareError> {
+async fn password_reset(payload: web::Json<Email>, pool: web::Data<ConnectionPool>, mailer: web::Data<SmtpTransport>) -> Result<impl Responder, UnishareError> {
     let mut db_conn = pool.get()?;
-    // mailer functionality to send the reset password
-    warn!("Mailer unimplemented");
+    let link = format!("{}/api/newpassword", std::env!("HOSTNAME"));
+        let email = Message::builder()
+            .from(Mailbox::new(None, std::env!("APP_MAIL").parse::<Address>().expect("error parsing user email")))
+            .to(Mailbox::new(None, (payload.into_inner()).email.parse::<Address>().expect("error parsing user email")))
+            .subject("Password reset")
+            .body(String::from("Please click this link to reset your password in Unishare: ".to_owned() + &link)).expect("error creating email");
+        let result = mailer.send(&email);
+        warn!("{}", std::env!("APP_MAIL"));
+        warn!("mail send result {:?}", result);
     // invalidater all existing sessions
     let id_opt: Option<Uuid> = users::table.select(users::id).filter(users::user_email.eq(payload.email.clone())).first(&mut db_conn).optional()?;
 
